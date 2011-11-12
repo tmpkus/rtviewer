@@ -8,7 +8,7 @@
 #include <fstream>
 #include <string>
 
-#include "../include/improps.h"
+#include "improps.h"
 
 using namespace std;
 template<> configdata & configdata::operator=(float rhs)

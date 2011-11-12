@@ -7,7 +7,7 @@
 #include <iostream>
 #include <cstring>
 #include <cmath>
-#include "../include/LUT.h"
+#include "LUT.h"
 // reset all LUT data to 0
 template<typename T> void LUT<T>::clear(void) {
 	if (size > 0 && data)

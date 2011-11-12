@@ -1,5 +1,5 @@
-/*RT*/#include <glib.h>
-/*RT*/#include <glib/gstdio.h>
+/*RT*///#include <glib.h>
+/*RT*///#include <glib/gstdio.h>
 /*RT*/#undef MAX
 /*RT*/#undef MIN
 /*RT*/#undef ABS
