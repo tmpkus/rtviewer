@@ -3,13 +3,27 @@
 ################################################################################
 
 # Add inputs and outputs from these tool invocations to the build variables 
+
+
+ifneq ($(TARGET_PLATFORM),windows)
 CC_SRCS += \
 ../simplegui/DesktopTest.cc \
-../simplegui/X11viewport.cc \
+../simplegui/X11\X11viewport.cc
 
 OBJS += \
 ./simplegui/DesktopTest.o \
-./simplegui/X11viewport.o \
+./simplegui/X11/X11viewport.o	 
+else
+
+CC_SRCS += \
+../simplegui/DesktopTest.cc \
+../simplegui/DirectX/directdraw_viewport.cc
+	
+OBJS += \
+./simplegui/DesktopTest.o \
+../simplegui/DirectX/directdraw_viewport.o	
+endif
+
 
 CC_DEPS += 
 

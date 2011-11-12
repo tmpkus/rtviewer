@@ -18,7 +18,7 @@
  */
 
 // image formats etc.
-#include "image.h"
+#include "../imageformats/image.h"
 
 #define MINMAX3(a,b,c,min,max) \
 { \

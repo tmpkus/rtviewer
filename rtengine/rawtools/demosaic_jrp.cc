@@ -16,7 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with RTViewer.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "utils/LUT.h"
+#include "../utils/LUT.h"
 #include "fast_demo.h"
 
 static LUTf dirwt;

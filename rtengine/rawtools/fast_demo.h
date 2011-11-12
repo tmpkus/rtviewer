@@ -21,7 +21,7 @@
 #define FAST_DEMO_H_
 #include <iostream>
 #include "rawimagesource.h"
-#include "image.h"
+#include "../imageformats/image.h"
 
 // tile size
 #define TS 256

@@ -20,10 +20,10 @@
 #ifndef VIEWPORT_H_
 #define VIEWPORT_H_
 
-#include "../rtengine/image.h"
-#include "../rtengine/ImageRaw.h"
-#include "../rtengine/improps.h"
-#include "../rtengine/usm.h"
+#include "../rtengine/imageformats/image.h"
+#include "../rtengine/rawtools/ImageRaw.h"
+#include "../rtengine/processing/improps.h"
+#include "../rtengine/filters/usm.h"
 
 class viewport: public Image<argb8>
 {

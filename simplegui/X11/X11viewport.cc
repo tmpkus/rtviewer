@@ -25,7 +25,7 @@ extern "C" {
 #include <sys/shm.h>
 #include <limits.h>
 }
-#include "viewport.h"
+#include "../viewport.h"
 using namespace std;
 
 typedef struct {

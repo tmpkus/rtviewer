@@ -17,9 +17,9 @@
  *  along with RTViewer.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <typeinfo>
-#include "utils/logfile.h"
+#include "../utils/logfile.h"
 #include "image.h"
-#include "colorconversions.h"
+#include "../colormanagement/colorconversions.h"
 
 template<typename color> void Image<color>::set_pixel(int w, int h,
 		unsigned int c) // create new

@@ -19,7 +19,7 @@
 
 #include <cstddef>
 #include <math.h>
-#include "image.h"
+#include "../imageformats/image.h"
 #include <iostream>
 using namespace std;
 

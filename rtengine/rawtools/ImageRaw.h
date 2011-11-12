@@ -20,7 +20,7 @@
 #ifndef RAWIMAGE_H_
 #define RAWIMAGE_H_
 #include <string>
-#include "image.h"
+#include "../imageformats/image.h"
 
 class Image_Raw : public Image<rgbHDR>
 {

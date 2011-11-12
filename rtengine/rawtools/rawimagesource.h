@@ -24,7 +24,7 @@
 #include <lcms2.h>
 #endif
 
-#include "utils/array2D.h"
+#include "../utils/array2D.h"
 #include "rawimage.h"
 #define HR_SCALE 2
 

@@ -24,7 +24,7 @@
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#include "utils/LUT.h"
+#include "../utils/LUT.h"
 #include "fast_demo.h"
 
 static LUTf dirwt;
