@@ -80,7 +80,7 @@ int improps::read(int argc, char **argv)
 			cout << "file " << config_file << " and " << default_config
 					<< " not found\n";
 			return 0;
-		}
+		} else
 		{
 			char line[256];
 			istream is(&config_file_p);

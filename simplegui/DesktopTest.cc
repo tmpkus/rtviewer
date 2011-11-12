@@ -24,6 +24,7 @@ class desktop: public viewport {
 	volatile int dx, dy, px, py;
 	char * raw_to_load;
 	Image_Raw * MyRAW;
+	int pp3_found;
 public:
 	improps props;
 
@@ -33,6 +34,7 @@ public:
 		px = 0;
 		py = 0;
 		scale = 1;
+		if (pp3_found==0) return 0;
 		MyRAW = new Image_Raw(raw_to_load, props);
 		// this ensure same size as preview.
 		RawTile <<= *this;
@@ -152,7 +154,7 @@ public:
 			viewport(argv[1], width, height) {
 
 		// read pp3 file
-		props.read(argc, argv);
+		pp3_found = props.read(argc, argv);
 		// set name of raw file
 		raw_to_load = argv[1];
 	}
