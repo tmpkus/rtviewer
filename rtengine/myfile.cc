@@ -54,6 +54,8 @@ int munmap(void *start, size_t length)
 
 //extern "C" {
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
 //}
