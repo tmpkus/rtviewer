@@ -15,8 +15,8 @@
 #define IMAGE_H_
 #include <string>
 #include <math.h>
-#include "array2D.h"
-#include "LUT.h"
+#include "utils/array2D.h"
+#include "utils/LUT.h"
 #include "improps.h"
 
 class Lab {
