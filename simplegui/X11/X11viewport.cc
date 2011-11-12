@@ -126,7 +126,7 @@ viewport::viewport(char * newtitle, int newwidth, int newheight) {
 	/* Tell the server to report only keypress-related events */
 	XSelectInput(vp.Main_Display, vp.Main_Window, KeyPressMask | KeyReleaseMask
 			| PointerMotionMask | ButtonPressMask | ButtonReleaseMask
-			|StructureNotifyMask
+			|StructureNotifyMask // |ResizeRedirectMask
 	/*  Button1MotionMask |	 Button2MotionMask |	 Button3MotionMask */
 	);
 
@@ -283,12 +283,12 @@ int viewport::process_events(void) {
 			//printf(" received a close message\n");
 			return 0;
 			break;
-		case ResizeRequest:
+		case ConfigureNotify://ResizeRequest: //VisibilityNotify:
 			resize=1;
+			cout << "resize" << endl;
 			break;
 		default:
-			logmsg(" received unknown event type: 0x%08x\n",xevent.type)
-			;
+			cout << " received unknown event type: "<< (int) xevent.type << endl;
 			break;
 		}
 	}

@@ -28,7 +28,7 @@
 class desktop: public viewport {
 	HDRImage RawTile;
 	LabImage baseim;
-	LabImage workim;
+
 	Image<rgbHDR> tempim;
 	volatile int moved, scale, do_filter;
 	volatile int dx, dy, px, py;
@@ -57,8 +57,7 @@ public:
 
 		moved = START_MOVE + 1;
 		do_filter = 0;
-		std::cout << "size x=" << workim.xsize() << " y=" << workim.ysize()
-				<< "\n";
+
 		// window refreshrate is 50Hz
 		usec_delay = 20000;
 		return 1;
@@ -92,17 +91,18 @@ public:
 	}
 
 	int render(int input) {
-		if ((moved == 0)&&(resize==0))
+		if (resize==1)
+		{
+
+			moved=START_MOVE;
+		}
+		resize=0;
+		if (moved == 0)
 		{
 			usec_delay = 30000;
 			return 0;
 		}
 		usec_delay = 10000;
-		if (resize==1)
-		{
-			resize=0;
-			moved=START_MOVE;
-		}
 		//
 		if (do_filter && moved == 1) {
 			// update offset
@@ -116,7 +116,7 @@ public:
 
 			// set offset to 0,0
 			RawTile.moveto(0, 0);
-
+			LabImage workim;
 			// convert to Lab
 			workim <<= RawTile;
 			// set offset to 0,0
@@ -160,7 +160,7 @@ public:
 				*this <<= RawTile;
 			}
 		}
-		moved--;
+		if (moved>0) moved--;
 		return 1;
 	}
 
