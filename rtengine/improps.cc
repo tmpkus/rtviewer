@@ -61,7 +61,7 @@ int improps::read(int argc, char **argv)
 		string default_config,config_file;
 		filebuf	config_file_p;
 		default_config=getenv ("HOME");
-		default_config+="/.config/RawTherapeeAlpha/profiles/newdefault.pp3";
+		default_config+="/.config/RawTherapeeAlpha/profiles/default.pp3";
 		config_file=argv[1];
 		config_file+=".pp3";
 
