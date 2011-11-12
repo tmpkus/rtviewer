@@ -41,6 +41,6 @@ CC_DEPS +=
 rtengine/%.o: ./rtengine/%.cc
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -I /usr/include/glib-2.0/ -O3 -fopenmp -march=native -msse4 -mfpmath=sse -ffast-math -Wall -c -fmessage-length=0 -o"$@" "$<"
+	g++ -O3 -fopenmp -march=native -msse4 -mfpmath=sse -ffast-math -Wall -c -fmessage-length=0 -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
