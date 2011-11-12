@@ -35,60 +35,9 @@ static LUTf dirwt;
 #define SDIFF(a , b) (0.0001f/(0.0001f+(a-b)*(a-b)))
 #define CDIFF(a , b) (adjust/(adjust+(a-b)*(a-b)))
 #define CLIP( x ) (x)
-//(((x)<0.0f)?0.0f:(((x)>(float)maximum)?(float)maximum:(x)))
-//static void __attribute__((constructor)) setup_dirwt()
-//{
-//	dirwt(0x10000);
-//	//set up directional weight function
-//	for (int i=0; i<0x10000; i++)
-//		dirwt[i] = 1.0f/SQR(1.0f+(float)i);
-//}
-
-/*
- static void __attribute__((destructor)) cleanup_dirwt()
- {
- delete [] dirwt;
- }
- */
-static inline void NDir(float p0, float p1, float p2, float p3, float p4, float p5, float p6, float p7, float p8,
-		float & med)
-{
-	double sum = 0.0f, avg = 0.0f;
-	float w;
-	w = DDIFF(p4,p0);
-	sum += w;
-	avg += w * p0;
-	w = DDIFF(p4,p1);
-	sum += w;
-	avg += w * p1;
-	w = DDIFF(p4,p2);
-	sum += w;
-	avg += w * p2;
-	w = DDIFF(p4,p3);
-	sum += w;
-	avg += w * p3;
-	w = DDIFF(p4,p5);
-	sum += w;
-	avg += w * p5;
-	w = DDIFF(p4,p4);
-	sum += w;
-	avg += w * p4;
-	w = DDIFF(p4,p6);
-	sum += w;
-	avg += w * p6;
-	w = DDIFF(p4,p7);
-	sum += w;
-	avg += w * p7;
-	w = DDIFF(p4,p8);
-	sum += w;
-	avg += w * p8;
-	med = avg / sum;
-	//med=(p4+avg)*0.5f;
-}
 
 void fast_demosaic::improve_correlation(HDRImage & pass1, HDRImage& pass2, float gadjust, float ladjust, int green)
 {
-	//int W=pass1.xsize(),H=pass1.ysize();
 	// improve green intensity correlations
 #pragma omp parallel for
 	for ( unsigned int y = 4 ; y < (H - 4) ; y++ )
@@ -196,7 +145,7 @@ void fast_demosaic::color_correct(HDRImage & pass1, HDRImage& pass2)
 #endif
 		}
 }
-// = 0.0001f; //*range;= 0.05f; //*range;
+
 #define HAVG(y,x) (0.25*(hint[y-1][x-1]+hint[y-1][x]+hint[y][x-1]+hint[y][x]))
 #define HINT(y,x) (hint[y-1][x-1]-HAVG(y-1,x-1)+hint[y][x]-HAVG(y+1,x+1) + )
 
@@ -205,17 +154,7 @@ void fast_demosaic::naive(HDRImage & dst, array2D<float> &hint, float adjust, fl
 	array2D<float> raw(W, H);
 	int rot = (get_rotateDegree() / 90) & 3;
 	HDRImage phase2(W, H);
-	//float mr = channel_mul[0]*pow(2.0, props.expcomp+1.0f); ///range;
-	//float mg = channel_mul[1]*pow(2.0, props.expcomp+1.0f); ///range;
-	//float mb = channel_mul[2]*pow(2.0, props.expcomp+1.0f); ///range;
-	//float r_black = cblack[0];//+black;
-	//float g_black = cblack[1];//+black;
-	//float b_black = cblack[2];//+black;
 
-	//float blacklevel = 0.0f; //black;
-	//float adj_black = black;
-	//float adj_range[3];
-	//for (int c=0;c<3;c++) adj_range[c]=range;//(get_white()-cblack[c] );
 // convert raw to proper colors
 
 	int max[3] = { 0, 0, 0 };
@@ -330,21 +269,8 @@ void fast_demosaic::naive(HDRImage & dst, array2D<float> &hint, float adjust, fl
 						av+=5.0f*(0.25f*(n+w+e+s)  + 0.25f*(col-0.25f*(cn+cw+ce+cs)));
 						sum+=5.0f;
 
-						g = av/sum;//0.25f*(n+w+e+s)  + 0.25f*(col-0.25f*(cn+cw+ce+cs));//  av/sum;//(col + adjust) * 0.25f * (n / cn + w / cw + e / ce + s / cs);
+						g = av/sum;
 
-						/*
-						 float sum = col/(col + raw[y - 2][x]); // LDIFF(col,raw[y - 2][x]);// *
-						 float f = n * sum;
-						 float t =col/(col + raw[y][x - 2]);// LDIFF(col,raw[y][x-2]);//(col + raw[y][x - 2]);// *
-						 f += w * t;
-						 sum += t;
-						 t = LDIFF(col,raw[y][x+2]);//(col + raw[y][x + 2]);// *
-						 f += e * t;
-						 sum += t;
-						 t = LDIFF(col,raw[y + 2][x]);//(col + raw[y + 2][x]);// *
-						 f += s * t;
-						 sum += t;
-						 g = (f / sum);*/
 						float v = 0.25f*(nw + ne + sw + se ) + 0.25f*(g-0.25f*(n+s+e+w));
 
 						if (FC(y, x) == 0) {
@@ -361,30 +287,28 @@ void fast_demosaic::naive(HDRImage & dst, array2D<float> &hint, float adjust, fl
 
 
 					switch (rot)
-													{
-													case 0:
-														RGB_converted[y][x].r = r > 0.0f ? r : 0.0f;
-														RGB_converted[y][x].g = g > 0.0f ? g : 0.0f;
-														RGB_converted[y][x].b = b > 0.0f ? b : 0.0f;
-														break;
-													case 1:
-														RGB_converted[x][my - y].r = r > 0.0f ? r : 0.0f;
-														RGB_converted[x][my - y].g = g > 0.0f ? g : 0.0f;
-														RGB_converted[x][my - y].b = b > 0.0f ? b : 0.0f;
-														break;
-													case 2:
-														RGB_converted[my - y][mx - x].r = r > 0.0f ? r : 0.0f;
-														RGB_converted[my - y][mx - x].g = g > 0.0f ? g : 0.0f;
-														RGB_converted[my - y][mx - x].b = b > 0.0f ? b : 0.0f;
-														break;
-
-													case 3:
-														RGB_converted[mx - x][y].r = r > 0.0f ? r : 0.0f;
-														RGB_converted[mx - x][y].g = g > 0.0f ? g : 0.0f;
-														RGB_converted[mx - x][y].b = b > 0.0f ? b : 0.0f;
-														break;
-													}					//float col = r;//0.2989f * r + 0.5870f * g + 0.1140f * b; //raw[y][x];
-
+					{
+						case 0:
+								RGB_converted[y][x].r = r > 0.0f ? r : 0.0f;
+								RGB_converted[y][x].g = g > 0.0f ? g : 0.0f;
+								RGB_converted[y][x].b = b > 0.0f ? b : 0.0f;
+								break;
+						case 1:
+								RGB_converted[x][my - y].r = r > 0.0f ? r : 0.0f;
+								RGB_converted[x][my - y].g = g > 0.0f ? g : 0.0f;
+								RGB_converted[x][my - y].b = b > 0.0f ? b : 0.0f;
+								break;
+						case 2:
+								RGB_converted[my - y][mx - x].r = r > 0.0f ? r : 0.0f;
+								RGB_converted[my - y][mx - x].g = g > 0.0f ? g : 0.0f;
+								RGB_converted[my - y][mx - x].b = b > 0.0f ? b : 0.0f;
+								break;
+						case 3:
+								RGB_converted[mx - x][y].r = r > 0.0f ? r : 0.0f;
+								RGB_converted[mx - x][y].g = g > 0.0f ? g : 0.0f;
+								RGB_converted[mx - x][y].b = b > 0.0f ? b : 0.0f;
+								break;
+					}
 				}
 			}
 	}
@@ -475,20 +399,13 @@ static void corner_to_I(HDRImage &src, array2D<float> &dst)
 }
 void fast_demosaic::jrp_demo(HDRImage & dst)
 {
-	//dst(W, H);
-	//HDRImage pass1(W, H);
 	array2D<float> I(W, H);
 
 	cout << W << "x" << H << "starting conversion\n";
 	cout << "jrp demosaic step 1\n";
-	//const float scale_raw_data = pow(2.0, props.expcomp);
-
-	//const unsigned short **rawData = (const unsigned short **) data;
-
 	// dcraw conversion method
 	int sum[8];
 	int c;
-	//for(c=0;c<4;c++) cblack[c] += black;
 	memset(sum, 0, sizeof sum);
 	for ( int row = 0 ; row < 8 ; row++ )
 		for ( int col = 0 ; col < 8 ; col++ ) {
@@ -518,12 +435,10 @@ void fast_demosaic::jrp_demo(HDRImage & dst)
 		if (min_channel > cam_mul[2])
 			min_channel = cam_mul[2];
 		min_channel *= ((float) get_white() - blmax - black); // full
-		//channel_mul[3] = scale_raw_data * cam_mul[2] / min_channel;
-		cout << " maximum is:" << get_white() << endl;
 		for ( int i = 0 ; i < 3 ; i++ ) {
 
 			for ( int j = 0 ; j < 3 ; j++ ) {
-				mat[i][j] = rgb_cam[i][j]; //*pow(2.0, props.expcomp)
+				mat[i][j] = rgb_cam[i][j];
 				cout << " " << rgb_cam[i][j];
 			}
 			cout << endl;
@@ -544,9 +459,6 @@ void fast_demosaic::jrp_demo(HDRImage & dst)
 		channel_mul[0] = cam_mul[0] / min_channel;
 		channel_mul[1] = cam_mul[1] / min_channel;
 		channel_mul[2] = cam_mul[2] / min_channel;
-		for ( int c = 0 ; c < 3 ; c++ )
-			cout << "Channel " << c << " " << channel_mul[c] << endl;
-
 	}
 	volatile int pct = 0;
 	//%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -557,43 +469,6 @@ void fast_demosaic::jrp_demo(HDRImage & dst)
 		Tile_flags[0][0]=2;
 		float accur = 0.0004;
 		naive(RGB_converted, I, accur, accur*0.25f);
-		//color_correct(pass1,pass1);
-		//improve_correlation(dst, pass1, 0.003f, 0.005f, 1);
-		//improve_correlation(dst, pass1, 0.003f, 0.05f,1);
-		//improve_correlation(pass1, dst, 0.003f, 0.0005f,0);
-		//color_correct2(pass1,dst,r_black,range);
-		//color_correct(pass1,dst);
-		/*
-		float rmax = 0, gmax = 0, bmax = 0;
-		for ( int i = 2 ; i < H - 2 ; i++ )
-			for ( int j = 2 ; j < W - 2 ; j++ ) {
-				float r, g, b;
-				r = dst[i][j].r;
-				g = dst[i][j].g;
-				b = dst[i][j].b;
-
-				float I = g; //0.2989f * r + 0.5870f * g + 0.1140f * b;
-#if 0
-				r = dst[i][j].r = pass1[i][j].g;
-				g = dst[i][j].g = pass1[i][j].g;
-				b = dst[i][j].b = pass1[i][j].g;
-#else
-				r = dst[i][j].r = I;
-				g = dst[i][j].g = I;
-				b = dst[i][j].b = I;
-
-#endif
-				if (r > rmax)
-					rmax = r;
-				if (g > gmax)
-					gmax = g;
-				if (b > bmax)
-					bmax = b;
-
-			}
-		cout << "RGB max values: " << rmax << " " << gmax << " " << bmax << endl;
-		*/
-
 		color_correct(RGB_converted,RGB_converted);
 
 	}
@@ -604,14 +479,8 @@ void fast_demosaic::cook_data()
 {
 	cout << W << "x" << H << "starting conversion\n";
 	cout << "jrp demosaic step 1\n";
-	//const float scale_raw_data = pow(2.0, props.expcomp);
-
-	//const unsigned short **rawData = (const unsigned short **) data;
-
-	// dcraw conversion method
 	int sum[8];
 	int c;
-	//for(c=0;c<4;c++) cblack[c] += black;
 	memset(sum, 0, sizeof sum);
 	for ( int row = 0 ; row < 8 ; row++ )
 		for ( int col = 0 ; col < 8 ; col++ ) {
@@ -641,12 +510,10 @@ void fast_demosaic::cook_data()
 		if (min_channel > cam_mul[2])
 			min_channel = cam_mul[2];
 		min_channel *= ((float) get_white() - blmax - black); // full
-		//channel_mul[3] = scale_raw_data * cam_mul[2] / min_channel;
 		cout << " maximum is:" << get_white() << endl;
 		for ( int i = 0 ; i < 3 ; i++ ) {
-
 			for ( int j = 0 ; j < 3 ; j++ ) {
-				mat[i][j] = rgb_cam[i][j]; //*pow(2.0, props.expcomp)
+				mat[i][j] = rgb_cam[i][j];
 				cout << " " << rgb_cam[i][j];
 			}
 			cout << endl;
@@ -667,9 +534,6 @@ void fast_demosaic::cook_data()
 		channel_mul[0] = cam_mul[0] / min_channel;
 		channel_mul[1] = cam_mul[1] / min_channel;
 		channel_mul[2] = cam_mul[2] / min_channel;
-		for ( int c = 0 ; c < 3 ; c++ )
-			cout << "Channel " << c << " " << channel_mul[c] << endl;
-
 	}
 	cout << "setup tile management\n";
 	Tile_flags((W + TILE_SIZE - 1) / TILE_SIZE,(H + TILE_SIZE - 1) / TILE_SIZE); // setup correct size
@@ -680,6 +544,7 @@ void fast_demosaic::cook_data()
 	cout << "setup RGB data image\n";
 	// check orientation
 	int rot = get_rotateDegree() / 90;
+
 	//method = VARSIZE_DEMOSAIC;
 	method = AMAZE_DEMOSAIC;
 	//method = HALFSIZE_DEMOSAIC;
@@ -1156,9 +1021,9 @@ void fast_demosaic::linear_interpolate()
     for (int i=0;i<height;i++)
     	for (int j=0;j<width;j++)
     	{
-    		RGB_converted[i][j].r=rgb[(i*width+j)*3 + 0];//(rgb[(i*width+j)*3 + 0]-(float) cblack[0]) * channel_mul[0];
-    		RGB_converted[i][j].g=rgb[(i*width+j)*3 + 1];//(rgb[(i*width+j)*3 + 1]-(float) cblack[1]) * channel_mul[1];
-    		RGB_converted[i][j].b=rgb[(i*width+j)*3 + 2];//(rgb[(i*width+j)*3 + 2]-(float) cblack[2]) * channel_mul[2];
+    		RGB_converted[i][j].r=rgb[(i*width+j)*3 + 0];
+    		RGB_converted[i][j].g=rgb[(i*width+j)*3 + 1];
+    		RGB_converted[i][j].b=rgb[(i*width+j)*3 + 2];
 
     	}
     delete [] rgb;

@@ -164,7 +164,7 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest)
 			//merror(buffer,"amaze_interpolate()");
 			//memset(buffer,0,(34*sizeof(float)+sizeof(int))*TS*TS);
 			// rgb array
-rgb			= (float(*)[3]) buffer; //pointers to array
+			rgb	= (float(*)[3]) buffer; //pointers to array
 			delh = (float(*)) (buffer + 3 * TS * TS);
 			delv = (float(*)) (buffer + 4 * TS * TS);
 			delhsq = (float(*)) (buffer + 5 * TS * TS);
