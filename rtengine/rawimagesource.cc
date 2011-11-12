@@ -108,8 +108,10 @@ RawImageSource::RawImageSource(char * mfilename) :
 	 hrmap[2] = NULL;
 	 needhr = NULL;
 	 hpmap = NULL;*/
+#ifdef USE_LCMS2
 	camProfile = NULL;
 	embProfile = NULL;
+#endif
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -144,10 +146,12 @@ RawImageSource::~RawImageSource() {
 	 freeArray<char> (needhr, H);
 	 if (hpmap)
 	 freeArray<char> (hpmap, H);*/
+#ifdef USE_LCMS2
 	if (camProfile)
 		cmsCloseProfile(camProfile);
 	if (embProfile)
 		cmsCloseProfile(embProfile);
+#endif
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1005,8 +1009,11 @@ int RawImageSource::load(string fname, bool batch) {
 	if (d1x)
 		border = 8;
 	if (get_profile())
+	{
+#ifdef USE_LCMS2
 		embProfile = cmsOpenProfileFromMem(get_profile(), get_profileLen());
-
+#endif
+	}
 	// create profile
 	/*
 	 memset(xyz_cam, 0, sizeof(xyz_cam));

@@ -20,7 +20,10 @@
 #define _RAWIMAGESOURCE_
 
 //#include <imagesource.h>
+#ifdef USE_LCMS2
 #include <lcms2.h>
+#endif
+
 #include "utils/array2D.h"
 #include "rawimage.h"
 #define HR_SCALE 2
@@ -75,9 +78,10 @@ protected:
 	float defGain;
 	//int blcode[16][16][32];  // Looks like it's an unused variable...
 	bool full;
+	/*
 	cmsHPROFILE camProfile;
 	cmsHPROFILE embProfile;
-
+	*/
 	RawImage* ri; // Copy of raw pixels
 
 	// to accelerate CIELAB conversion:
