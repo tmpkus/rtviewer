@@ -92,13 +92,17 @@ public:
 	}
 
 	int render(int input) {
-		if (moved == 0)
+		if ((moved == 0)&&(resize==0))
 		{
 			usec_delay = 30000;
 			return 0;
 		}
 		usec_delay = 10000;
-
+		if (resize==1)
+		{
+			resize=0;
+			moved=START_MOVE;
+		}
 		//
 		if (do_filter && moved == 1) {
 			// update offset

@@ -40,6 +40,7 @@ public:
 	int process_events (void);
 	void run(void);
 	unsigned int usec_delay;
+	int resize;
 private:
 	int width,height,bpp;
 	std::string title;

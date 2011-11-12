@@ -24,7 +24,6 @@ extern "C" {
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <limits.h>
-//#include "xlib.h"
 }
 #include "viewport.h"
 using namespace std;
@@ -83,44 +82,7 @@ viewport::viewport(char * newtitle, int newwidth, int newheight) {
 		}
 	}
 	XFree(Pixmap_Formats);
-#ifdef __ENABLE_CONVERSIONS__
-	/* Check if a converter is avaliable */
-	convert =
-	request_converter (converter_depth, Visual_info->red_mask,
-			Visual_info->green_mask, Visual_info->blue_mask);
-	if (!convert)
-	{
-		/* Close the display */
-		XCloseDisplay (vp.Main_Display);
-		return 0;
-	}
-	/* Get the actual bytes-per-pixel value */
-	switch (converter_depth)
-	{
-		case 8:
-		output_pitch = 1;
-		break;
-		case 15:
-		output_pitch = 2;
-		break;
-		case 16:
-		output_pitch = 2;
-		break;
-		case 24:
-		output_pitch = 3;
-		break;
-		case 32:
-		output_pitch = 4;
-		break;
-	}
-	/* Allocate the temporary buffer */
-	Buffer = (char *) malloc (width * height * output_pitch);
-	if (Buffer == NULL)
-	{
-		XCloseDisplay (vp.Main_Display);
-		return FAILURE;
-	}
-#else
+
 	/* It runs only on a 32bpp display if no conversions were activated */
 	if (converter_depth != 32) {
 		XCloseDisplay(vp.Main_Display);
@@ -128,7 +90,6 @@ viewport::viewport(char * newtitle, int newwidth, int newheight) {
 		return;
 	}
 	cout << "2\n";
-#endif /* __ENABLE_CONVERSIONS__ */
 	/* Check for XShm extension */
 	if (!XShmQueryExtension(vp.Main_Display)) {
 		XCloseDisplay(vp.Main_Display);
@@ -155,12 +116,6 @@ viewport::viewport(char * newtitle, int newwidth, int newheight) {
 	Y_Position = 0;
 #endif /* __CENTER_WINDOW__ */
 	/* Create the window */
-#if defined( __IN_ROOT_WINDOW__ )
-	vp.Main_Window = RootWindow(vp.Main_Display, Screen);
-	/* Tell the server to report only keypress-related events */
-	/* Tell the server to report only keypress-related events */
-	XSelectInput (vp.Main_Display, vp.Main_Window, KeyPressMask | KeyReleaseMask |PointerMotionMask |ButtonPressMask |ButtonReleaseMask |StructureNotifyMask );
-#else
 	vp.Main_Window = XCreateWindow(vp.Main_Display, Root_Window, X_Position,
 			Y_Position, width, height, 0, Bit_Depth, InputOutput, Visual_info,
 			CWBackPixel | CWBorderPixel | CWBackingStore, &Window_attributes);
@@ -193,7 +148,6 @@ viewport::viewport(char * newtitle, int newwidth, int newheight) {
 	/* Put the window on top of the others */
 	XMapRaised(vp.Main_Display, vp.Main_Window);
 
-#endif
 	/* Clear event queue */
 	XFlush(vp.Main_Display);
 
@@ -328,6 +282,9 @@ int viewport::process_events(void) {
 		case ClientMessage:
 			//printf(" received a close message\n");
 			return 0;
+			break;
+		case ResizeRequest:
+			resize=1;
 			break;
 		default:
 			logmsg(" received unknown event type: 0x%08x\n",xevent.type)
