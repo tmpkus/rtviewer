@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lXext -llcms2 -lgomp -lX11
+LIBS := -lXext -lgomp -lX11
 
