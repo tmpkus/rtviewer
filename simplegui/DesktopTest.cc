@@ -160,7 +160,7 @@ public:
 
 int main(int argc, char ** argv) {
 	if (argc < 2) {
-		cout << "usage %s <raw file>\n";
+		cout << "usage " << argv[0] << " <raw file>\n";
 		return 0;
 	}
 

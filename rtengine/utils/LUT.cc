@@ -85,9 +85,11 @@ template<typename T> LUT<T>::LUT(unsigned int s, T(*fn)(float), float scale,
 	owner = 1;
 	size = s;
 	max=(size>0)?size-1:0;
+	/*
 	std::cout << "LUT init\n";
 	 for (int i=0;i<s;i+=s/8)
 	 std::cout << "LUT i=" << i << " = " << data[i] << "\n";
+	 */
 	//if (flags&LUT_INIT_CLEAR) clear();
 }
 template<typename T> void LUT<T>::operator ()(unsigned int s, T(*fn)(float),
