@@ -23,6 +23,6 @@
 using namespace std;
 
 
-void list_filters(void);
+//void list_filters(void);
 void apply_filters(HDRImage & im, improps & props);
 #endif

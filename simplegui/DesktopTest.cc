@@ -64,6 +64,10 @@ public:
 		usec_delay = 20000;
 		return 1;
 	}
+	~desktop(void)
+	{
+		if (MyRAW) delete MyRAW;
+	}
 
 	// deal with mouse interaction
 	void mouse(int x, int y, int butt) {

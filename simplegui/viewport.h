@@ -28,7 +28,7 @@ public:
 	virtual void key(int,int){};
 	virtual int mainloop(int delta_time) {return 1;};
 	virtual int render(int){return 1;};
-	virtual int setup(void *data){return 1;};
+	//virtual int setup(void *data){return 1;};
 	viewport(char * ntitle, int width, int height);
 	~viewport(void);
 	int update (void);

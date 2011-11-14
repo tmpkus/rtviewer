@@ -357,4 +357,4 @@ void sharpen (HDRImage & dst,improps &props) {
 	dst <<= temp;
 }
 */
-ADDMODULE( sharpen, Labim , 80)
+ADD_FILTER( sharpen, Labim , 80)

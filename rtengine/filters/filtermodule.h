@@ -52,25 +52,21 @@ typedef enum image_type_t
  } module;
 
 
+ void list_filters(void);
+ void addmodule(module & moduleinfo);
+ extern module * modules;
 
-#define ADDMODULE( fn, inputtype , myrank) \
-extern module * modules;  \
+#define ADD_FILTER( fn, inputtype , myrank) \
 static module moduleinfo; \
-static int setmoduleinfo(void) { moduleinfo.name=#fn ; \
-   moduleinfo.type = inputtype ; \
-   moduleinfo.rank= myrank; \
-   moduleinfo.f##inputtype = fn; \
-   module * found = modules; \
-   module * next = modules; \
-   while (next && (next->rank< myrank)) { found = next;next=found->next;} \
-   if ((modules==0)||(next==modules)) \
-   {   moduleinfo.next = modules; \
-   	   modules= &moduleinfo;} \
-   else \
-   { moduleinfo.next = found->next; \
-     found->next= &moduleinfo;} \
+static int setmoduleinfo(void) \
+{ \
+	moduleinfo.name=#fn ; \
+	moduleinfo.type = inputtype ; \
+	moduleinfo.rank= myrank; \
+	moduleinfo.f##inputtype = fn; \
+	addmodule(moduleinfo); \
    return 1; \
-  }; \
+}; \
 static int init = setmoduleinfo();
 
 #endif

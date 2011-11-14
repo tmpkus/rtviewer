@@ -287,4 +287,4 @@ void Lab_Denoise(LabImage & src,improps & props)
 	join_as_Lab(src, Luma1, Chroma2, luma, chroma);
 }
 
-ADDMODULE( Lab_Denoise, Labim , 100)
+ADD_FILTER( Lab_Denoise, Labim , 100)

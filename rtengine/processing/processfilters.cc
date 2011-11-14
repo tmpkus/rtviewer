@@ -20,7 +20,8 @@
 #include <iostream>
 using namespace std;
 
-module * modules = NULL;
+/*
+ module * modules = NULL;
 
 void list_filters(void) {
 	module * list = modules;
@@ -29,7 +30,8 @@ void list_filters(void) {
 		list = list->next;
 	}
 }
-
+*
+ */
 void apply_filters(HDRImage & im, improps & props) {
 	image_type imt = HDRim, cur = HDRim;
 	LabImage L(im.xsize(),im.ysize());
