@@ -135,9 +135,9 @@ viewport::viewport(char * newtitle, int newwidth, int newheight) {
 	Window_sizehints.x = 0;
 	Window_sizehints.y = 0;
 	Window_sizehints.min_width = 10;
-	Window_sizehints.max_width = width;
+	Window_sizehints.max_width = Screen_Width;
 	Window_sizehints.min_height = 10;
-	Window_sizehints.max_height = height;
+	Window_sizehints.max_height = Screen_Height;
 
 	/* Set the window's sizehint */
 	XSetWMNormalHints(vp.Main_Display, vp.Main_Window, &Window_sizehints);
@@ -199,6 +199,7 @@ viewport::viewport(char * newtitle, int newwidth, int newheight) {
 	// setup image class to refer to full shared X data
 	set_ref(Screen_Width, Screen_Height, (unsigned int *) vp.X_image->data,
 			ARRAY2D_BYREFERENCE);
+
 	usec_delay = 10000;
 	return;
 }
@@ -284,8 +285,15 @@ int viewport::process_events(void) {
 			return 0;
 			break;
 		case ConfigureNotify://ResizeRequest: //VisibilityNotify:
+		{
+			XConfigureEvent *conf = (XConfigureEvent *)&xevent;
 			resize=1;
-			cout << "resize" << endl;
+			if (conf->width!=width || conf->height!=height)
+			{
+				cout << "resize since different sizes" << endl;
+				width=conf->width;height=conf->height;
+			}
+		}
 			break;
 		default:
 			cout << " received unknown event type: "<< (int) xevent.type << endl;

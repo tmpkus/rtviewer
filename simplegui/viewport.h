@@ -35,9 +35,10 @@ public:
 	int process_events (void);
 	void run(void);
 	unsigned int usec_delay;
-	volatile int resize;
+	volatile int resize,width,height;
+
 private:
-	int width,height,bpp;
+	int bpp;
 	std::string title;
 	void * ref;
 };

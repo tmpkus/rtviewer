@@ -35,7 +35,7 @@ class desktop: public viewport {
 	volatile int dx, dy, px, py;
 	char * raw_to_load;
 	Image_Raw * MyRAW;
-	int pp3_found,vp_width,vp_height;
+	int pp3_found;
 public:
 	improps props;
 
@@ -44,7 +44,7 @@ public:
 		dy = 0;
 		px = 0;
 		py = 0;
-		HDRImage RawTile(vp_width,vp_height);
+		HDRImage RawTile(width,height);
 		scale = 1;
 		if (pp3_found==0) return 0;
 		MyRAW = new Image_Raw(raw_to_load, props);
@@ -107,7 +107,7 @@ public:
 		//
 		if (do_filter && moved == 1) {
 			// update offset
-			HDRImage RawTile(vp_width,vp_height);
+			HDRImage RawTile(width,height);
 			RawTile.moveto(dx, dy);
 
 			// convert from raw
@@ -127,7 +127,7 @@ public:
 		} else {
 			if (moved == START_MOVE)
 			{
-				HDRImage RawTile(vp_width,vp_height);
+				HDRImage RawTile(width,height);
 				// set offset
 				RawTile.moveto(dx, dy);
 				// convert raw
@@ -146,15 +146,13 @@ public:
 		return 1;
 	}
 
-	desktop(int argc, char**argv, int width, int height) :
-			viewport(argv[1], width, height) {
+	desktop(int argc, char**argv, int nwidth, int nheight) :
+			viewport(argv[1], nwidth, nheight) {
 
 		// read pp3 file
 		pp3_found = props.read(argc, argv);
 		// set name of raw file
 		raw_to_load = argv[1];
-		vp_width=width;
-		vp_height=height;
 	}
 };
 void list_filters(void);
