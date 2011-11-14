@@ -97,11 +97,11 @@ public:
 	}
 
 	int render(int input) {
-		if (resize==1)
+		if (refresh==1)
 		{
 			moved=START_MOVE;
 		}
-		resize=0;
+		refresh=0;
 		if (moved == 0)
 		{
 			usec_delay = 30000;

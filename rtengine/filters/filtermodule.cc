@@ -1,4 +1,6 @@
 /*
+ * filtermodule.cc
+ *
  *  This file is part of RTViewer.
  *
  *	copyright (c) 2011  Jan Rinze Peterzon (janrinze@gmail.com)
@@ -17,30 +19,32 @@
  *  along with RTViewer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VIEWPORT_H_
-#define VIEWPORT_H_
-#include "../rtengine/rtengine.h"
-class viewport: public Image<argb8>
-{
+#include "filtermodule.h"
+#include <iostream>
+using namespace std;
 
-public:
-	virtual void mouse(int x,int y,int butt){};
-	virtual void key(int,int){};
-	virtual int mainloop(int delta_time) {return 1;};
-	virtual int render(int){return 1;};
-	//virtual int setup(void *data){return 1;};
-	viewport(char * ntitle, int width, int height);
-	~viewport(void);
-	int update (void);
-	int process_events (void);
-	void run(void);
-	unsigned int usec_delay;
-	volatile int refresh,width,height;
+module * modules = NULL;
 
-private:
-	int bpp;
-	std::string title;
-	void * ref;
-};
-#define __CENTER_WINDOW__
-#endif /* VIEWPORT_H_ */
+void list_filters(void) {
+	module * list = modules;
+	while (list) {
+		cout << "filter: " << list->name << " rank: " << list->rank << endl;
+		list = list->next;
+	}
+}
+
+void addmodule(module & moduleinfo) {
+	module * found = modules;
+	module * next = modules;
+	while (next && (next->rank < moduleinfo.rank)) {
+		found = next;
+		next = found->next;
+	}
+	if ((modules == 0) || (next == modules)) {
+		moduleinfo.next = modules;
+		modules = &moduleinfo;
+	} else {
+		moduleinfo.next = found->next;
+		found->next = &moduleinfo;
+	}
+}
