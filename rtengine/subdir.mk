@@ -15,6 +15,7 @@ CC_SRCS += \
 ../rtengine/imageformats/image.cc \
 ../rtengine/filters/Lab_denoise.cc \
 ../rtengine/filters/usm.cc \
+../rtengine/processing/processfilters.cc \
 ../rtengine/processing/improps.cc \
 
 
@@ -30,6 +31,7 @@ OBJS += \
 ./rtengine/imageformats/image.o \
 ./rtengine/filters/Lab_denoise.o \
 ./rtengine/filters/usm.o \
+./rtengine/processing/processfilters.o \
 ./rtengine/processing/improps.o \
 ./rtengine/utils/LUT.o \
 

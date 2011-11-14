@@ -101,7 +101,7 @@ template<typename color> Image<color> & Image<color>::operator=(
  data <<= rhs.data; // this should auto-magically do color conversion
  return *this;
  }
- */
+*/
 
 template<typename color>
 int Image<color>::load(std::string name) {
@@ -113,9 +113,9 @@ int Image<color>::save(std::string name) {
 	logerr("image::save(std::string name) not implemented yet");
 	return 0;
 }
-void Lab_Denoise(LabImage &src,const float luma, const float chroma, float gam_in);
+void Lab_Denoise(LabImage &src,improps & props);//const float luma, const float chroma, float gam_in);
 
-template <typename color> void Image<color>::Lab_denoise(const float luma, const float chroma, float gam_in)
+template <typename color> void Image<color>::Lab_denoise(improps & props)//const float luma, const float chroma, float gam_in)
 {
 			LabImage src(this->xsize(),this->ysize());
 			int x=data.xoffset(),y=data.yoffset();
@@ -125,7 +125,7 @@ template <typename color> void Image<color>::Lab_denoise(const float luma, const
 				temp<<=*this;
 				src<<=temp;
 			}
-			src.Lab_denoise(luma,chroma,gam_in);
+			src.Lab_denoise(props);//luma,chroma,gam_in);
 			src.moveto(0,0);
 			{
 				HDRImage temp;
@@ -134,17 +134,17 @@ template <typename color> void Image<color>::Lab_denoise(const float luma, const
 			}
 			data.moveto(x,y);
 }
-template <> void Image<Lab>::Lab_denoise(const float luma, const float chroma, float gam_in)
+template <> void Image<Lab>::Lab_denoise(improps & props) //const float luma, const float chroma, float gam_in)
 {
-	Lab_Denoise(*this,luma,chroma,gam_in);
+	Lab_Denoise(*this,props);//luma,chroma,gam_in);
 }
-template <> void Image<rgbHDR>::Lab_denoise(const float luma, const float chroma, float gam_in)
+template <> void Image<rgbHDR>::Lab_denoise(improps & props) //(const float luma, const float chroma, float gam_in)
 {
 	LabImage src;
 	int x=data.xoffset(),y=data.yoffset();
 	data.moveto(0,0);
 	src<<=*this;
-	src.Lab_denoise(luma,chroma,gam_in);
+	src.Lab_denoise(props);
 	src.moveto(0,0);
 	*this<<=src;
 	data.moveto(x,y);

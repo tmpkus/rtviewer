@@ -16,12 +16,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with RTViewer.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef USM_H_
-#define USM_H_
-#include "../processing/improps.h"
+#ifndef PROCESSFILTERS_H_
+#define PROCESSFILTERS_H_
+#include "../filters/filtermodule.h"
+#include <iostream>
+using namespace std;
 
-void sharpen (LBrBbImage & dst,improps & props);
-void sharpen (LabImage & dst,improps & props);
-void sharpen (HDRImage & dst,improps & props);
 
-#endif /* USM_H_ */
+void list_filters(void);
+void apply_filters(HDRImage & im, improps & props);
+#endif

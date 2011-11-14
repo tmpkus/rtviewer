@@ -233,9 +233,9 @@ public:
 	Image<color> & operator=(Image<color> & rhs);
 	template <typename othercolor>
 		Image<color> & operator=(Image<othercolor> & rhs){
-		if (this != &rhs) {
+		//if ((void*)this != (void*)&rhs) {
 			data = rhs.data;
-		}
+		//}
 		return *this;
 	};
 	template <typename othercolor>
@@ -251,7 +251,7 @@ public:
 	int xoff(void) {return data.xoffset();};
 	int yoff(void) {return data.yoffset();};
 
-	void Lab_denoise(const float luma, const float chroma, float gam_in);
+	void Lab_denoise(improps & props); //(const float luma, const float chroma, float gam_in);
 	void moveto(int nx,int ny) {data.moveto(nx,ny); };
 	void move(int nx,int ny) { data.move(nx,ny); };
 	void pos(int &xnpos,int &ynpos){ xnpos=data.xoffset();ynpos=data.yoffset();}

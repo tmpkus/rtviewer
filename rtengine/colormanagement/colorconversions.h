@@ -16,6 +16,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with RTViewer.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifndef COLORCONVERSIONS_H_
+#define COLORCONVERSIONS_H_
+
 //216/24389
 #define epsilon 0.00885645f
 //24389/27
@@ -258,3 +262,5 @@ rgbHI & rgbHI::operator=(argb8 & rhs) {
 	this->b = (65535.0f * IGamma[rhs.b]); // inverse gamma
 	return *this;
 }
+
+#endif

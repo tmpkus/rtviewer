@@ -26,14 +26,22 @@
 
 #include "ImageRaw.h"
 #include "fast_demo.h"
-#define SQR(x) ((x)*(x))
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#define LIM(x,min,max) MAX(min,MIN(x,max))
-#define ULIM(x,y,z) ((y) < (z) ? LIM(x,y,z) : LIM(x,z,y))
+//#define SQR(x) ((x)*(x))
+template<typename T> static inline T SQR(T x) { return x*x;};
+//#define MIN(a,b) ((a) < (b) ? (a) : (b))
+template<typename T> static inline T MIN(T a,T b) { return((a) < (b) ? (a) : (b));};
+//#define MAX(a,b) ((a) > (b) ? (a) : (b))
+template<typename T> static inline T MAX(T a,T b) { return((a) > (b) ? (a) : (b));};
+//#define LIM(x,min,max) MAX(min,MIN(x,max))
+template<typename T> static inline T LIM(T x,T min,T max) { return MAX(min,MIN(x,max));};
+//#define ULIM(x,y,z) ((y) < (z) ? LIM(x,y,z) : LIM(x,z,y))
+template <typename T> static inline T ULIM(T x,T y,T z) {return ((y) < (z) ? LIM(x,y,z) : LIM(x,z,y)) ;}
 #define HCLIP(x) x //is this still necessary???
-#define fabs( x ) ((x)>=0.0f?(x):-(x))
-#define Swap( x , y ) { typeof(x) temp = x;x=y;y=temp;}
+
+//#define fabs( x ) ((x)>=0.0f?(x):-(x))
+template <typename T> static inline T fabs(T x ) { return ((x)>=0.0f?(x):-(x)); }
+//#define Swap( x , y ) { typeof(x) temp = x;x=y;y=temp;}
+template <typename T> static inline void Swap(T &x,T &y) { T temp=x;x=y;y=temp ;};
 //#define Myfc(y,x) FC(((y)+winy),((x)+winx))
 #define Myfc(y,x) FC((y),(x))
 

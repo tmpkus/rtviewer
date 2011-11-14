@@ -18,7 +18,10 @@
  */
 
 // image formats etc.
+#include <iostream>
+using namespace std;
 #include "../imageformats/image.h"
+#include "filtermodule.h"
 
 #define MINMAX3(a,b,c,min,max) \
 { \
@@ -289,9 +292,15 @@ template <class T> void gaussVertical (T & src, T & dst, float sigma) {
     }
     delete [] temp2;
 }   
-
-void sharpen (LBrBbImage & dst,float radius, float amount,float thresh) {
-
+/*
+void sharpen (LBrBbImage & dst,improps &props)
+{
+	if ((bool) props.pp3["[Sharpening]"]["Enabled"] != true) return;
+	float radius = props.pp3["[Sharpening]"]["Radius"];
+	float amount = props.pp3["[Sharpening]"]["Amount"];
+	float thresh = props.pp3["[Sharpening]"]["Threshold"];
+	if (amount==0.0) return;
+	amount=amount* 0.01f;
 	LBrBbImage temp;
 	temp <<=dst;
 	int H=dst.ysize(),W=dst.xsize();
@@ -311,9 +320,16 @@ void sharpen (LBrBbImage & dst,float radius, float amount,float thresh) {
                 }
             }
 	}
-}
-void sharpen (LabImage & dst,float radius, float amount,float thresh) {
-
+}*/
+void sharpen (LabImage & dst,improps &props)
+{
+	if ((bool) props.pp3["[Sharpening]"]["Enabled"] != true) return;
+	float radius = props.pp3["[Sharpening]"]["Radius"];
+	float amount = props.pp3["[Sharpening]"]["Amount"];
+	float thresh = props.pp3["[Sharpening]"]["Threshold"];
+	if (amount==0.0) return;
+	cout << "really applying filter now" << endl;
+	amount=amount* 0.01f;
 	LabImage temp;
 	temp <<=dst;
 	int H=dst.ysize(),W=dst.xsize();
@@ -329,14 +345,16 @@ void sharpen (LabImage & dst,float radius, float amount,float thresh) {
                 float diff = dst[i][j].L - temp[i][j].L;
                 if (diff>thresh||diff<-thresh) {
                     dst[i][j].L= dst[i][j].L + amount * diff;
-
                 }
             }
 	}
 }
-void sharpen (HDRImage & dst,float radius, float amount,float thresh) {
+/*
+void sharpen (HDRImage & dst,improps &props) {
 	LBrBbImage temp;
 	temp <<=dst;
-	sharpen (temp, radius,  amount, thresh);
+	sharpen (temp, props);
 	dst <<= temp;
 }
+*/
+ADDMODULE( sharpen, Labim , 80)

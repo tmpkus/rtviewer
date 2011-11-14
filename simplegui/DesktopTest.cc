@@ -18,15 +18,16 @@
  */
 #include <iostream>
 #include <cstdlib>
+#include "../rtengine/rtengine.h"
 #include "viewport.h"
 
 //using namespace std;
 #define X_SIZE 1280
 #define Y_SIZE 720
 #define START_MOVE 50
-
+void Lab_Denoise(LabImage &a,improps & b);
 class desktop: public viewport {
-	HDRImage RawTile;
+
 	LabImage baseim;
 
 	Image<rgbHDR> tempim;
@@ -34,7 +35,7 @@ class desktop: public viewport {
 	volatile int dx, dy, px, py;
 	char * raw_to_load;
 	Image_Raw * MyRAW;
-	int pp3_found;
+	int pp3_found,vp_width,vp_height;
 public:
 	improps props;
 
@@ -43,11 +44,12 @@ public:
 		dy = 0;
 		px = 0;
 		py = 0;
+		HDRImage RawTile(vp_width,vp_height);
 		scale = 1;
 		if (pp3_found==0) return 0;
 		MyRAW = new Image_Raw(raw_to_load, props);
 		// this ensure same size as preview.
-		RawTile <<= *this;
+
 		// set offset to 0,0
 		RawTile.moveto(0, 0);
 		// demosaic raw photo
@@ -93,7 +95,6 @@ public:
 	int render(int input) {
 		if (resize==1)
 		{
-
 			moved=START_MOVE;
 		}
 		resize=0;
@@ -106,6 +107,7 @@ public:
 		//
 		if (do_filter && moved == 1) {
 			// update offset
+			HDRImage RawTile(vp_width,vp_height);
 			RawTile.moveto(dx, dy);
 
 			// convert from raw
@@ -116,36 +118,16 @@ public:
 
 			// set offset to 0,0
 			RawTile.moveto(0, 0);
-			LabImage workim;
-			// convert to Lab
-			workim <<= RawTile;
-			// set offset to 0,0
-			workim.moveto(0, 0);
 
-			// apply sharpening if necessary
-			if ((bool) props.pp3["[Sharpening]"]["Enabled"] == true) {
-				cout << "doing sharpening\n";
-				if (props.sh_amount > 0.0f)
-					sharpen(workim, props.sh_radius, props.sh_amount * 0.01f,
-							0.0f);
-			}
-
-			// apply denoise if necessary
-			if ((bool) props.pp3["[Directional Pyramid Denoising]"]["Enabled"]
-					== true) {
-				cout << "doing noise reduction\n";
-				if ((props.noise_lamount > 0.0f)
-						|| (props.noise_camount > 0.0f))
-					workim.Lab_denoise(props.noise_lamount * 0.01f,
-							props.noise_camount * 0.01f, props.noise_gamma);
-			}
+			apply_filters(RawTile,  props);
 
 			// output to window
 			// does conversion Lab to argb8
-			*this <<= workim;
+			*this <<= RawTile;
 		} else {
 			if (moved == START_MOVE)
 			{
+				HDRImage RawTile(vp_width,vp_height);
 				// set offset
 				RawTile.moveto(dx, dy);
 				// convert raw
@@ -171,10 +153,14 @@ public:
 		pp3_found = props.read(argc, argv);
 		// set name of raw file
 		raw_to_load = argv[1];
+		vp_width=width;
+		vp_height=height;
 	}
 };
-
+void list_filters(void);
 int main(int argc, char ** argv) {
+	//list_filters();
+	//return 0;
 	if (argc < 2) {
 		cout << "usage " << argv[0] << " <raw file>\n";
 		return 0;

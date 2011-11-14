@@ -20,7 +20,9 @@
 #include <cstddef>
 #include <math.h>
 #include "../imageformats/image.h"
+#include "../processing/improps.h"
 #include <iostream>
+#include "filtermodule.h"
 using namespace std;
 
 #ifdef _OPENMP
@@ -207,7 +209,7 @@ static void Bilateral_Luma(LumImage &ref, LumImage &working, LumImage &res, int 
 				}
 		}
 		for ( ; y < h ; y++ ) {
-			cout << "3:line " << y << endl;
+			//cout << "3:line " << y << endl;
 			int s1 = (y > radius) ? -radius : -y;
 			int e1 = ((h - y) > (radius + 1)) ? radius + 1 : (h - y);
 			for ( int x = X ; x < w ; x++ ) {
@@ -222,7 +224,7 @@ static void Bilateral_Luma(LumImage &ref, LumImage &working, LumImage &res, int 
 void lab_split(LabImage & src, LumImage &L, ChrImage &C)
 {
 	int w = src.xsize(), h = src.ysize();
-
+#pragma omp parallel for
 	for ( int y = 0 ; y < h ; y++ )
 		for ( int x = 0 ; x < w ; x++ ) {
 			L[y][x].L = src[y][x].L;
@@ -233,7 +235,7 @@ void lab_split(LabImage & src, LumImage &L, ChrImage &C)
 void join_as_Lab(LabImage & src, LumImage &L, ChrImage &C, float luma, float chroma)
 {
 	int w = src.xsize(), h = src.ysize();
-
+#pragma omp parallel for
 	for ( int y = 0 ; y < h ; y++ )
 		for ( int x = 0 ; x < w ; x++ ) {
 			if (luma > 0.0f)
@@ -244,15 +246,24 @@ void join_as_Lab(LabImage & src, LumImage &L, ChrImage &C, float luma, float chr
 			}
 		}
 }
-void Lab_Denoise(LabImage & src, const float luma, const float chroma, float gam_in)
+void Lab_Denoise(LabImage & src,improps & props)
 {
+	if ((bool) props.pp3["[Directional Pyramid Denoising]"]["Enabled"] != true) return;
+	float luma = props.pp3["[Directional Pyramid Denoising]"]["Luma"];
+	float chroma = props.pp3["[Directional Pyramid Denoising]"]["Chroma"];
+	const float gam_in = props.pp3["[Directional Pyramid Denoising]"]["Gamma"];
+	if ((luma == 0.0)&&(chroma==0.0)) return;
+	luma=luma*0.01f;
+	chroma=chroma*0.01f;
+	cout << "doing noise reduction\n";
 	float lumaw = luma;
 	float chromaw = chroma;
 	float gammaw = exp(gam_in * 8.0f) / 1000.0f;
-	cout << " denoise using gamma " << gammaw << endl;
+	//cout << " denoise using gamma " << gammaw << endl;
 
 // setup size and temporary storage.
 	int W = src.xsize(), H = src.ysize();
+	cout << " got size " << W << " x " << H << endl;
 	LumImage Luma1(W, H);
 	ChrImage Chroma1(W, H);
 	LumImage Luma2(W, H);
@@ -276,3 +287,4 @@ void Lab_Denoise(LabImage & src, const float luma, const float chroma, float gam
 	join_as_Lab(src, Luma1, Chroma2, luma, chroma);
 }
 
+ADDMODULE( Lab_Denoise, Labim , 100)
