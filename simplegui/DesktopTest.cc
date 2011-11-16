@@ -37,7 +37,7 @@ class desktop: public viewport {
 	Image_Raw * MyRAW;
 	int pp3_found;
 public:
-	improps props;
+	//improps props;
 
 	int setup() {
 		dx = 0;
@@ -47,7 +47,7 @@ public:
 		HDRImage RawTile(width,height);
 		scale = 1;
 		if (pp3_found==0) return 0;
-		MyRAW = new Image_Raw(raw_to_load, props);
+		MyRAW = new Image_Raw(raw_to_load);
 		// this ensure same size as preview.
 
 		// set offset to 0,0
@@ -108,7 +108,8 @@ public:
 			return 0;
 		}
 		usec_delay = 10000;
-		//
+		// override mouse scroll wheel..
+		do_filter = 1;
 		if (do_filter && moved == 1) {
 			// update offset
 			HDRImage RawTile(width,height);
@@ -123,7 +124,7 @@ public:
 			// set offset to 0,0
 			RawTile.moveto(0, 0);
 
-			apply_filters(RawTile,  props);
+			apply_filters(RawTile,  MyRAW->props);
 
 			// output to window
 			// does conversion Lab to argb8
@@ -154,7 +155,7 @@ public:
 			viewport(argv[1], nwidth, nheight) {
 
 		// read pp3 file
-		pp3_found = props.read(argc, argv);
+
 		// set name of raw file
 		raw_to_load = argv[1];
 	}

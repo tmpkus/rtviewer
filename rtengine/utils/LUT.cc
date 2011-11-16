@@ -81,8 +81,9 @@ template<typename T> void LUT<T>::operator ()(int s, int flags) {
 	if (flags & LUT_INIT_CLEAR)
 		clear();
 }
-template<typename T> LUT<T>::LUT(unsigned int s, T(*fn)(float), float scale,
+template<typename T> LUT<T>::LUT(unsigned int s, T(*func)(float), float scale,
 		int flags) {
+	fn=func;
 	clip = flags | LUT_SCALE_FLOAT;
 	if (size < s) {
 		delete[] data;
@@ -97,15 +98,28 @@ template<typename T> LUT<T>::LUT(unsigned int s, T(*fn)(float), float scale,
 	owner = 1;
 	size = s;
 	max=(size>0)?size-1:0;
-	/*
-	std::cout << "LUT init\n";
-	 for (int i=0;i<s;i+=s/8)
-	 std::cout << "LUT i=" << i << " = " << data[i] << "\n";
-	 */
-	//if (flags&LUT_INIT_CLEAR) clear();
 }
-template<typename T> void LUT<T>::operator ()(unsigned int s, T(*fn)(float),
+template<typename T> LUT<T>::LUT(unsigned int s, T (*func)(float,float*), float * parms, float scale,
+		int flags) {
+	fp=func;params=parms;
+	clip = flags | LUT_SCALE_FLOAT;
+	if (size < s) {
+		delete[] data;
+		data = new T[s];
+	}
+	fscale = (float) s / scale;
+	float step = scale / (float) s;
+	float index = 0.0;
+	for (unsigned int i = 0; i < s; i++) {
+		data[i] = fp(step*(float)i,params);
+	}
+	owner = 1;
+	size = s;
+	max=(size>0)?size-1:0;
+}
+template<typename T> void LUT<T>::operator ()(unsigned int s, T(*func)(float),
 		float scale, int flags) {
+	fn=func;
 	clip = flags | LUT_SCALE_FLOAT;
 	if (size < s) {
 		delete[] data;
@@ -122,6 +136,24 @@ template<typename T> void LUT<T>::operator ()(unsigned int s, T(*fn)(float),
 	max=(size>0)?size-1:0;
 
 	//if (flags&LUT_INIT_CLEAR) clear();
+}
+template<typename T> void LUT<T>::operator ()(unsigned int s, T (*func)(float,float*), float * parms, float scale,
+		int flags) {
+	fp=func;params=parms;
+	clip = flags | LUT_SCALE_FLOAT;
+	if (size < s) {
+		delete[] data;
+		data = new T[s];
+	}
+	fscale = (float) s / scale;
+	float step = scale / (float) s;
+	float index = 0.0;
+	for (unsigned int i = 0; i < s; i++) {
+		data[i] = fp(step*(float)i,params);
+	}
+	owner = 1;
+	size = s;
+	max=(size>0)?size-1:0;
 }
 // initialize LUT with data from an array
 template<typename T> LUT<T>::LUT(int s, T * source) {
@@ -169,33 +201,7 @@ template<typename T> LUT<T> & LUT<T>::operator=(const LUT<T> &rhs) {
 
 	return *this;
 }
-template<typename T> T LUT<T>::operator[](float &indx) {
-	if (data==NULL) return (T) 0;
-	float index = indx;
-	if (clip & LUT_SCALE_FLOAT)
-		index = index * fscale;
-	int idx = floor(index);
-	if ((unsigned int) idx >= max) {
-		if (idx < 0) {
-			if (clip & LUT_CLIP_BELOW)
-				return data[0];
-			if (fn)
-				return fn(index);
-			idx = 0;
-		} else {
-			if (clip & LUT_CLIP_ABOVE)
-				return data[max];
-			// use 2nd order derivative too.
-			if (fn)
-				return fn(index);
-			idx = max;
-		}
-	}
-	float diff = index-(float) idx;
-	T p1 = data[idx];
-	T p2 = data[idx + 1] - p1;
-	return (p1 + p2 * diff);
-}
+
 template class LUT<float> ;
 template class LUT<int> ;
 template class LUT<unsigned int> ;

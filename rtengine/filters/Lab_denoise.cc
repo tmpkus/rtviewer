@@ -29,16 +29,6 @@ using namespace std;
 #include <omp.h>
 #endif
 
-
-static inline float L_weight(float t1, float t2, float gamma)
-{
-	float t = (t2 - t1);
-	float f;
-	f = t * t;
-	return gamma / (gamma + f);
-}
-#define BILDIFF( v1 , v2 ) L_weight( v1 , v2 , gamma )
-
 class Chroma_t
 {
 public:
@@ -50,13 +40,29 @@ public:
 	float L;
 };
 typedef array2D<Chroma_t> ChrImage;
-
 typedef array2D<Luma_t> LumImage;
+
+static inline float L_weight(float t1, float t2)
+{
+	float t = (t2 - t1)*0.3f;
+		float f = t*t;
+		if (f>9.0f) return 0.013f/f;
+
+		float g=f*f;
+		float p=f+0.5f*g;
+		p=p+0.125f*g*f;
+		p=p+g*g*0.08333333333f;
+		p=1.0f/(1.0f +p);
+		return p;// fast approximation of exp(-t*t);
+}
+
+#define BILDIFF( v1 , v2 ) L_weight( v1 , v2 )
+
 static inline float Chroma_weight(float t1, float t2, float gamma,float radius)
 {
-	float t = (t2 - t1)*0.1f;
+	float t = (t2 - t1)*0.2f;
 	float f = t*t;
-	if (f>9.0f) return 0.0f;
+	if (f>9.0f) return 0.013f/f;
 
 	float g=f*f;
 	float p=f+0.5f*g;
@@ -99,24 +105,30 @@ static void inline L_reduce(LumImage &ref, LumImage &working, LumImage &res, flo
 	float L = 0.0, wgt = 0.0;
 	for ( int j = sj ; j < ej ; j++ )
 		for ( int i = si ; i < ei ; i++ )
-		if (i!=0||j!=0){
+		{
 			float cL = working[y + j][x + i].L;
-			float w = 2.0f / (2.0f + (i * i + j * j));
+			float w;
+			if (i==0&&j==0) w=0.25f; else w = gamma / (gamma + (float)(i * i + j * j));
 			float g = w * BILDIFF(cL,refL);
 			wgt += g;
 			L += cL * g;
 
 		}
+	if (wgt>1.15f) // no salt/pepper
+	{
+		wgt+=0.75f;
+		L+=sL*0.75f;
+	}
 	// salt and pepper filter
-	if (sL>0.0f)
+/*	if (sL>0.0f)
 	{
 		float offset = sL*wgt;
 		float rdiff = offset-L;
 		//float rdiff = diff;
 		if (rdiff<0.0) rdiff=-rdiff;
 		// small enough difference means no salt/pepper
-		if (rdiff<(anti_dot*offset)) { wgt+=1.0;L+=sL;}
-	}
+		if (rdiff<(anti_dot*offset)) { wgt+=0.5f;L+=sL*0.5f;}
+	}*/
 	res[y][x].L = (L / wgt - sL) * amount + sL;
 
 }
@@ -255,10 +267,10 @@ void Lab_Denoise(LabImage & src,improps & props)
 	if ((luma == 0.0)&&(chroma==0.0)) return;
 	luma=luma*0.01f;
 	chroma=chroma*0.01f;
-	cout << "doing noise reduction\n";
+	cout << "doing noise reduction: luma " << luma << " chroma " << chroma << "gamma " << gam_in << endl ;
 	float lumaw = luma;
 	float chromaw = chroma;
-	float gammaw = exp(gam_in * 8.0f) / 1000.0f;
+	float gammaw = gam_in;//exp(gam_in * 8.0f) / 1000.0f;
 	//cout << " denoise using gamma " << gammaw << endl;
 
 // setup size and temporary storage.
@@ -274,8 +286,8 @@ void Lab_Denoise(LabImage & src,improps & props)
 	if (luma == 0.0f)
 		lumaw = chromaw; //special case if chroma>0 but luma=0
 
-	Bilateral_Luma(Luma1, Luma1, Luma2, 1, gammaw / 10.0f, lumaw, 0.25f);
-	Bilateral_Luma(Luma2, Luma2, Luma1, 3, gammaw / 10.0f, lumaw * 0.15f, 0.1f);
+	Bilateral_Luma(Luma1, Luma1, Luma2, 5, gammaw / 10.0f, lumaw, 0.25f);
+	Bilateral_Luma(Luma2, Luma2, Luma1, 5, gammaw / 10.0f, lumaw, 0.25f);//lumaw * 0.15f, 0.1f);
 
 	if (chromaw > 0.955f) {
 		Bilateral_Chroma(Luma1, Chroma1, Chroma2, 12, gammaw, chromaw);

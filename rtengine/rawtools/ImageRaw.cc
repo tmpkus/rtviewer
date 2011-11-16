@@ -22,17 +22,20 @@
 
 Image_Raw ::Image_Raw(char * new_name)
 {
+	pp3_found = props.read(new_name);
 	fast_demosaic *thisraw = new fast_demosaic (new_name);
 
 	ref = (void *)thisraw;
-	thisraw->cook_data();
+	thisraw->cook_data(props);
 	//ISO=myraw.iso_speed;
 	//if(myraw.success) myraw.fast_demo(*this);
 	//if(myraw.success) myraw.amaze_demosaic_RT(*this);
 	//if(myraw.success) myraw.jrp_demo(*this);
 }
+/*
 Image_Raw ::Image_Raw(char * new_name, improps props)
 {
+	pp3_found = props.read(argc, argv);
 	fast_demosaic *thisraw = new fast_demosaic (new_name,props);
 	ref = (void *)thisraw;
 	thisraw->cook_data();
@@ -40,7 +43,8 @@ Image_Raw ::Image_Raw(char * new_name, improps props)
 	//if(myraw.success) myraw.fast_demo(*this);
 	//if(myraw.success) myraw.amaze_demosaic_RT(*this);
 	//if(myraw.success) myraw.jrp_demo(*this);
-}
+}*/
+
 Image_Raw ::~Image_Raw()
 {
 	fast_demosaic *thisraw =(fast_demosaic *)ref;
@@ -53,19 +57,19 @@ void Image_Raw ::demosaic(HDRImage &dest)
 	switch (thisraw->demosaic_method())
 	{
 	case AMAZE_DEMOSAIC:
-		thisraw->amaze_demosaic_RT(dest);
+		thisraw->amaze_demosaic_RT(dest,props);
 		break;
 	case FAST_DEMOSAIC:
-		thisraw->fast_demo(dest);
+		thisraw->fast_demo(dest,props);
 		break;
 	case JRP_DEMOSAIC:
-		thisraw->jrp_demo(dest);
+		thisraw->jrp_demo(dest,props);
 		break;
 	case HALFSIZE_DEMOSAIC:
-		thisraw->half_size_demo(dest);
+		thisraw->half_size_demo(dest,props);
 		break;
 	case VARSIZE_DEMOSAIC:
-		thisraw->nth_size_demo(dest,3);
+		thisraw->nth_size_demo(dest,3,props);
 		break;
 	}
 

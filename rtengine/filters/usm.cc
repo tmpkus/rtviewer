@@ -328,7 +328,7 @@ void sharpen (LabImage & dst,improps &props)
 	float amount = props.pp3["[Sharpening]"]["Amount"];
 	float thresh = props.pp3["[Sharpening]"]["Threshold"];
 	if (amount==0.0) return;
-	cout << "really applying filter now" << endl;
+	cout << "sharpen filter: radius" << radius << " amount "<< amount << " threshold "<< thresh << endl;
 	amount=amount* 0.01f;
 	LabImage temp;
 	temp <<=dst;

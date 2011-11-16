@@ -56,10 +56,10 @@ template<typename TY> configdata & configdata::operator=(vector<TY> & rhs)
 	return *this;
 }
 
-int improps::read(int argc, char **argv)
+int improps::read(char * toread)
 {
 	// we load the config_ file derived from the file name
-	expcomp = 0.0f;
+/*	expcomp = 0.0f;
 	contrast = 0.0f;
 	noise_lamount = 0.0f; //config__data["[Directional Pyramid Denoising]"]["Luma"].fval*0.01f;
 	noise_camount = 0.0f; //config__data["[Directional Pyramid Denoising]"]["Chroma"].fval*0.01f;
@@ -69,17 +69,17 @@ int improps::read(int argc, char **argv)
 		cout << " no file name given\n";
 		return 0;
 	}
-	else {
+	else {*/
 		string default_config,config_file;
 		filebuf	config_file_p;
 		default_config=getenv ("HOME");
 		default_config+="/.config/RawTherapeeAlpha/profiles/default.pp3";
-		config_file=argv[1];
+		config_file=toread;
 		config_file+=".pp3";
 
 		cout << "checking for config_ file: " << config_file << endl;
 		cout << "failover is: " << default_config <<endl;
-		raw_name = strdup(argv[1]);
+		raw_name = strdup(toread);
 		pp3_name = strdup(config_file.c_str());
 		void * tst=(void *)config_file_p.open(config_file.c_str(), ios::in);
 		if ( tst == NULL)
@@ -136,7 +136,7 @@ int improps::read(int argc, char **argv)
 				chapt++;
 			}
 
-			expcomp = pp3["[Exposure]"]["Compensation"];
+/*			expcomp = pp3["[Exposure]"]["Compensation"];
 			contrast = pp3["[Exposure]"]["Contrast"];
 			noise_lamount = pp3["[Directional Pyramid Denoising]"]["Luma"];
 			noise_camount = pp3["[Directional Pyramid Denoising]"]["Chroma"];
@@ -145,12 +145,12 @@ int improps::read(int argc, char **argv)
 			sh_amount = pp3["[Sharpening]"]["Amount"];
 
 			pp3["[test]"]["Compensation"] = 1.0f;
-			pp3["[test]"]["Contrast"] = contrast;
+			pp3["[test]"]["Contrast"] = contrast;*/
 
 			dump();
 			return 1;
 		}
-	}
+/*	}*/
 
 	cout << "config file does not exist\n";
 	return 0;

@@ -5,7 +5,7 @@
 #-include ../makefile.init
 
 #CC_OPTIMIZE := -O3 -fopenmp -march=native -msse4 -mfpmath=sse -ffast-math -Wall -c -fmessage-length=0 
-CC_OPTIMIZE := -O3 -fopenmp -ffast-math -c -fmessage-length=0 
+CC_OPTIMIZE := -g -O3 -fopenmp -ffast-math -c -fmessage-length=0 
 RM := rm -rf
 
 # All of the sources participating in the build are defined here

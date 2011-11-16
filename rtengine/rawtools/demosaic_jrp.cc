@@ -103,9 +103,10 @@ void fast_demosaic::improve_correlation(HDRImage & pass1, HDRImage& pass2, float
 
 		}
 }
-void fast_demosaic::color_correct(HDRImage & pass1, HDRImage& pass2)
+void fast_demosaic::color_correct(HDRImage & pass1, HDRImage& pass2,improps &props)
 {
-	const float post_scale = pow(2.0, props.expcomp);
+	const float expcomp = props.pp3["[Exposure]"]["Compensation"];
+	const float post_scale = pow(2.0, expcomp);
 	int Hgt=pass2.ysize(),Wdt=pass2.xsize();
 	cout << "Doing color correction\n";
 #pragma omp for
@@ -306,8 +307,8 @@ void fast_demosaic::naive(HDRImage & dst, array2D<float> &hint, float adjust, fl
 			}
 	}
 }
-
-void fast_demosaic::corner(HDRImage & dst, array2D<float> &I)
+/*
+void fast_demosaic::corner(HDRImage & dst, array2D<float> &I,improps &props)
 {
 	array2D<float> raw(W, H);
 
@@ -316,8 +317,9 @@ void fast_demosaic::corner(HDRImage & dst, array2D<float> &I)
 	float r_black = cblack[0]; //+black;
 	float g_black = cblack[1]; //+black;
 	float b_black = cblack[2]; //+black;
-
-	float adj_range = range / pow(2.0, props.expcomp);
+	const float expcomp = props.pp3["[Exposure]"]["Compensation"];
+	const float post_scale = pow(2.0, expcomp);
+	float adj_range = range / post_scale;
 	float mr = channel_mul[0] / adj_range; ///range;
 	float mg = channel_mul[1] / adj_range; ///range;
 	float mb = channel_mul[2] / adj_range; ///range;
@@ -389,8 +391,8 @@ static void corner_to_I(HDRImage &src, array2D<float> &dst)
 	for ( int y = 0 ; y < H - 1 ; y++ )
 		for ( int x = 0 ; x < W - 1 ; x++ )
 			dst[y][x] = 0.3f * src[y][x].r + 0.59f * src[y][x].g + 0.11f * src[y][x].b;
-}
-void fast_demosaic::jrp_demo(HDRImage & dst)
+}*/
+void fast_demosaic::jrp_demo(HDRImage & dst,improps & props)
 {
 	array2D<float> I(W, H);
 
@@ -462,13 +464,13 @@ void fast_demosaic::jrp_demo(HDRImage & dst)
 		Tile_flags[0][0]=2;
 		float accur = 0.0004;
 		naive(RGB_converted, I, accur, accur*0.25f);
-		color_correct(RGB_converted,RGB_converted);
+		color_correct(RGB_converted,RGB_converted,props);
 
 	}
 	RGB_converted.moveto(-dst.xoff(),-dst.yoff());
 	dst <<= RGB_converted;
 }
-void fast_demosaic::cook_data()
+void fast_demosaic::cook_data(improps & props)
 {
 	cout << W << "x" << H << "starting conversion\n";
 	cout << "jrp demosaic step 1\n";
@@ -560,7 +562,7 @@ void fast_demosaic::cook_data()
 	}
 	RGB_converted.moveto(0,0);
 	rawData(W, H);
-	float max_f=2.0f;
+	float max_f=4.0f;
 #pragma omp for
 	for ( unsigned int y = 0 ; y < H ; y++ ) {
 		for ( unsigned int x = 0 ; x < W ; x++ ) {
@@ -574,7 +576,7 @@ void fast_demosaic::cook_data()
 	if ((method==JRP_DEMOSAIC)&&0)
 	{
 		linear_interpolate();
-		color_correct(RGB_converted,RGB_converted);
+		color_correct(RGB_converted,RGB_converted,props);
 		Tile_flags[0][0]=2;
 	}
 }
@@ -667,7 +669,7 @@ int fast_demosaic::touch_tiles(HDRImage &dest, int &tile_xs, int &tile_xe, int &
 			}
 	return runtiles;
 }
-void fast_demosaic::half_size_demo(HDRImage & dest)
+void fast_demosaic::half_size_demo(HDRImage & dest,improps & props)
 {
 	int tile_xs, tile_ys, tile_xe, tile_ye;
 	int rot = (get_rotateDegree() / 90) & 3;
@@ -746,10 +748,10 @@ void fast_demosaic::half_size_demo(HDRImage & dest)
 	}
 	RGB_converted.moveto(-dest.xoff(), -dest.yoff());
 	dest <<= RGB_converted;
-	color_correct(dest,dest);
+	color_correct(dest,dest,props);
 
 }
-void fast_demosaic::nth_size_demo(HDRImage & dest,int num)
+void fast_demosaic::nth_size_demo(HDRImage & dest,int num,improps & props)
 {
 	int tile_xs, tile_ys, tile_xe, tile_ye;
 	int rot = (get_rotateDegree() / 90) & 3;
@@ -824,7 +826,7 @@ void fast_demosaic::nth_size_demo(HDRImage & dest,int num)
 	}
 	RGB_converted.moveto(-dest.xoff(), -dest.yoff());
 	dest <<= RGB_converted;
-	color_correct(dest,dest);
+	color_correct(dest,dest,props);
 
 }
 void fast_demosaic::linear_interpolate()

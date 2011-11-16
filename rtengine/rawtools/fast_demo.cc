@@ -46,7 +46,7 @@ static LUTf dirwt;
  delete [] dirwt;
  }
  */
-void fast_demosaic::fast_demo(HDRImage & dest)
+void fast_demosaic::fast_demo(HDRImage & dest,improps & props)
 {
 	dirwt(0x30000);
 	//set up directional weight function

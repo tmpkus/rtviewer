@@ -28,6 +28,8 @@ private:
 	float ISO;
 	void * ref;
 public:
+	int pp3_found;
+	improps props;
 	Image_Raw(char * new_name);
 	Image_Raw(char * new_name,improps properties);
 	float get_ISO(void) {return ISO;};

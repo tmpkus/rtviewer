@@ -45,7 +45,7 @@ template <typename T> static inline void Swap(T &x,T &y) { T temp=x;x=y;y=temp ;
 //#define Myfc(y,x) FC(((y)+winy),((x)+winx))
 #define Myfc(y,x) FC((y),(x))
 
-void fast_demosaic::amaze_demosaic_RT(HDRImage & dest)
+void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 {
 	int tile_xs,tile_ys,tile_xe,tile_ye;
 	int rot = (get_rotateDegree() / 90) & 3;
@@ -53,8 +53,9 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest)
 		int winx = 0, winy = 0, winw = W, winh = H;
 		//cout << " amaze: running " << runtiles << " tiles\n";
 		//MIN(clip_pt,x)
+		const float expcomp = props.pp3["[Exposure]"]["Compensation"];
 		const float scale_raw_data = 1.0f; //pow(2.0,props.expcomp)/65535.0f;
-		const float post_scale = pow(2.0, props.expcomp);
+		const float post_scale = pow(2.0, expcomp);
 		int width = winw, height = winh;
 
 		const float clip_pt = 4.0; // = 1/initialGain;
@@ -1217,9 +1218,10 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest)
 								col = cc + left;
 
 								indx = rr * TS + cc;
-								float r = rgb[indx][0] * post_scale; //- boffset;
-								float g = rgb[indx][1] * post_scale; // - boffset;
-								float b = rgb[indx][2] * post_scale; // - boffset;
+								float r = rgb[indx][0];// * post_scale; //- boffset;
+								float g = rgb[indx][1];// * post_scale; // - boffset;
+								float b = rgb[indx][2];// * post_scale; // - boffset;
+/*
 								r = (r > 1.0f) ? 1.0f : ((r < 0.0f) ? 0.0f:r);
 								g = (g > 1.0f) ? 1.0f : ((g < 0.0f) ? 0.0f:g);
 								b = (b > 1.0f) ? 1.0f : ((b < 0.0f) ? 0.0f:b);
@@ -1227,28 +1229,29 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest)
 								float nr = mat[0][0] * r + mat[0][1] * g + mat[0][2] * b;
 								float ng = mat[1][0] * r + mat[1][1] * g + mat[1][2] * b;
 								float nb = mat[2][0] * r + mat[2][1] * g + mat[2][2] * b;
+								*/
 								switch (rot)
 								{
 								case 0:
-									RGB_converted[row][col].r = nr > 0.0f ? (nr>1.0f?1.0f:nr) : 0.0f;
-									RGB_converted[row][col].g = ng > 0.0f ? (ng>1.0f?1.0f:ng) : 0.0f;
-									RGB_converted[row][col].b = nb > 0.0f ? (nb>1.0f?1.0f:nb) : 0.0f;
+									RGB_converted[row][col].r = r;// nr > 0.0f ? (nr>1.0f?1.0f:nr) : 0.0f;
+									RGB_converted[row][col].g = g;//ng > 0.0f ? (ng>1.0f?1.0f:ng) : 0.0f;
+									RGB_converted[row][col].b = b;//nb > 0.0f ? (nb>1.0f?1.0f:nb) : 0.0f;
 									break;
 								case 1:
-									RGB_converted[col][mrow - row].r = nr > 0.0f ? (nr>1.0f?1.0f:nr) : 0.0f;
-									RGB_converted[col][mrow - row].g = ng > 0.0f ? (ng>1.0f?1.0f:ng) : 0.0f;
-									RGB_converted[col][mrow - row].b = nb > 0.0f ? (nb>1.0f?1.0f:nb) : 0.0f;
+									RGB_converted[col][mrow - row].r = r;// nr > 0.0f ? (nr>1.0f?1.0f:nr) : 0.0f;
+									RGB_converted[col][mrow - row].g = g;//ng > 0.0f ? (ng>1.0f?1.0f:ng) : 0.0f;
+									RGB_converted[col][mrow - row].b = b;//nb > 0.0f ? (nb>1.0f?1.0f:nb) : 0.0f;
 									break;
 								case 2:
-									RGB_converted[mrow - row][mcol - col].r = nr > 0.0f ? (nr>1.0f?1.0f:nr) : 0.0f;
-									RGB_converted[mrow - row][mcol - col].g = ng > 0.0f ? (ng>1.0f?1.0f:ng) : 0.0f;
-									RGB_converted[mrow - row][mcol - col].b = nb > 0.0f ? (nb>1.0f?1.0f:nb) : 0.0f;
+									RGB_converted[mrow - row][mcol - col].r = r;// nr > 0.0f ? (nr>1.0f?1.0f:nr) : 0.0f;
+									RGB_converted[mrow - row][mcol - col].g = g;//ng > 0.0f ? (ng>1.0f?1.0f:ng) : 0.0f;
+									RGB_converted[mrow - row][mcol - col].b = b;//nb > 0.0f ? (nb>1.0f?1.0f:nb) : 0.0f;
 									break;
 
 								case 3:
-									RGB_converted[mcol - col][row].r = nr > 0.0f ? (nr>1.0f?1.0f:nr) : 0.0f;
-									RGB_converted[mcol - col][row].g = ng > 0.0f ? (ng>1.0f?1.0f:ng) : 0.0f;
-									RGB_converted[mcol - col][row].b = nb > 0.0f ? (nb>1.0f?1.0f:nb) : 0.0f;
+									RGB_converted[mcol - col][row].r = r; // nr > 0.0f ? (nr>1.0f?1.0f:nr) : 0.0f;
+									RGB_converted[mcol - col][row].g = g; //ng > 0.0f ? (ng>1.0f?1.0f:ng) : 0.0f;
+									RGB_converted[mcol - col][row].b = b; //nb > 0.0f ? (nb>1.0f?1.0f:nb) : 0.0f;
 									break;
 								}
 

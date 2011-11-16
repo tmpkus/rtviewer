@@ -24,27 +24,43 @@
 using namespace std;
 
 module * modules = NULL;
+module * pre_raw_filters = NULL;
+module * post_raw_filters = NULL;
+
+void insert_by_rank(module & to_insert, module * & anchor) {
+	module * found = anchor;
+	module * next = anchor;
+	while (next && (next->rank < to_insert.rank)) {
+		found = next;
+		next = found->next;
+	}
+	if ((anchor == 0) || (next == anchor)) {
+		to_insert.next = anchor;
+		anchor = &to_insert;
+	} else {
+		to_insert.next = found->next;
+		found->next = &to_insert;
+	}
+}
 
 void list_filters(void) {
-	module * list = modules;
-	while (list) {
-		cout << "filter: " << list->name << " rank: " << list->rank << endl;
-		list = list->next;
+	module * list, *mods[3] = { pre_raw_filters, post_raw_filters, modules };
+	const char * names[3] = { "raw filters:", "post demosaic filters:",
+			"filter modules:" };
+	for (int i = 0; i < 3; i++) {
+		list = mods[i];
+		cout << names[i] << endl;
+		while (list) {
+			cout << "  filter: " << list->name << " rank: " << list->rank << endl;
+			list = list->next;
+		}
 	}
 }
 
 void addmodule(module & moduleinfo) {
-	module * found = modules;
-	module * next = modules;
-	while (next && (next->rank < moduleinfo.rank)) {
-		found = next;
-		next = found->next;
-	}
-	if ((modules == 0) || (next == modules)) {
-		moduleinfo.next = modules;
-		modules = &moduleinfo;
-	} else {
-		moduleinfo.next = found->next;
-		found->next = &moduleinfo;
-	}
+	insert_by_rank(moduleinfo,modules);
+}
+
+void add_prerawfilter(module & moduleinfo) {
+	insert_by_rank(moduleinfo,pre_raw_filters);
 }

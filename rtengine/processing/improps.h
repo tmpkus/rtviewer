@@ -55,11 +55,14 @@ public:
 
 	template <class U> configdata & operator= (U rhs);
 	template <typename T> configdata & operator= (vector<T> & rhs);
+
 	operator float()
 	{
 		char *t;
 		type=FLOAT;
-		return (float)strtod(text,&t);
+		//if (text)
+			return (float)strtod(text,&t);
+		//else return 0.0f;
 	};
 	operator int()
 	{
@@ -107,7 +110,11 @@ public:
 		}
 };
 
-
+typedef struct
+{
+	char * colspace_name;
+	//colmatrix col_matrix;
+} colorspace;
 
 
 typedef map<char*,configdata,ltstr> configitems;
@@ -120,14 +127,10 @@ private:
 	char * pp3_name;
 public:
 	pp3_datamap pp3;
-	float expcomp;
-	float contrast;
-	float sh_radius;
-	float sh_amount;
-	float noise_lamount;
-	float noise_camount;
-	float noise_gamma;
-	int read(int argc,char** argv);
+
+	colorspace cols;
+
+	int read(char * name);
 	void dump(void);
 };
 
