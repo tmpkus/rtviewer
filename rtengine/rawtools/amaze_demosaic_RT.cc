@@ -105,7 +105,7 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 #pragma omp parallel
 		{
 			//position of top/left corner of the tile
-			int top, left;
+			//int top, left;
 			// beginning of storage block for tile
 			float *buffer;
 			// rgb values
@@ -254,9 +254,10 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 			// Main algorithm: Tile loop
 			//#pragma omp parallel for shared(rawData,height,width,red,green,blue) private(top,left) schedule(dynamic)
 			//code is openmp ready; just have to pull local tile variable declarations inside the tile loop
+
 #pragma omp for schedule(dynamic) nowait
-			for ( top = winy - 16; top < winy + height ; top += TILE_SIZE )
-				for ( left = winx - 16; left < winx + width ; left += TILE_SIZE )
+			for (int top = winy - 16; top < winy + height ; top += TILE_SIZE )
+				for ( int left = winx - 16; left < winx + width ; left += TILE_SIZE )
 					if (Tile_flags[(top + 16) / TILE_SIZE][(left + 16) / TILE_SIZE] == 1) // not yet transformed.
 							{
 						Tile_flags[(top + 16) / TILE_SIZE][(left + 16) / TILE_SIZE] = 2;

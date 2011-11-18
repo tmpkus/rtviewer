@@ -540,7 +540,7 @@ void fast_demosaic::cook_data(improps & props)
 	//if (rot&1)
 	//	Tile_flags((H + TILE_SIZE - 1) / TILE_SIZE,(W + TILE_SIZE - 1) / TILE_SIZE); // setup correct size
 	//else
-	Tile_flags((W + TILE_SIZE - 1) / TILE_SIZE,(H + TILE_SIZE - 1) / TILE_SIZE); // setup correct size
+	Tile_flags((W + 32 + TILE_SIZE - 1) / TILE_SIZE,(H + 32 + TILE_SIZE - 1) / TILE_SIZE); // setup correct size
 
 	for ( unsigned int ty = 0 ; ty < Tile_flags.height() ; ty++ )
 		for ( unsigned int tx = 0 ; tx < Tile_flags.width() ; tx++ )
