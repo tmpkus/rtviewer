@@ -330,6 +330,7 @@ void sharpen (LabImage & dst,improps &props)
 	if (amount==0.0) return;
 	cout << "sharpen filter: radius" << radius << " amount "<< amount << " threshold "<< thresh << endl;
 	amount=amount* 0.01f;
+	thresh=thresh*0.01f;
 	LabImage temp;
 	temp <<=dst;
 	int H=dst.ysize(),W=dst.xsize();

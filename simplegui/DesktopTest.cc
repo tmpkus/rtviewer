@@ -139,7 +139,7 @@ public:
 				MyRAW->demosaic(RawTile);
 				// grab current position
 				RawTile.pos(dx, dy); // demosaic has clipped the offsets so we grab them again
-
+				apply_filters(RawTile,  MyRAW->props, 10);
 				// set offset to 0,0
 				RawTile.moveto(0, 0);
 

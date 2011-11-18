@@ -16,6 +16,7 @@ CC_SRCS += \
 ../rtengine/filters/filtermodule.cc \
 ../rtengine/filters/Lab_denoise.cc \
 ../rtengine/filters/usm.cc \
+../rtengine/filters/colorspace.cc \
 ../rtengine/processing/processfilters.cc \
 ../rtengine/processing/improps.cc \
 
@@ -33,6 +34,7 @@ OBJS += \
 ./rtengine/filters/filtermodule.o \
 ./rtengine/filters/Lab_denoise.o \
 ./rtengine/filters/usm.o \
+./rtengine/filters/colorspace.o \
 ./rtengine/processing/processfilters.o \
 ./rtengine/processing/improps.o \
 ./rtengine/utils/LUT.o \

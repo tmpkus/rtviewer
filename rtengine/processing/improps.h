@@ -129,7 +129,7 @@ public:
 	pp3_datamap pp3;
 
 	colorspace cols;
-
+	float mat[3][3]; // color matrix used
 	int read(char * name);
 	void dump(void);
 };

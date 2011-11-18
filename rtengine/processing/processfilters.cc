@@ -32,7 +32,7 @@ void list_filters(void) {
 }
 *
  */
-void apply_filters(HDRImage & im, improps & props) {
+void apply_filters(HDRImage & im, improps & props, int max) {
 	image_type imt = HDRim, cur = HDRim;
 	LabImage L(im.xsize(),im.ysize());
 	HSVImage H;//(im.xsize(),im.ysize());
@@ -40,7 +40,7 @@ void apply_filters(HDRImage & im, improps & props) {
 	H.moveto(0,0);
 	list_filters();
 	module * list = modules;
-	while (list) {
+	while (list && list->rank<=max) {
 
 		// convert current type to desired type
 		// if necessary

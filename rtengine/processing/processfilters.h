@@ -24,5 +24,5 @@ using namespace std;
 
 
 //void list_filters(void);
-void apply_filters(HDRImage & im, improps & props);
+void apply_filters(HDRImage & im, improps & props,int max=100000);
 #endif

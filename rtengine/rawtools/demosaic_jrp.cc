@@ -530,6 +530,11 @@ void fast_demosaic::cook_data(improps & props)
 		channel_mul[1] = cam_mul[1] / min_channel;
 		channel_mul[2] = cam_mul[2] / min_channel;
 	}
+
+	for (int i=0;i<3;i++)
+			for (int j=0;j<3;j++)
+				props.mat[i][j]=mat[i][j];
+
 	cout << "setup tile management\n";
 	int rot = get_rotateDegree() / 90;
 	//if (rot&1)
