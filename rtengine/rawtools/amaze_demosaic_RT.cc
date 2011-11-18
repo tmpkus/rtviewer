@@ -1283,7 +1283,7 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 	}
 	RGB_converted.moveto(-dest.xoff(), -dest.yoff());
 	dest <<= RGB_converted;
-
+	color_correct(dest,dest,props);
 	// done
 
 #undef TS

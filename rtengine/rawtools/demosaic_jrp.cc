@@ -531,6 +531,10 @@ void fast_demosaic::cook_data(improps & props)
 		channel_mul[2] = cam_mul[2] / min_channel;
 	}
 	cout << "setup tile management\n";
+	int rot = get_rotateDegree() / 90;
+	//if (rot&1)
+	//	Tile_flags((H + TILE_SIZE - 1) / TILE_SIZE,(W + TILE_SIZE - 1) / TILE_SIZE); // setup correct size
+	//else
 	Tile_flags((W + TILE_SIZE - 1) / TILE_SIZE,(H + TILE_SIZE - 1) / TILE_SIZE); // setup correct size
 
 	for ( unsigned int ty = 0 ; ty < Tile_flags.height() ; ty++ )
@@ -538,7 +542,6 @@ void fast_demosaic::cook_data(improps & props)
 			Tile_flags[ty][tx] = 0; // set cleared;
 	cout << "setup RGB data image\n";
 	// check orientation
-	int rot = get_rotateDegree() / 90;
 
 	//method = VARSIZE_DEMOSAIC;
 	method = AMAZE_DEMOSAIC;
@@ -597,7 +600,7 @@ int fast_demosaic::touch_tiles(HDRImage &dest, int &tile_xs, int &tile_xe, int &
 		if (py < 0)
 			py = 0;
 		cout << "before clip " << px << " " << py << endl;
-
+		cout << " dest X Y: " << RGB_converted.xsize() << " " << RGB_converted.ysize() << endl;
 		if ((px + dest.xsize()) > RGB_converted.xsize())
 			px = RGB_converted.xsize() - dest.xsize();
 		if ((py + dest.ysize()) > RGB_converted.ysize())
@@ -612,6 +615,42 @@ int fast_demosaic::touch_tiles(HDRImage &dest, int &tile_xs, int &tile_xe, int &
 		tsz=tsz/2;
 	if (method==VARSIZE_DEMOSAIC)
 			tsz=tsz/3;
+	// something is still not right here.
+
+	int d_x = dest.xoff();
+	int d_y = dest.yoff();
+	int d_ex = dest.xoff() + dest.xsize() - 1;
+	int d_ey = dest.yoff() + dest.ysize() - 1;
+
+	switch (rot)
+	{
+	case 0:
+		tile_xs = d_x / tsz;
+		tile_xe = d_ex / tsz;
+		tile_ys = d_y / tsz;
+		tile_ye = d_ey / tsz;
+		break;
+	case 1:
+		tile_xs= d_y /tsz;
+		tile_xe= d_ey/tsz;
+		tile_ys= (H-d_ex-1)/tsz;
+		tile_ye= (H-d_x-1)/tsz;
+		break;
+	case 2:
+		tile_xs= (W-d_ex-1) /tsz;
+		tile_xe= (W-d_x-1)/tsz;
+		tile_ys= (H-d_ey-1)/tsz;
+		tile_ye= (H-d_y-1)/tsz;
+		break;
+	case 3:
+		tile_xs= (W-d_ey-1) /tsz;
+		tile_xe= (W-d_y-1)/tsz;
+		tile_ys= (d_x)/tsz;
+		tile_ye= (d_ex)/tsz;
+		break;
+	}
+
+	/*
 	tile_xs = dest.xoff() / tsz;
 	tile_ys = dest.yoff() / tsz;
 	tile_xe = (dest.xoff() + dest.xsize() - 1) / tsz;
@@ -655,11 +694,15 @@ int fast_demosaic::touch_tiles(HDRImage &dest, int &tile_xs, int &tile_xe, int &
 			break;
 		}
 	}
-
+*/
 	int runtiles = 0;
+	cout << "rotation is: "<< rot << endl;
 	cout << "tiles from " << tile_xs << "x" << tile_ys << " to " << tile_xe << "x" << tile_ye <<endl;
-	if (tile_xs<0) tile_xs=0;
-	if (tile_ys<0) tile_ys=0;
+	if (tile_xs<0) { tile_xs=0; cout << " x too low" << endl;}
+	if (tile_ys<0) { tile_ys=0; cout << " y too low" << endl;}
+	if (tile_ye>=Tile_flags.height()) { tile_ye=Tile_flags.height()-1;cout << " y too high" << endl;}
+	if (tile_xe>=Tile_flags.width()) { tile_ye=Tile_flags.width()-1;;cout << " x too high" << endl;}
+
 
 	for ( ; tile_ys <= tile_ye ; tile_ys++ )
 		for ( int tx = tile_xs ; tx <= tile_xe ; tx++ )
