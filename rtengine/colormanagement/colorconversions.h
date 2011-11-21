@@ -198,17 +198,32 @@ rgbHDR & rgbHDR::operator=(Lab & rhs) {
 
 	return *this;
 }
-static inline void to_YCbCr(rgbHDR & in,LBrBb & out)
+static inline void to_YCbCr(const rgbHDR & in,LBrBb & out)
  {
-	 out.L = (0.299f 	* in.r + 0.587f    * in.g + 0.114f * in.b);
-	 out.Bb = (-0.168736f * in.r - 0.331264f * in.g + 0.5f   * in.b);
-	 out.Br = (0.5f		* in.r -0.418688f  * in.g - 0.081312f*in.b);
+	/*
+	 out.L =( 0.2990000f * in.r + 0.587000f * in.g + 0.114000f * in.b);
+	 out.b =(-0.1687360f * in.r - 0.331264f * in.g + 0.5f      * in.b);
+	 out.a =( 0.5f		  * in.r - 0.418688f * in.g - 0.081312f * in.b);
+	 */
+	 float L =( 0.2990000f * in.r*in.r + 0.587000f * in.g*in.g + 0.114000f * in.b*in.b);
+	 float b =(-0.1687360f * in.r*in.r - 0.331264f * in.g*in.g + 0.5f      * in.b*in.b);
+	 float a =( 0.5f	   * in.r*in.r - 0.418688f * in.g*in.g - 0.081312f * in.b*in.b);
+	 if (L>0.0f) b=b/L;
+	 if (L>0.0f) a=a/L;
+	 out.L=L;
+	 out.a=a;
+	 out.b=b;
+
  }
-static inline void from_YCbCr(LBrBb & in,rgbHDR & out)
+static inline void from_YCbCr(const LBrBb & in,rgbHDR & out)
  {
-	 out.r = (1.000f 	* in.L + 0.000f * in.Bb + 1.402f * in.Br);
-	 out.g = (1.000f 	* in.L - 0.344f	* in.Bb - 0.714f * in.Br);
-	 out.b = (1.000f 	* in.L + 1.772f * in.Bb + 0.000f * in.Br);
+	 float r = sqrt(in.L*(1.000f  + 0.000001f * in.b + 1.402000f * in.a));
+	 float g = sqrt(in.L*(1.000f  - 0.344136f * in.b - 0.714136f * in.a));
+	 float b = sqrt(in.L*(1.000f  + 1.772000f * in.b + 0.000000f * in.a));
+	 out.r = r;
+	 out.g = g;
+	 out.b = b;
+
  }
 
 LBrBb & LBrBb::operator =(class argb8 & rhs) {

@@ -67,7 +67,7 @@ public:
 };
 class LBrBb {
 public:
-	float L, Br, Bb;
+	float L, a, b;
 	LBrBb & operator=(class argb8 & rhs) ;
 	LBrBb & operator=(class rgbHDR & rhs);
 	LBrBb & operator=(unsigned int & rhs);
@@ -75,32 +75,32 @@ public:
 	{
 		LBrBb t;
 		t.L=this->L/rhs.L;
-		t.Br=this->Br/rhs.Br;
-		t.Bb=this->Bb/rhs.Bb;
+		t.a=this->a/rhs.a;
+		t.b=this->b/rhs.b;
 		return t;
 	}
 	LBrBb  operator+(const class LBrBb&rhs)
 	{
 		LBrBb t;
 		t.L=this->L+rhs.L;
-		t.Br=this->Br+rhs.Br;
-		t.Bb=this->Bb+rhs.Bb;
+		t.a=this->a+rhs.a;
+		t.b=this->b+rhs.b;
 		return t;
 	}
 	LBrBb  operator/(float & rhs)
 		{
 		LBrBb t;
 			t.L=this->L/rhs;
-			t.Br=this->Br/rhs;
-			t.Bb=this->Bb/rhs;
+			t.a=this->a/rhs;
+			t.b=this->b/rhs;
 			return t;
 		}
 	LBrBb  operator*(float & rhs)
 		{
 		LBrBb t;
 			t.L=this->L*rhs;
-			t.Br=this->Br*rhs;
-			t.Bb=this->Bb*rhs;
+			t.a=this->a*rhs;
+			t.b=this->b*rhs;
 			return t;
 		}
 
@@ -250,8 +250,9 @@ public:
 	int ysize(void) {return data.height(); };
 	int xoff(void) {return data.xoffset();};
 	int yoff(void) {return data.yoffset();};
-
+/*
 	void Lab_denoise(improps & props); //(const float luma, const float chroma, float gam_in);
+	*/
 	void moveto(int nx,int ny) {data.moveto(nx,ny); };
 	void move(int nx,int ny) { data.move(nx,ny); };
 	void pos(int &xnpos,int &ynpos){ xnpos=data.xoffset();ynpos=data.yoffset();}
@@ -271,5 +272,6 @@ public:
 #define HIImage Image<rgbHI>
 #define HDRImage Image<rgbHDR>
 #define LBrBbImage Image<LBrBb>
+#define RAWImage Image<float>
 
 #endif /* IMAGE_H_ */

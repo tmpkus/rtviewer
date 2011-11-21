@@ -127,7 +127,7 @@ private:
 	char * pp3_name;
 public:
 	pp3_datamap pp3;
-
+	volatile int early;
 	colorspace cols;
 	float mat[3][3]; // color matrix used
 	int read(char * name);

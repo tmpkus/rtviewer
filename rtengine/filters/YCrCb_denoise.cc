@@ -44,7 +44,7 @@ typedef array2D<Luma_t> LumImage;
 
 static inline float L_weight(float t1, float t2)
 {
-	float t = (t2 - t1)*0.3f;
+	float t = (t2 - t1)*60.0f;//*0.6f;
 		float f = t*t;
 		if (f>9.0f) return 0.013f/f;
 
@@ -60,10 +60,9 @@ static inline float L_weight(float t1, float t2)
 
 static inline float Chroma_weight(float t1, float t2, float gamma,float radius)
 {
-	float t = (t2 - t1)*0.2f;
+	float t = (t2 - t1)*20.0f;
 	float f = t*t;
 	if (f>9.0f) return 0.013f/f;
-
 	float g=f*f;
 	float p=f+0.5f*g;
 	p=p+0.125f*g*f;
@@ -233,7 +232,7 @@ static void Bilateral_Luma(LumImage &ref, LumImage &working, LumImage &res, int 
 	}
 }
 
-void lab_split(LabImage & src, LumImage &L, ChrImage &C)
+void lab_split(LBrBbImage & src, LumImage &L, ChrImage &C)
 {
 	int w = src.xsize(), h = src.ysize();
 #pragma omp parallel for
@@ -244,7 +243,7 @@ void lab_split(LabImage & src, LumImage &L, ChrImage &C)
 			C[y][x].b = src[y][x].b;
 		}
 }
-void join_as_Lab(LabImage & src, LumImage &L, ChrImage &C, float luma, float chroma)
+void join_as_Lab(LBrBbImage & src, LumImage &L, ChrImage &C, float luma, float chroma)
 {
 	int w = src.xsize(), h = src.ysize();
 #pragma omp parallel for
@@ -258,8 +257,10 @@ void join_as_Lab(LabImage & src, LumImage &L, ChrImage &C, float luma, float chr
 			}
 		}
 }
-void Lab_Denoise(LabImage & src,improps & props)
+void YCrCb_denoise(HDRImage & realsrc,improps & props)
 {
+	LBrBbImage src;
+	src=realsrc;
 	if ((bool) props.pp3["[Directional Pyramid Denoising]"]["Enabled"] != true) return;
 	float luma = props.pp3["[Directional Pyramid Denoising]"]["Luma"];
 	float chroma = props.pp3["[Directional Pyramid Denoising]"]["Chroma"];
@@ -287,7 +288,7 @@ void Lab_Denoise(LabImage & src,improps & props)
 		lumaw = chromaw; //special case if chroma>0 but luma=0
 
 	Bilateral_Luma(Luma1, Luma1, Luma2, 5, gammaw / 10.0f, lumaw, 0.25f);
-	Bilateral_Luma(Luma2, Luma2, Luma1, 5, gammaw / 10.0f, lumaw, 0.25f);//lumaw * 0.15f, 0.1f);
+	Bilateral_Luma(Luma1, Luma2, Luma1, 5, gammaw / 10.0f, lumaw, 0.25f);//lumaw * 0.15f, 0.1f);
 
 	if (chromaw > 0.955f) {
 		Bilateral_Chroma(Luma1, Chroma1, Chroma2, 12, gammaw, chromaw);
@@ -297,7 +298,8 @@ void Lab_Denoise(LabImage & src,improps & props)
 		Bilateral_Chroma(Luma1, Chroma1, Chroma2, 9, gammaw, chromaw);	}
 
 	join_as_Lab(src, Luma1, Chroma2, luma, chroma);
+	realsrc=src;
 }
 
 
-//ADD_FILTER( Lab_Denoise, Labim , 100)
+//ADD_FILTER( YCrCb_denoise, HDRim , 100)

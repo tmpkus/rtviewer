@@ -14,7 +14,9 @@ CC_SRCS += \
 ../rtengine/rawtools/ImageRaw.cc \
 ../rtengine/imageformats/image.cc \
 ../rtengine/filters/filtermodule.cc \
+../rtengine/filters/RGB_denoise.cc \
 ../rtengine/filters/Lab_denoise.cc \
+../rtengine/filters/YCrCb_denoise.cc \
 ../rtengine/filters/usm.cc \
 ../rtengine/filters/colorspace.cc \
 ../rtengine/processing/processfilters.cc \
@@ -32,7 +34,9 @@ OBJS += \
 ./rtengine/rawtools/ImageRaw.o \
 ./rtengine/imageformats/image.o \
 ./rtengine/filters/filtermodule.o \
+./rtengine/filters/RGB_denoise.o \
 ./rtengine/filters/Lab_denoise.o \
+./rtengine/filters/YCrCb_denoise.o \
 ./rtengine/filters/usm.o \
 ./rtengine/filters/colorspace.o \
 ./rtengine/processing/processfilters.o \

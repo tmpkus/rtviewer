@@ -57,6 +57,8 @@
 #include <unistd.h>				// for sleep()
 #include <string.h>				// for memset()
 #include "logfile.h" // for log()
+#include <iostream>
+using namespace std;
 // flags for use
 #define ARRAY2D_LOCK_DATA	1
 #define ARRAY2D_CLEAR_DATA	2
@@ -101,7 +103,7 @@ public:
 	// use as empty declaration, resize before use!
 	// very useful as a member object
 	array2D() :
-		x(0), y(0), owner(0),flags(0),xoff(0),yoff(0),dxoff(0),dyoff(0), data(NULL), ptr(NULL), lock(0) {
+		x(0), y(0), owner(1),flags(0),xoff(0),yoff(0),dxoff(0),dyoff(0), data(NULL), ptr(NULL), lock(0) {
 		logmsg("got empty array2D init\n");
 	}
 
@@ -185,9 +187,21 @@ public:
 		{
 			memset(data,0,x*y*sizeof(T));
 		}
+		if ((owner==0) && (flags & ARRAY2D_BYREFERENCE))
+		{
+			for (int i=0;i<y;i++)
+				memset(ptr[i],0,x*sizeof(T));
+		}
 	}
 	// use with indices
 	T * operator[](size_t index) {
+#ifdef _DEBUG
+		if (index<0 || index>=y)
+			{
+				cout << "Array2d: out of bounds: " << index << " max is " << y << endl;
+				return NULL;
+			}
+#endif
 		return data+index*x;//ptr[index];
 	}
 

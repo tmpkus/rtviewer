@@ -113,6 +113,7 @@ int Image<color>::save(std::string name) {
 	logerr("image::save(std::string name) not implemented yet");
 	return 0;
 }
+/*
 void Lab_Denoise(LabImage &src,improps & props);//const float luma, const float chroma, float gam_in);
 
 template <typename color> void Image<color>::Lab_denoise(improps & props)//const float luma, const float chroma, float gam_in)
@@ -148,7 +149,7 @@ template <> void Image<rgbHDR>::Lab_denoise(improps & props) //(const float luma
 	src.moveto(0,0);
 	*this<<=src;
 	data.moveto(x,y);
-}
+} */
 // Instantiate myclass for the supported template type parameters
 
 template class Image<argb8> ;
