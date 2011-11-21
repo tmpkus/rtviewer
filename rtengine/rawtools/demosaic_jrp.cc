@@ -464,7 +464,7 @@ void fast_demosaic::jrp_demo(HDRImage & dst,improps & props)
 		Tile_flags[0][0]=2;
 		float accur = 0.0004;
 		naive(RGB_converted, I, accur, accur*0.25f);
-		color_correct(RGB_converted,RGB_converted,props);
+		//color_correct(RGB_converted,RGB_converted,props);
 
 	}
 	RGB_converted.moveto(-dst.xoff(),-dst.yoff());
@@ -581,10 +581,10 @@ void fast_demosaic::cook_data(improps & props)
 			rawData[y][x] = (r > max_f) ? max_f : ((r < 0.0f) ? 0.0f:r);
 		}
 	}
-	if ((method==JRP_DEMOSAIC)&&0)
+	if ((method==JRP_DEMOSAIC))
 	{
 		linear_interpolate();
-		color_correct(RGB_converted,RGB_converted,props);
+		//color_correct(RGB_converted,RGB_converted,props);
 		Tile_flags[0][0]=2;
 	}
 }
@@ -796,7 +796,7 @@ void fast_demosaic::half_size_demo(HDRImage & dest,improps & props)
 	}
 	RGB_converted.moveto(-dest.xoff(), -dest.yoff());
 	dest <<= RGB_converted;
-	color_correct(dest,dest,props);
+	//color_correct(dest,dest,props);
 
 }
 void fast_demosaic::nth_size_demo(HDRImage & dest,int num,improps & props)
@@ -874,7 +874,7 @@ void fast_demosaic::nth_size_demo(HDRImage & dest,int num,improps & props)
 	}
 	RGB_converted.moveto(-dest.xoff(), -dest.yoff());
 	dest <<= RGB_converted;
-	color_correct(dest,dest,props);
+	//color_correct(dest,dest,props);
 
 }
 void fast_demosaic::linear_interpolate()

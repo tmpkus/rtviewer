@@ -60,22 +60,24 @@ public:
 	{
 		char *t;
 		type=FLOAT;
-		//if (text)
+		if (text)
 			return (float)strtod(text,&t);
-		//else return 0.0f;
+		else return 0.0f;
 	};
 	operator int()
 	{
 		char *t;
 		type=INT;
-		return strtol(text,&t,0);
+		if (text) return strtol(text,&t,0);
+		return 0;
 	};
 	operator bool()
 	{
 		char *t="true";
 		type=BOOL;
-		bool test = ((strncmp(t,text,4))==0);
-		return test;
+		if (text)
+			return ((strncmp(t,text,4))==0);
+		return false;
 	};
 	operator char *()
 	{
@@ -85,6 +87,8 @@ public:
 	operator class vector<float> ()
 		{
 			vector<float> t;
+			if (text)
+			{
 			char * r=text;
 			while(*r)
 			{
@@ -93,11 +97,14 @@ public:
 				if (*res==';') res++;
 				r=res;
 			}
+			}
 			return t;
 		}
 	operator class vector<int> ()
 		{
 			vector<int> t;
+			if (text)
+			{
 			char * r=text;
 			while(*r)
 			{
@@ -105,6 +112,7 @@ public:
 				t.push_back(strtol(r,&res,0));
 				if (*res==';') res++;
 				r=res;
+			}
 			}
 			return t;
 		}

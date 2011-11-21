@@ -20,33 +20,26 @@
 #include <iostream>
 using namespace std;
 
-/*
- module * modules = NULL;
-
-void list_filters(void) {
-	module * list = modules;
-	while (list) {
-		cout << "filter: " << list->name << " rank: " << list->rank << endl;
-		list = list->next;
-	}
-}
-*
- */
 void apply_filters(HDRImage & im, improps & props, int max) {
-	image_type imt = HDRim, cur = HDRim;
+	image_type cur = HDRim;
 	LabImage L(im.xsize(),im.ysize());
-	HSVImage H;//(im.xsize(),im.ysize());
 	L.moveto(0,0);
+
+	/* -- HSV is broken , needs fixing --
+	HSVImage H;//(im.xsize(),im.ysize());
 	H.moveto(0,0);
+	*/
+
 	list_filters();
 	module * list = modules;
-	while (list && list->rank<=max) {
+
+	while (list && list->rank<=max && props.early) {
 
 		// convert current type to desired type
 		// if necessary
 
-		// while converting we don't use <<= but =
-		// that ensures we can resize or rotate too.
+		// while converting we don't use '<<=' but '='
+		// which ensures we can resize or rotate the original too.
 
 		// HSV support is broken so we comment it
 
@@ -60,10 +53,11 @@ void apply_filters(HDRImage & im, improps & props, int max) {
 					L = im;
 					cur = Labim;
 					break;
+				/* -- HSV is broken , needs fixing --
 				case HSVim:
 					//H <<= im;
 					cur = HSVim;
-					break;
+					break;*/
 				case HDRim:
 				default: // nothing to do
 					break;
@@ -72,10 +66,11 @@ void apply_filters(HDRImage & im, improps & props, int max) {
 				switch (list->type) {
 				case Labim:
 					break;
+				/* -- HSV is broken , needs fixing --
 				case HSVim:
-					//H <<= L;
+					H = L;
 					cur = HSVim;
-					break;
+					break; */
 				case HDRim:
 					im = L;
 					cur = HDRim;
@@ -83,6 +78,7 @@ void apply_filters(HDRImage & im, improps & props, int max) {
 				default: // nothing to do
 					break;
 				}
+			/* -- HSV is broken , needs fixing --
 			case HSVim:
 				switch (list->type) {
 				case Labim:
@@ -98,6 +94,7 @@ void apply_filters(HDRImage & im, improps & props, int max) {
 				default: // nothing to do
 					break;
 				}
+				*/
 			}
 		}
 
@@ -107,8 +104,9 @@ void apply_filters(HDRImage & im, improps & props, int max) {
 		case Labim:
 			list->fLabim(L, props);
 			break;
+		/* -- HSV is broken , needs fixing --
 		case HSVim:
-			break;
+			break;*/
 		case HDRim:
 			list->fHDRim(im, props);
 			break;
@@ -120,15 +118,17 @@ void apply_filters(HDRImage & im, improps & props, int max) {
 	cout << "convert back imagetype" << endl;
 
 	// convert back to HDRImage.
+	// since that is where we started.
 	switch (cur) {
 	case HDRim:
 		break;
 	case Labim:
 		im = L;
 		break;
+	/* -- HSV is broken , needs fixing --
 	case HSVim:
-		//im <<= H;
-		break;
+		im <<= H;
+		break;*/
 	default: // nothing to do
 		break;
 	}

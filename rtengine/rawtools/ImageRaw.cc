@@ -27,23 +27,7 @@ Image_Raw ::Image_Raw(char * new_name)
 
 	ref = (void *)thisraw;
 	thisraw->cook_data(props);
-	//ISO=myraw.iso_speed;
-	//if(myraw.success) myraw.fast_demo(*this);
-	//if(myraw.success) myraw.amaze_demosaic_RT(*this);
-	//if(myraw.success) myraw.jrp_demo(*this);
 }
-/*
-Image_Raw ::Image_Raw(char * new_name, improps props)
-{
-	pp3_found = props.read(argc, argv);
-	fast_demosaic *thisraw = new fast_demosaic (new_name,props);
-	ref = (void *)thisraw;
-	thisraw->cook_data();
-	//ISO=myraw.iso_speed;
-	//if(myraw.success) myraw.fast_demo(*this);
-	//if(myraw.success) myraw.amaze_demosaic_RT(*this);
-	//if(myraw.success) myraw.jrp_demo(*this);
-}*/
 
 Image_Raw ::~Image_Raw()
 {

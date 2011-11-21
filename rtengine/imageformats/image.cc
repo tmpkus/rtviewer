@@ -22,17 +22,17 @@
 #include "../colormanagement/colorconversions.h"
 
 template<typename color> void Image<color>::set_pixel(int w, int h,
-		unsigned int c) // create new
+		unsigned int c)
 {
 	if (((unsigned int) w < data.width()) && ((unsigned int) h < data.height()))
 		data[h][w] = c;
 }
-template<typename color> void Image<color>::set_pixel(int w, int h, color c) // create new
+template<typename color> void Image<color>::set_pixel(int w, int h, color c)
 {
 	if (((unsigned int) w < data.width()) && ((unsigned int) h < data.height()))
 		data[h][w] = c;
 }
-template<typename color> Image<color>::Image(int w, int h) // create new
+template<typename color> Image<color>::Image(int w, int h)
 {
 	data(w, h);
 }
@@ -113,44 +113,8 @@ int Image<color>::save(std::string name) {
 	logerr("image::save(std::string name) not implemented yet");
 	return 0;
 }
-/*
-void Lab_Denoise(LabImage &src,improps & props);//const float luma, const float chroma, float gam_in);
 
-template <typename color> void Image<color>::Lab_denoise(improps & props)//const float luma, const float chroma, float gam_in)
-{
-			LabImage src(this->xsize(),this->ysize());
-			int x=data.xoffset(),y=data.yoffset();
-			data.moveto(0,0);
-			{
-				HDRImage temp;
-				temp<<=*this;
-				src<<=temp;
-			}
-			src.Lab_denoise(props);//luma,chroma,gam_in);
-			src.moveto(0,0);
-			{
-				HDRImage temp;
-				temp<<=src;
-				*this<<=temp;
-			}
-			data.moveto(x,y);
-}
-template <> void Image<Lab>::Lab_denoise(improps & props) //const float luma, const float chroma, float gam_in)
-{
-	Lab_Denoise(*this,props);//luma,chroma,gam_in);
-}
-template <> void Image<rgbHDR>::Lab_denoise(improps & props) //(const float luma, const float chroma, float gam_in)
-{
-	LabImage src;
-	int x=data.xoffset(),y=data.yoffset();
-	data.moveto(0,0);
-	src<<=*this;
-	src.Lab_denoise(props);
-	src.moveto(0,0);
-	*this<<=src;
-	data.moveto(x,y);
-} */
-// Instantiate myclass for the supported template type parameters
+// Instantiate the classes for the supported template type parameters
 
 template class Image<argb8> ;
 template class Image<Lab> ;

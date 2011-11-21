@@ -200,7 +200,10 @@ public:
 	}
 };
 
-
+/*
+ *  HSV needs to be expanded to become useful within image operations.
+ *
+ */
 class hsv {
 public:
 	float H, S, V;
@@ -231,6 +234,8 @@ public:
 	void operator()(int w, int h, unsigned int *  orig, unsigned int flgs = 0);
 	void operator()(int w, int h);
 	Image<color> & operator=(Image<color> & rhs);
+
+	// '=' will ensure same size and data.
 	template <typename othercolor>
 		Image<color> & operator=(Image<othercolor> & rhs){
 		//if ((void*)this != (void*)&rhs) {
@@ -238,9 +243,10 @@ public:
 		//}
 		return *this;
 	};
+	// the '<<=' will allow different sizes of images
 	template <typename othercolor>
 		Image<color> & operator<<=(Image<othercolor> & rhs){
-		data <<= rhs.data; // this should auto-magically do color conversion
+		data <<= rhs.data;
 		return *this;
 	}
 	void clear() { data.clear(); };
@@ -250,9 +256,6 @@ public:
 	int ysize(void) {return data.height(); };
 	int xoff(void) {return data.xoffset();};
 	int yoff(void) {return data.yoffset();};
-/*
-	void Lab_denoise(improps & props); //(const float luma, const float chroma, float gam_in);
-	*/
 	void moveto(int nx,int ny) {data.moveto(nx,ny); };
 	void move(int nx,int ny) { data.move(nx,ny); };
 	void pos(int &xnpos,int &ynpos){ xnpos=data.xoffset();ynpos=data.yoffset();}
