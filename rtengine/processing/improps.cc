@@ -58,7 +58,7 @@ template<typename TY> configdata & configdata::operator=(vector<TY> & rhs)
 
 int improps::read(char * toread)
 {
-	early=0; // flag for early termination of processing
+	early=1; // flag for early termination of processing
 
 	// we load the config_ file derived from the file name
 /*	expcomp = 0.0f;
