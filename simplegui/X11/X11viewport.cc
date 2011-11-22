@@ -286,16 +286,17 @@ int viewport::process_events(void) {
 			break;
 		case UnmapNotify:
 		case MapNotify:
-			refresh=1;
+			refresh|=1;
 			break;
 		case ConfigureNotify://ResizeRequest: //VisibilityNotify:
 		{
 			XConfigureEvent *conf = (XConfigureEvent *)&xevent;
-			refresh=1;
+
 			if (conf->width!=width || conf->height!=height)
 			{
 				cout << "resize since different sizes" << endl;
 				width=conf->width;height=conf->height;
+				refresh|=2;
 			}
 		}
 			break;

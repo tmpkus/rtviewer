@@ -88,7 +88,7 @@ public:
 				do_filter = 0;
 			}
 			if (butt & 16) {
-				moved = 2;
+				moved = START_MOVE;
 				do_filter = 1;
 			}
 
@@ -97,20 +97,18 @@ public:
 	}
 
 	int render(int input) {
-		if (refresh==1)
+		if (refresh)
 		{
-			moved=START_MOVE;
+			moved=START_MOVE;refresh=0;
 		}
-		refresh=0;
-		if (moved == 0)
+		if ((moved == 0)&&(refresh==0))
 		{
 			usec_delay = 30000;
 			return 0;
 		}
+
 		usec_delay = 10000;
-		// override mouse scroll wheel..
-		do_filter = 1;
-		if (do_filter && moved == 1) {
+		if (moved == 1) {
 			// update offset
 			HDRImage RawTile(width,height);
 			RawTile.moveto(dx, dy);
@@ -129,6 +127,8 @@ public:
 			// output to window
 			// does conversion Lab to argb8
 			*this <<= RawTile;
+			moved=0;
+			return 1;
 		} else {
 			if (moved == START_MOVE)
 			{
@@ -145,10 +145,13 @@ public:
 
 				// show converted image in window.
 				*this <<= RawTile;
+				moved --;
+				return 1;
 			}
 		}
 		if (moved>0) moved--;
-		return 1;
+		usec_delay = 30000;
+		return 0;
 	}
 
 	desktop(int argc, char**argv, int nwidth, int nheight) :
