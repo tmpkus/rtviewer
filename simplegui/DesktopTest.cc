@@ -46,8 +46,8 @@ public:
 		py = 0;
 		HDRImage RawTile(width,height);
 		scale = 1;
-		if (pp3_found==0) return 0;
 		MyRAW = new Image_Raw(raw_to_load);
+		if (MyRAW->pp3_found==0) return 0;
 		// this ensure same size as preview.
 
 		// set offset to 0,0
