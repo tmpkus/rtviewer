@@ -44,19 +44,20 @@ typedef array2D<Luma_t> LumImage;
 
 static inline float RGBdiff(const rgbHDR &tst,const rgbHDR &ref,const float amount)
 {
-	float Rref = ref.r*ref.r+ref.b*ref.b+ref.g*ref.g;
-	//float Rtst = tst.r*tst.r+tst.b*tst.b+tst.g*tst.g;
-	//float RDiff = (Rref>Rtst)? Rref-Rtst:Rtst-Rref;
+	float Rref = .3f*ref.r*ref.r+.2f*ref.b*ref.b+.5f*ref.g*ref.g;
+	float Rtst = .3f*tst.r*tst.r+.2f*tst.b*tst.b+.5f*tst.g*tst.g;
+	float RDiff = (Rref>Rtst)? Rref-Rtst:Rtst-Rref;
 
-	float width = amount*(Rref+0.1f);//+(ref.r+ref.g+tst.b))
+	float width = amount*(Rref+0.01f);//+(ref.r+ref.g+tst.b))3.0f*
     //if(width==0.0f) width=
 
 	float rv=(ref.r-tst.r);
 	float gv=(ref.g-tst.g);
 	float bv=(ref.b-tst.b);
-	float f = ((rv*rv+gv*gv+bv*bv)*15.0f/*+RDiff*5.0f*/)/width;
+	//float f = ((rv*rv+gv*gv+bv*bv)*15.0f/*+RDiff*5.0f*/)/width;
+	float f = ((RDiff+(rv*rv+gv*gv+bv*bv))*6.0f/*+RDiff*5.0f*/)/width;
 
-	if (f>9.0f) return 0.000001f;
+	if (f>9.0f) return 0.00000001f;
 
 	float g=f*f;
 	float p=f+0.5f*g;
@@ -74,6 +75,7 @@ static void inline RGB_reduce(HDRImage &ref, HDRImage &working, HDRImage &res, f
 	const rgbHDR refL = working[y][x];
 	rgbHDR L,Ln;
 	L.r=0.0f;L.g=0.0f;L.b=0.0f;
+	Ln.r=0.0f;Ln.g=0.0f;Ln.b=0.0f;
 	float wgt = 0.0f,wgtn = 0.0f;
 	int n=0;
 	for ( int j = sj ; j < ej ; j++ )
@@ -88,7 +90,7 @@ static void inline RGB_reduce(HDRImage &ref, HDRImage &working, HDRImage &res, f
 				g = RGBdiff(cL,sL,amount)*50.0f / (50.0f + (float)(i * i + j * j));
 
 			//float g = w * RGBdiff(cL,refL,amount);
-			if (g>0.4) // correlation found
+			if (g>0.4) // strong correlation found
 			{
 				n++;
 				wgtn += g;
@@ -103,15 +105,19 @@ static void inline RGB_reduce(HDRImage &ref, HDRImage &working, HDRImage &res, f
 			}
 			}
 		}
-
+/*
 	if (n>15)
 	{
+		wgtn+=1.0f;
+		Ln.r+=refL.r;
+		Ln.g+=refL.g;
+		Ln.b+=refL.b;
 		L.r=(Ln.r/wgtn);//*(1.0-antidot)+antidot*sL.r;//-sL.r)*amount+sL.r;
 		L.g=(Ln.g/wgtn);//*(1.0-antidot)+antidot*sL.g;//-sL.g)*amount+sL.g;
 		L.b=(Ln.b/wgtn);//*(1.0-antidot)+antidot*sL.b;//-sL.b)*amount+sL.b;
 		res[y][x]=L;
 		return;
-	}
+	}*/
 	if (n>2)//(wgt>0.65f) // no salt/pepper
 	{
 		const float add=antidot;
@@ -133,9 +139,9 @@ static void inline RGB_reduce(HDRImage &ref, HDRImage &working, HDRImage &res, f
 		// small enough difference means no salt/pepper
 		if (rdiff<(anti_dot*offset)) { wgt+=0.5f;L+=sL*0.5f;}
 	}*/
-	L.r=(L.r/wgt)*(1.0-antidot)+antidot*sL.r;//-sL.r)*amount+sL.r;
-	L.g=(L.g/wgt)*(1.0-antidot)+antidot*sL.g;//-sL.g)*amount+sL.g;
-	L.b=(L.b/wgt)*(1.0-antidot)+antidot*sL.b;//-sL.b)*amount+sL.b;
+	L.r=(L.r/wgt);//*(1.0-antidot)+antidot*sL.r;//-sL.r)*amount+sL.r;
+	L.g=(L.g/wgt);//*(1.0-antidot)+antidot*sL.g;//-sL.g)*amount+sL.g;
+	L.b=(L.b/wgt);//*(1.0-antidot)+antidot*sL.b;//-sL.b)*amount+sL.b;
 
 	res[y][x]=L;//(L / wgt - sL) * amount + sL;
 
@@ -152,7 +158,6 @@ static void Bilateral_HDR_Luma(HDRImage &ref, HDRImage &working, HDRImage &res, 
 		int w = ((X + blocksize) >= W) ? W : X + blocksize;
 		int y, h = H;
 		for ( y = 0; y < radius * early; y++ ) {
-			if (early) break;
 			int s1 = -y;
 			int e1 = radius + 1;
 			for ( int x = X ; x < w * early; x++ ) {
@@ -208,7 +213,7 @@ void RGB_denoise(HDRImage & src,improps & props)
 	luma=luma*0.01f;
 	chroma=chroma*0.01f;
 	cout << "doing noise reduction: luma " << luma << " chroma " << chroma << "gamma " << gam_in << endl ;
-	float lumaw = luma;
+	float lumaw = luma*luma;
 	float chromaw = chroma;
 	float gammaw = gam_in;
 	//cout << " denoise using gamma " << gammaw << endl;
@@ -219,9 +224,9 @@ void RGB_denoise(HDRImage & src,improps & props)
 
 	HDRImage temp1(W,H);//,temp2;
 
-	Bilateral_HDR_Luma(src, src, temp1, 12, gammaw / 10.0f, lumaw, 0.01f,props.early);
-	if (props.early) src=temp1;
-	//Bilateral_HDR_Luma(src,temp1,src ,3, gammaw / 10.0f, lumaw, 0.01f);
+	if (props.early) Bilateral_HDR_Luma(src, src, temp1, 8, gammaw / 10.0f, lumaw, 1.0f,props.early);
+	//if (props.early) src=temp1;
+	if (props.early) Bilateral_HDR_Luma(src,temp1,src ,8, gammaw / 10.0f, lumaw, 1.0f,props.early);
 	//Bilateral_HDR_Luma(temp1,src,temp1 ,1, gammaw / 10.0f, lumaw, 0.0f);
 	//src=temp1;
 
