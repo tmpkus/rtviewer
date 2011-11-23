@@ -24,26 +24,26 @@
 
 using namespace std;
 template<> configdata & configdata::operator=(float rhs) {
-	free(this->text); // was allocated by strdup;
+	if (this->text) free(this->text); // was allocated by strdup;
 	this->text = new char[32];
 	snprintf(text, 32, "%f", rhs);
 	return *this;
 }
 template<> configdata & configdata::operator=(int rhs) {
-	free(this->text); // was allocated by strdup;
+	if (this->text) free(this->text); // was allocated by strdup;
 	this->text = new char[32];
 	snprintf(text, 32, "%d", rhs);
 	return *this;
 }
 template<> configdata & configdata::operator=(bool rhs) {
-	free(this->text); // was allocated by strdup;
+	if (this->text) free(this->text); // was allocated by strdup;
 	const char * t = (rhs) ? "true" : "false";
 	this->text = strdup(t);
 	return *this;
 }
 
 template<typename TY> configdata & configdata::operator=(vector<TY> & rhs) {
-	free(this->text); // was allocated by strdup;
+	if (this->text) free(this->text); // was allocated by strdup;
 	string s;
 	int i;
 	for (i = 0; i < rhs.size(); i++)
