@@ -48,7 +48,7 @@ static inline float RGBdiff(const rgbHDR &tst, const rgbHDR &ref,
 			+ .58f * tst.g * tst.g;
 	float RDiff = (Rref > Rtst) ? Rref - Rtst : Rtst - Rref;
 
-	float width = amount * (Rref + 0.015f); //+(ref.r+ref.g+tst.b))3.0f*
+	float width =  (Rtst + 0.005f); //+(ref.r+ref.g+tst.b))3.0f*
 	//if(width==0.0f) width=
 
 	float rv = (ref.r - tst.r);
@@ -56,7 +56,7 @@ static inline float RGBdiff(const rgbHDR &tst, const rgbHDR &ref,
 	float bv = (ref.b - tst.b);
 	//float f = ((rv*rv+gv*gv+bv*bv)*15.0f/*+RDiff*5.0f*/)/width;
 	float f =
-			((RDiff + 0.2f * (rv * rv + gv * gv + bv * bv)) * 6.0f/*+RDiff*5.0f*/)
+			((RDiff + 0.1f * (.28f *rv * rv + .58f *gv * gv + .14f *bv * bv)) * 5.0f/*+RDiff*5.0f*/)
 					/ width;
 
 	if (f > 9.0f)
@@ -96,7 +96,7 @@ static void inline RGB_reduce(HDRImage &ref, HDRImage &working, HDRImage &res,
 						/ (50.0f + (float) (i * i + j * j));
 
 				//float g = w * RGBdiff(cL,refL,amount);
-				if (g > 0.4) // strong correlation found
+				if (g > 0.2) // strong correlation found
 						{
 					n++;
 					wgtn += g;
@@ -124,16 +124,16 @@ static void inline RGB_reduce(HDRImage &ref, HDRImage &working, HDRImage &res,
 	 res[y][x]=L;
 	 return;
 	 }*/
-	if (n > 2) //(wgt>0.65f) // no salt/pepper
+	if (n > 1) //(wgt>0.65f) // no salt/pepper
 			{
-		const float add = antidot;
+		const float add = 1.0f;
 		wgt += add + wgtn;
 		L.r += refL.r * add + Ln.r;
 		L.g += refL.g * add + Ln.g;
 		L.b += refL.b * add + Ln.b;
 
 	} else {
-		const float add = 0.00000001f / amount;
+		const float add = 0.00000001f ;
 		wgt += add + wgtn;
 		L.r += refL.r * add + Ln.r;
 		L.g += refL.g * add + Ln.g;
@@ -150,9 +150,9 @@ static void inline RGB_reduce(HDRImage &ref, HDRImage &working, HDRImage &res,
 	 // small enough difference means no salt/pepper
 	 if (rdiff<(anti_dot*offset)) { wgt+=0.5f;L+=sL*0.5f;}
 	 }*/
-	L.r = (L.r / wgt); //*(1.0-antidot)+antidot*sL.r;//-sL.r)*amount+sL.r;
-	L.g = (L.g / wgt); //*(1.0-antidot)+antidot*sL.g;//-sL.g)*amount+sL.g;
-	L.b = (L.b / wgt); //*(1.0-antidot)+antidot*sL.b;//-sL.b)*amount+sL.b;
+	L.r = ((L.r / wgt)-sL.r)*amount+sL.r; //*(1.0-antidot)+antidot*sL.r;//;
+	L.g = ((L.g / wgt)-sL.g)*amount+sL.g; //*(1.0-antidot)+antidot*sL.g;//;
+	L.b = ((L.b / wgt)-sL.b)*amount+sL.b; //*(1.0-antidot)+antidot*sL.b;//;
 
 	res[y][x] = L; //(L / wgt - sL) * amount + sL;
 
@@ -230,7 +230,7 @@ void RGB_denoise(HDRImage & src, improps & props) {
 	chroma = chroma * 0.01f;
 	cout << "doing noise reduction: luma " << luma << " chroma " << chroma
 			<< "gamma " << gam_in << endl;
-	float lumaw = luma * luma;
+	float lumaw = luma;// * luma;
 	float chromaw = chroma;
 	float gammaw = gam_in;
 	//cout << " denoise using gamma " << gammaw << endl;
@@ -242,7 +242,7 @@ void RGB_denoise(HDRImage & src, improps & props) {
 	HDRImage temp1(W, H); //,temp2;
 
 	if (props.early)
-		Bilateral_HDR_Luma(src, src, temp1, 10, gammaw / 10.0f, lumaw, 1.0f,
+		Bilateral_HDR_Luma(src, src, temp1, 8, gammaw / 10.0f, lumaw, 1.0f,
 				props.early);
 	//if (props.early) src=temp1;
 	if (props.early)

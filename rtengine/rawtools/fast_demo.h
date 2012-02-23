@@ -44,13 +44,16 @@ private:
 	array2D<char> Tile_flags;
 	HDRImage RGB_converted;
 	enum Demosaic_Method method;
+	int first_pass;
 public:
+	int resize,recalc;
 	//improps props;
 	bool success;
 	fast_demosaic(char * mfilename):
 		//props(defprop),
 		RawImageSource(mfilename)
 	{
+		first_pass=1;resize=4;recalc=1;
 		std::cout << "fast_demosaic: load file " << mfilename << endl;
 		success=(load(mfilename, 0)==0);
 		std::cout << "fast_demosaic: DONE load file " << mfilename << endl;
@@ -79,6 +82,6 @@ public:
 	float get_ISO(void) {return iso_speed;}
 	enum Demosaic_Method demosaic_method() {return method;}
 	void linear_interpolate(void);
-	void cook_data(improps &props);
+	void cook_data(improps &props,int scale=4);
 };
 #endif /* FAST_DEMO_H_ */

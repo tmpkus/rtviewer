@@ -45,7 +45,7 @@ public:
 		px = 0;
 		py = 0;
 		HDRImage RawTile(width,height);
-		scale = 1;
+		scale = 4;
 		MyRAW = new Image_Raw(raw_to_load);
 		if (MyRAW->pp3_found==0) return 0;
 		// this ensure same size as preview.
@@ -53,7 +53,7 @@ public:
 		// set offset to 0,0
 		RawTile.moveto(0, 0);
 		// demosaic raw photo
-		MyRAW->demosaic(RawTile);
+		MyRAW->demosaic(RawTile,scale);
 		// output to window
 		*this <<= RawTile;
 
@@ -85,11 +85,13 @@ public:
 			pressed = 1;
 			if (butt & 8) {
 				moved = START_MOVE;
-				do_filter = 0;
+				if (scale>1) scale--;
+				cout << " scale:" << scale << endl;
 			}
 			if (butt & 16) {
 				moved = START_MOVE;
-				do_filter = 1;
+				if (scale<10) scale ++;
+				cout << " scale:" << scale << endl;
 			}
 
 		} else
@@ -114,7 +116,7 @@ public:
 			RawTile.moveto(dx, dy);
 
 			// convert from raw
-			MyRAW->demosaic(RawTile);
+			MyRAW->demosaic(RawTile,scale);
 
 			// get current offset
 			RawTile.pos(dx, dy); // demosaic has clipped the offsets so we grab them again
@@ -136,7 +138,7 @@ public:
 				// set offset
 				RawTile.moveto(dx, dy);
 				// convert raw
-				MyRAW->demosaic(RawTile);
+				MyRAW->demosaic(RawTile,scale);
 				// grab current position
 				RawTile.pos(dx, dy); // demosaic has clipped the offsets so we grab them again
 				apply_filters(RawTile,  MyRAW->props, 10);

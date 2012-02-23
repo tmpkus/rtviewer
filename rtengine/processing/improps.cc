@@ -58,7 +58,7 @@ int improps::read(char * toread) {
 	// we load the config_ file derived from the file name
 
 	string default_config, config_file;
-	filebuf config_file_p;
+	filebuf config_file_p,*tst;
 	default_config = getenv("HOME");
 	default_config += "/.config/RawTherapeeAlpha/profiles/default.pp3";
 	config_file = toread;
@@ -68,11 +68,11 @@ int improps::read(char * toread) {
 	cout << "failover is: " << default_config << endl;
 	raw_name = strdup(toread);
 	pp3_name = strdup(config_file.c_str());
-	void * tst = (void *) config_file_p.open(config_file.c_str(), ios::in);
+	tst =  config_file_p.open(config_file.c_str(), ios::in);
 	if (tst == NULL)
 	{
 		cout << config_file << " not found so trying fail over\n";
-		tst = (void*) config_file_p.open(default_config.c_str(), ios::in);
+		tst = config_file_p.open(default_config.c_str(), ios::in);
 	}
 	if (tst == NULL)
 	{

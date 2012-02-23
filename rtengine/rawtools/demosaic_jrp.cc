@@ -470,12 +470,14 @@ void fast_demosaic::jrp_demo(HDRImage & dst,improps & props)
 	RGB_converted.moveto(-dst.xoff(),-dst.yoff());
 	dst <<= RGB_converted;
 }
-void fast_demosaic::cook_data(improps & props)
+void fast_demosaic::cook_data(improps & props,int scale)
 {
 	cout << W << "x" << H << "starting conversion\n";
 	cout << "jrp demosaic step 1\n";
 	int sum[8];
 	int c;
+	resize=scale;
+	recalc =1;
 	memset(sum, 0, sizeof sum);
 	for ( int row = 0 ; row < 8 ; row++ )
 		for ( int col = 0 ; col < 8 ; col++ ) {
@@ -540,7 +542,7 @@ void fast_demosaic::cook_data(improps & props)
 	//if (rot&1)
 	//	Tile_flags((H + TILE_SIZE - 1) / TILE_SIZE,(W + TILE_SIZE - 1) / TILE_SIZE); // setup correct size
 	//else
-	Tile_flags((W + 32 + TILE_SIZE - 1) / TILE_SIZE,(H + 32 + TILE_SIZE - 1) / TILE_SIZE); // setup correct size
+	Tile_flags((W + 32 + TILE_SIZE - 1) / (TILE_SIZE),(H + 32 + TILE_SIZE - 1) / (TILE_SIZE)); // setup correct size
 
 	for ( unsigned int ty = 0 ; ty < Tile_flags.height() ; ty++ )
 		for ( unsigned int tx = 0 ; tx < Tile_flags.width() ; tx++ )
@@ -549,14 +551,16 @@ void fast_demosaic::cook_data(improps & props)
 	// check orientation
 
 	//method = VARSIZE_DEMOSAIC;
-	method = AMAZE_DEMOSAIC;
+	if (scale ==1) method = AMAZE_DEMOSAIC;
+	else method = VARSIZE_DEMOSAIC;
 	//method = HALFSIZE_DEMOSAIC;
 	//method = JRP_DEMOSAIC;
 
-	if ((method != HALFSIZE_DEMOSAIC)&&(method != VARSIZE_DEMOSAIC)){
+	//if ((method != HALFSIZE_DEMOSAIC)&&(method != VARSIZE_DEMOSAIC)){
 		if (rot & 1)
 			RGB_converted(H, W);
 		else RGB_converted(W, H);
+		/*
 	}
 	else
 	if(method == HALFSIZE_DEMOSAIC) {
@@ -565,12 +569,15 @@ void fast_demosaic::cook_data(improps & props)
 		else RGB_converted((W + 1) / 2, (H + 1) / 2);
 	} else {
 		if (rot & 1)
-					RGB_converted((H + 1) / 3, (W + 1) / 3);
-				else RGB_converted((W + 1) / 3, (H + 1) / 3);
-	}
+					RGB_converted((H + 1) / scale, (W + 1) / scale);
+				else RGB_converted((W + 1) / scale, (H + 1) / scale);
+	}*/
 	RGB_converted.moveto(0,0);
-	rawData(W, H);
+
 	float max_f=4.0f;
+	if (first_pass)
+	{
+		rawData(W, H);
 #pragma omp for
 	for ( unsigned int y = 0 ; y < H ; y++ ) {
 		for ( unsigned int x = 0 ; x < W ; x++ ) {
@@ -581,6 +588,8 @@ void fast_demosaic::cook_data(improps & props)
 			rawData[y][x] = (r > max_f) ? max_f : ((r < 0.0f) ? 0.0f:r);
 		}
 	}
+	}
+	first_pass=0;
 	if ((method==JRP_DEMOSAIC))
 	{
 		linear_interpolate();
@@ -616,10 +625,11 @@ int fast_demosaic::touch_tiles(HDRImage &dest, int &tile_xs, int &tile_xe, int &
 	}
 
 	int tsz=TILE_SIZE;
-	if (method==HALFSIZE_DEMOSAIC)
-		tsz=tsz/2;
-	if (method==VARSIZE_DEMOSAIC)
-			tsz=tsz/3;
+
+	//if (method==HALFSIZE_DEMOSAIC)
+	//	tsz=tsz/2;
+	//if (method==VARSIZE_DEMOSAIC)
+	//		tsz=tsz/resize;
 	// something is still not right here.
 
 	int d_x = dest.xoff();
@@ -702,11 +712,13 @@ int fast_demosaic::touch_tiles(HDRImage &dest, int &tile_xs, int &tile_xe, int &
 */
 	int runtiles = 0;
 	cout << "rotation is: "<< rot << endl;
-	cout << "tiles from " << tile_xs << "x" << tile_ys << " to " << tile_xe << "x" << tile_ye <<endl;
+
+	//cout << "tiles from " << tile_xs << "x" << tile_ys << " to " << tile_xe << "x" << tile_ye <<endl;
 	if (tile_xs<0) { tile_xs=0; cout << " x too low" << endl;}
 	if (tile_ys<0) { tile_ys=0; cout << " y too low" << endl;}
 	if (tile_ye>=Tile_flags.height()) { tile_ye=Tile_flags.height()-1;cout << " y too high" << endl;}
-	if (tile_xe>=Tile_flags.width()) { tile_ye=Tile_flags.width()-1;;cout << " x too high" << endl;}
+	if (tile_xe>=Tile_flags.width()) { tile_xe=Tile_flags.width()-1;;cout << " x too high" << endl;}
+	cout << "tiles from " << tile_xs << "x" << tile_ys << " to " << tile_xe << "x" << tile_ye <<endl;
 
 
 	for ( ; tile_ys <= tile_ye ; tile_ys++ )
@@ -715,6 +727,7 @@ int fast_demosaic::touch_tiles(HDRImage &dest, int &tile_xs, int &tile_xe, int &
 				Tile_flags[tile_ys][tx] = 1;
 				runtiles++;
 			}
+	//cout << " done runtiles" << endl;
 	return runtiles;
 }
 void fast_demosaic::half_size_demo(HDRImage & dest,improps & props)
@@ -799,32 +812,35 @@ void fast_demosaic::half_size_demo(HDRImage & dest,improps & props)
 	//color_correct(dest,dest,props);
 
 }
+
+// tiles don't match resize algo
+// so we don't use them..
+// the algo is very quick anyway
+
 void fast_demosaic::nth_size_demo(HDRImage & dest,int num,improps & props)
 {
 	int tile_xs, tile_ys, tile_xe, tile_ye;
 	int rot = (get_rotateDegree() / 90) & 3;
-	if (touch_tiles(dest, tile_xs, tile_xe, tile_ys, tile_ye) > 0) {
-		for ( int X = 0 ; X < W ; X += TILE_SIZE ) {
-			int xlim = ((X + TILE_SIZE) < W) ? X + TILE_SIZE:W;
+	if (recalc) {
+		recalc=0;
+#pragma omp parallel for
+		for ( int Y = 0 ; Y < (H-num) ; Y += num )
+		{
+
 			int mrow = (H/num)-1;
 			int mcol = (W/num)-1;
-
-			for ( int Y = 0 ; Y < H ; Y += TILE_SIZE ) {
-				if (Tile_flags[Y / TILE_SIZE][X / TILE_SIZE] == 1) { // process request
-					int ylim = ((Y + TILE_SIZE) < H) ? Y + TILE_SIZE:H;
-					for (int y = Y; y < ylim ; y += num )
-						for (int x = X; x < xlim ; x += num ) {
-							float r=0, g=0, b=0;
-							float nr=0,ng=0,nb=0;
-							for (int ty=y;ty<y+num;ty++)
-								for(int tx=x;tx<x+num;tx++)
+		for ( int X = 0 ; X < (W-num) ; X += num ) {
+			float r=0,b=0,g=0,nr=0,ng=0,nb=0;
+			for (int ty=Y;ty<Y+num;ty++)
+				for(int tx=X;tx<X+num;tx++)
 								{
-									if (FC(tx, ty) == 1) // green here
+									int color=FC(tx, ty);
+									if (color == 1) // green here
 									{
 										g += rawData[ty][tx];
 										ng+=1.0;
 									} else
-									if (FC(tx, ty) == 0) //red next
+									if (color == 0) //red next
 									{
 										r += rawData[ty][tx];
 										nr+=1.0;
@@ -837,8 +853,8 @@ void fast_demosaic::nth_size_demo(HDRImage & dest,int num,improps & props)
 							r=r/nr;
 							g=g/ng;
 							b=b/nb;
-							int row = y / num;
-							int col = x / num;
+							int row = Y / num;
+							int col = X / num;
 							switch (rot)
 							{
 							case 0:
@@ -865,15 +881,13 @@ void fast_demosaic::nth_size_demo(HDRImage & dest,int num,improps & props)
 							}
 
 						}
-					// tag this processed tile
-				Tile_flags[Y / TILE_SIZE][X / TILE_SIZE] = 2;
-				}
 
-			}
-		}
+				}
 	}
+	cout << "done demosaicing" << endl;
 	RGB_converted.moveto(-dest.xoff(), -dest.yoff());
 	dest <<= RGB_converted;
+	cout << "done demosaicing" << endl;
 	//color_correct(dest,dest,props);
 
 }
