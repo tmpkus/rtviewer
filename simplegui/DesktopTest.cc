@@ -83,15 +83,22 @@ public:
 			oldx = x;
 			oldy = y;
 			pressed = 1;
+			int old_scale = scale;
 			if (butt & 8) {
 				moved = START_MOVE;
 				if (scale>1) scale--;
+
 				cout << " scale:" << scale << endl;
 			}
 			if (butt & 16) {
 				moved = START_MOVE;
 				if (scale<10) scale ++;
 				cout << " scale:" << scale << endl;
+			}
+			if (butt&(16+8))
+			{
+				dx=(((dx+width/2)*old_scale)/scale)-(width/2);
+				dy=(((dy+height/2)*old_scale)/scale)-(height/2);
 			}
 
 		} else
