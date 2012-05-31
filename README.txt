@@ -9,6 +9,8 @@ version 0.0.0
 building:
 
   make rtviewer
+  cd rtengine/plugins
+  make all
 
 works on:
 
@@ -16,13 +18,13 @@ works on:
 
 depends on:
 
-  $HOME/.config/RawTherapeeAlpha/profiles/default.pp3
+  $HOME/.config/RawTherapeeAlpha4/profiles/Default.pp3
   it will default to this pp3 file for raw files without pp3 file.
 
 requirements:
 
 	liblcms2
-	Xlibraries
+	X libraries
 
 	builds with -lXext -llcms2 -lgomp -lX11
 
