@@ -24,6 +24,10 @@ usage:
   Since some filters like noise filtering are very slow the filterprocess
   will start after 3 seconds of mouse interaction.
 
+  Changes in the corresponding pp3 file will be picked up automatically.
+  Any pp3 editor that saves directly after a change is made can now be
+  used as an interactive editor for the viewer.
+
 works on:
 
   Ubuntu/Debian with 32bpp X desktop
