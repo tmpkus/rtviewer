@@ -17,6 +17,12 @@ usage:
   
   With Ubuntu or Debian it is possible to associate raw files to rtviewer
   that way rtviewer will be used to (pre)view raw files with pp3
+  
+  Zoomin/out : scroll wheel
+  panning: hold mouse button and move mouse.
+  
+  Since some filters like noise filtering are very slow the filterprocess
+  will start after 3 seconds of mouse interaction.
 
 works on:
 
@@ -25,7 +31,7 @@ works on:
 depends on:
 
   $HOME/.config/RawTherapeeAlpha4/profiles/Default.pp3
-  it will default to this pp3 file for raw files without pp3 file.
+  it will default to this pp3 file for raw files without a pp3 file.
 
 requirements:
 
