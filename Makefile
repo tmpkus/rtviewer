@@ -48,10 +48,15 @@ all: rtviewer
 rtviewer: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -g -o "rtviewer" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -g -rdynamic -o "rtviewer" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
+
+plugins:
+	@echo 'Building plugins'
+	$(MAKE) -f rtengine/filters/Makefile 
+	
 
 # Other Targets
 clean:
