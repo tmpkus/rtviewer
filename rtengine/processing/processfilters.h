@@ -18,7 +18,7 @@
  */
 #ifndef PROCESSFILTERS_H_
 #define PROCESSFILTERS_H_
-#include "../filters/filtermodule.h"
+#include "../pluginhandler/plugin.h"
 #include <iostream>
 using namespace std;
 

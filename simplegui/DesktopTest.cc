@@ -97,6 +97,8 @@ public:
 			}
 			if (butt&(16+8))
 			{
+				// recalculate upper left corner after scaling
+				// adjusting the view to keep the center constant.
 				dx=(((dx+width/2)*old_scale)/scale)-(width/2);
 				dy=(((dy+height/2)*old_scale)/scale)-(height/2);
 			}

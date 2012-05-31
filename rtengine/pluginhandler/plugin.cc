@@ -19,7 +19,7 @@
  *  along with RTViewer.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "filtermodule.h"
+#include "plugin.h"
 #include <iostream>
 #include <sys/types.h>
 #include <dirent.h>
@@ -27,11 +27,11 @@
 
 using namespace std;
 
-module * modules = NULL;
+static module * modules = NULL;
 module * pre_raw_filters = NULL;
 module * post_raw_filters = NULL;
 
-static int getfiltersfromdir()
+static int getplugins()
 {
 	int num=0;
 	::string name = "/home/janrinze/.config/RawTherapee/filters";
@@ -68,9 +68,9 @@ static int getfiltersfromdir()
 	return num;
 }
 
-static int numfilters = getfiltersfromdir();
+static int numfilters = getplugins();
 
-void insert_by_rank(module & to_insert, module * & anchor) {
+static void insert_by_rank(module & to_insert, module * & anchor) {
 	module * found = anchor;
 	module * next = anchor;
 	cout << "adding filter " << to_insert.name << " with rank " << to_insert.rank << endl;
@@ -101,7 +101,7 @@ void list_filters(void) {
 	}
 }
 
-extern "C"void addmodule(module & moduleinfo) {
+void addmodule(module & moduleinfo) {
 	insert_by_rank(moduleinfo,modules);
 }
 

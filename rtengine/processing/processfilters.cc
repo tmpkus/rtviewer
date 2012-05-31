@@ -30,8 +30,8 @@ void apply_filters(HDRImage & im, improps & props, int max) {
 	H.moveto(0,0);
 	*/
 
-	list_filters();
-	module * list = modules;
+	//list_filters();
+	module * list = get_filters();
 
 	while (list && list->rank<=max && props.early) {
 
