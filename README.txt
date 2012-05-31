@@ -12,6 +12,12 @@ building:
   cd rtengine/plugins
   make all
 
+usage:
+  rtviewer <rawfile>
+  
+  With Ubuntu or Debian it is possible to associate raw files to rtviewer
+  that way rtviewer will be used to (pre)view raw files with pp3
+
 works on:
 
   Ubuntu/Debian with 32bpp X desktop
