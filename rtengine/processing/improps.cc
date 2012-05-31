@@ -60,7 +60,7 @@ int improps::read(char * toread) {
 	string default_config, config_file;
 	filebuf config_file_p,*tst;
 	default_config = getenv("HOME");
-	default_config += "/.config/RawTherapeeAlpha/profiles/default.pp3";
+	default_config += "/.config/RawTherapee4/profiles/Default.pp3";
 	config_file = toread;
 	config_file += ".pp3";
 

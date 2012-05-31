@@ -30,11 +30,21 @@ using namespace std;
 static module * modules = NULL;
 module * pre_raw_filters = NULL;
 module * post_raw_filters = NULL;
+/*
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
 
+struct passwd *pw = getpwuid(getuid());
+
+const char *homedir = pw->pw_dir;
+*/
 static int getplugins()
 {
 	int num=0;
-	::string name = "/home/janrinze/.config/RawTherapee/filters";
+	::string name="";
+	name.append(getenv("HOME"));
+	name.append("/.config/RawTherapee4/filters");
 	DIR *dir = opendir(name.c_str());
 	    if(dir)
 	    {
@@ -111,5 +121,5 @@ void add_prerawfilter(module & moduleinfo) {
 
 module * get_filters()
 {
-	return &modules;
+	return modules;
 }
