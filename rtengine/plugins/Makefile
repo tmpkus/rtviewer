@@ -9,7 +9,8 @@ all: $(OBJS) install
 	g++ $(CC_OPTIMIZE) -o $@ $<  -shared -fPIC 
 
 install:
-	cp *.so ~/.config/RawTherapee/filters/
+	mkdir -p ~/.config/RawTherapee4/filters/
+	cp *.so ~/.config/RawTherapee4/filters/
 
 clean:
 	rm -f *.so
