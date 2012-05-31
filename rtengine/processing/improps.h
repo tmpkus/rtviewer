@@ -24,6 +24,9 @@
 #include <vector>
 #include <cstdlib>
 #include <cstring>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -128,18 +131,25 @@ typedef struct
 typedef map<char*,configdata,ltstr> configitems;
 typedef map<char*,configitems,ltstr> pp3_datamap;
 
+
+
+
 class improps
 {
 private:
 	char * raw_name;
 	char * pp3_name;
+	struct timespec mtime;
 public:
 	pp3_datamap pp3;
 	volatile int early;
 	colorspace cols;
 	float mat[3][3]; // color matrix used
+
+
 	int read(char * name);
 	void dump(void);
+	int update();
 };
 
 #endif /* IMPROPS_H_ */

@@ -108,6 +108,14 @@ public:
 	}
 
 	int render(int input) {
+		// simple polling on pp3 file
+		//cout << "test pp3" <<endl;
+		if (MyRAW->pp3_found && MyRAW->props.update())
+			{
+				refresh=1;
+				//cout << "pp3 file has changed" << endl;
+				MyRAW->props.read(NULL);
+			}
 		if (refresh)
 		{
 			moved=START_MOVE;refresh=0;
