@@ -53,8 +53,8 @@ typedef enum image_type_t
 
 
  void list_filters(void);
- extern "C" void addmodule(module & moduleinfo);
- // extern "C" module * modules;
+ void addmodule(module & moduleinfo);
+ module * get_filters();
 
 #define ADD_FILTER( fn, inputtype , myrank) \
 static module moduleinfo; \
@@ -67,6 +67,5 @@ static int setmoduleinfo(void) \
 	addmodule(moduleinfo); \
    return 1; \
 }; \
-static int filterinit = setmoduleinfo(); \
-//static void ensure_init() { init=0; };
+static int filterinit = setmoduleinfo();
 #endif

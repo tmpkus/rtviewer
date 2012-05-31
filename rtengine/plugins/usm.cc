@@ -21,7 +21,7 @@
 #include <iostream>
 using namespace std;
 #include "../imageformats/image.h"
-#include "filtermodule.h"
+#include "../pluginhandler/plugin.h"
 
 #define MINMAX3(a,b,c,min,max) \
 { \

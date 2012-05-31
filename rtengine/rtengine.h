@@ -5,5 +5,4 @@
 #include "../rtengine/rawtools/ImageRaw.h"
 #include "../rtengine/processing/improps.h"
 #include "../rtengine/processing/processfilters.h"
-#include "../rtengine/filters/usm.h"
 #endif

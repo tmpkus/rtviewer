@@ -22,7 +22,7 @@
 #include "../imageformats/image.h"
 #include "../processing/improps.h"
 #include <iostream>
-#include "filtermodule.h"
+#include "../pluginhandler/plugin.h"
 using namespace std;
 
 #ifdef _OPENMP

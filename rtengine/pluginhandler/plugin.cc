@@ -108,3 +108,8 @@ void addmodule(module & moduleinfo) {
 void add_prerawfilter(module & moduleinfo) {
 	insert_by_rank(moduleinfo,pre_raw_filters);
 }
+
+module * get_filters()
+{
+	return &modules;
+}
