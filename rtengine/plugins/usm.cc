@@ -323,12 +323,16 @@ void sharpen (LBrBbImage & dst,improps &props)
 }*/
 void sharpen (LabImage & dst,improps &props)
 {
-	if ((bool) props.pp3["[Sharpening]"]["Enabled"] != true) return;
 	float radius = props.pp3["[Sharpening]"]["Radius"];
 	float amount = props.pp3["[Sharpening]"]["Amount"];
 	float thresh = props.pp3["[Sharpening]"]["Threshold"];
-	if (amount==0.0) return;
 	cout << "sharpen filter: radius" << radius << " amount "<< amount << " threshold "<< thresh << endl;
+	if ((bool) props.pp3["[Sharpening]"]["Enabled"] != true)
+		{
+			cout<<" not enabled " << endl;
+			return;
+		}
+	if (amount==0.0) return;
 	amount=amount* 0.01f;
 	thresh=thresh*0.01f;
 	LabImage temp;

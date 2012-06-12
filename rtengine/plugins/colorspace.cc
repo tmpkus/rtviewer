@@ -32,12 +32,14 @@ void color_correct(HDRImage & dest,improps &props)
 	float expcomp = props.pp3["[Exposure]"]["Compensation"];
 	float bright = props.pp3["[Exposure]"]["Brightness"];
 	float contrast = props.pp3["[Exposure]"]["Contrast"];
+	float black = props.pp3["[Exposure]"]["Black"];
 
+	black = black /65536.0f;
 	bright = bright*0.001f;
 	contrast=contrast*0.01f;
 	const float not_contrast = 1.0f - fabs(contrast);
 
-	const float post_scale = pow(2.0f, expcomp);
+	const float post_scale = pow(2.0f, expcomp)/(1.0f-black);
 	float mat[3][3];
 	for (int i=0;i<3;i++)
 		for (int j=0;j<3;j++)
@@ -48,9 +50,9 @@ void color_correct(HDRImage & dest,improps &props)
 #pragma omp parallel for
 	for (  int y = 0 ; y < Hgt ; y++ )
 		for (  int x = 0 ; x < Wdt ; x++ ) {
-			float r = dest[y][x].r*post_scale +bright;
-			float g = dest[y][x].g*post_scale +bright;
-			float b = dest[y][x].b*post_scale +bright;
+			float r = (dest[y][x].r-black)*post_scale ;
+			float g = (dest[y][x].g-black)*post_scale ;
+			float b = (dest[y][x].b-black)*post_scale ;
 
 			// adjust levels
 
@@ -66,9 +68,9 @@ void color_correct(HDRImage & dest,improps &props)
 			float nb = mat[2][0] * r + mat[2][1] * g + mat[2][2] * b;
 
 			// apply contrast
-			r= not_contrast*nr + contrast * Contrast(nr);
-			g= not_contrast*ng + contrast * Contrast(ng);
-			b= not_contrast*nb + contrast * Contrast(nb);
+			r= not_contrast*nr + contrast * Contrast(nr) + bright;
+			g= not_contrast*ng + contrast * Contrast(ng) + bright;
+			b= not_contrast*nb + contrast * Contrast(nb) + bright;
 
 			// apply brightness
 

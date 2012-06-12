@@ -140,6 +140,7 @@ private:
 	char * raw_name;
 	char * pp3_name;
 	struct timespec mtime;
+	int ino_fd;
 public:
 	pp3_datamap pp3;
 	volatile int early;

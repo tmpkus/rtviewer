@@ -19,6 +19,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sys/inotify.h>
 
 #include "improps.h"
 
@@ -55,9 +56,17 @@ template<typename TY> configdata & configdata::operator=(vector<TY> & rhs) {
 	this->text = strdup(s.c_str());
 	return *this;
 }
-
+#define EVENT_SIZE  ( sizeof (struct inotify_event) )
+#define EVENT_BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
 int improps::update() {
 	//cout << "testing filechange" << pp3_name << endl;
+	char buf[EVENT_BUF_LEN];
+	if (ino_fd)
+	{
+		if (::read(ino_fd,buf,EVENT_BUF_LEN)<1) return 0;
+		while (::read(ino_fd,buf,EVENT_BUF_LEN)>0);
+		return 1;
+	}
 	struct stat64 fileinfo;
 	if (-1 != stat64(pp3_name, &fileinfo)) {
 		if ((mtime.tv_sec != fileinfo.st_mtim.tv_sec)
@@ -77,6 +86,7 @@ int improps::read(char * toread) {
 
 	// we load the config_ file derived from the file name
 	if (toread) {
+
 		string default_config, config_file;
 		default_config = getenv("HOME");
 		default_config += "/.config/RawTherapee4/profiles/Default.pp3";
@@ -101,6 +111,9 @@ int improps::read(char * toread) {
 			return 0;
 		}
 		pp3_name = strdup(config_file.c_str());
+		ino_fd=inotify_init1(IN_NONBLOCK);
+		inotify_add_watch( ino_fd, pp3_name, IN_CLOSE_WRITE );
+
 
 	} else {
 		if (pp3_name == NULL
@@ -118,6 +131,9 @@ int improps::read(char * toread) {
 		cout << line << endl;
 		if (line[0] == '[') {
 			chapter = strdup(line);
+			char *t=chapter;
+			while(*t && *t!=']') t++;
+			if (*t==']') t[1]=0; // avoid CR LF stuff
 			configitems temp;
 			cout << "added chapter " << chapter <<endl;
 			pp3[chapter] = temp;
