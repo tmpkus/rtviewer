@@ -130,6 +130,7 @@ public:
 		if (moved == 1) {
 			// update offset
 			HDRImage RawTile(width,height);
+			RawTile.clear();
 			RawTile.moveto(dx, dy);
 
 			// convert from raw
@@ -145,6 +146,7 @@ public:
 
 			// output to window
 			// does conversion Lab to argb8
+			//(*this).clear();
 			*this <<= RawTile;
 			moved=0;
 			return 1;
@@ -152,6 +154,7 @@ public:
 			if (moved == START_MOVE)
 			{
 				HDRImage RawTile(width,height);
+				RawTile.clear();
 				// set offset
 				RawTile.moveto(dx, dy);
 				// convert raw
@@ -163,6 +166,7 @@ public:
 				RawTile.moveto(0, 0);
 
 				// show converted image in window.
+				//(*this).clear();
 				*this <<= RawTile;
 				moved --;
 				return 1;

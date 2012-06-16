@@ -573,7 +573,7 @@ void fast_demosaic::cook_data(improps & props,int scale)
 				else RGB_converted((W + 1) / scale, (H + 1) / scale);
 	}*/
 	RGB_converted.moveto(0,0);
-
+	RGB_converted.clear();
 	float max_f=4.0f;
 	if (first_pass)
 	{

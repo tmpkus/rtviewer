@@ -53,9 +53,9 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 		int winx = 0, winy = 0, winw = W, winh = H;
 		//cout << " amaze: running " << runtiles << " tiles\n";
 		//MIN(clip_pt,x)
-		const float expcomp = props.pp3["[Exposure]"]["Compensation"];
+		//const float expcomp = props.pp3["[Exposure]"]["Compensation"];
 		const float scale_raw_data = 1.0f; //pow(2.0,props.expcomp)/65535.0f;
-		const float post_scale = pow(2.0, expcomp);
+		//const float post_scale = pow(2.0, expcomp);
 		int width = winw, height = winh;
 
 		const float clip_pt = 4.0; // = 1/initialGain;
@@ -71,7 +71,7 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 				+ 1, m2 = 2 * TS + 2, m3 = 3 * TS + 3;
 
 		//neighborhood of a pixel
-		static const int nbr[5] = { -v2, -2, 2, v2, 0 };
+		//static const int nbr[5] = { -v2, -2, 2, v2, 0 };
 
 		//tolerance to avoid dividing by zero
 		static const float eps = 1e-5, epssq = 1e-10; //tolerance to avoid dividing by zero
@@ -81,9 +81,9 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 		//nyquist texture test threshold
 		static const float nyqthresh = 0.5;
 		//diagonal interpolation test threshold
-		static const float pmthresh = 0.25;
+		//static const float pmthresh = 0.25;
 		//factors for bounding interpolation in saturated regions
-		static const float lbd = 1.0, ubd = 1.0; //lbd=0.66, ubd=1.5 alternative values;
+		//static const float lbd = 1.0, ubd = 1.0; //lbd=0.66, ubd=1.5 alternative values;
 
 		//gaussian on 5x5 quincunx, sigma=1.2
 		static const float gaussodd[4] = { 0.14659727707323927f, 0.103592713382435f, 0.0732036125103057f,
@@ -92,13 +92,13 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 		static const float gaussgrad[6] = { 0.07384411893421103f, 0.06207511968171489f, 0.0521818194747806f,
 				0.03687419286733595f, 0.03099732204057846f, 0.018413194161458882f };
 		//gaussian on 3x3, sigma =0.7
-		static const float gauss1[3] = { 0.3376688223162362f, 0.12171198028231786f, 0.04387081413862306f };
+		//static const float gauss1[3] = { 0.3376688223162362f, 0.12171198028231786f, 0.04387081413862306f };
 		//gaussian on 5x5 alt quincunx, sigma=1.5
 		static const float gausseven[2] = { 0.13719494435797422f, 0.05640252782101291f };
 		//guassian on quincunx grid
 		static const float gquinc[4] = { 0.169917f, 0.108947f, 0.069855f, 0.0287182f };
 
-		volatile double progress = 0.0;
+		//volatile double progress = 0.0;
 		//const unsigned short **rawData = (const unsigned short **)data;
 
 		// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -272,68 +272,68 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 
 						//tile vars
 						//counters for pixel location in the image
-						int row, col;
+//						int row, col;
 						//min and max row/column in the tile
 						int rrmin, rrmax, ccmin, ccmax;
 						//counters for pixel location within the tile
-						int rr, cc;
+//						int rr, cc;
 						//color index 0=R, 1=G, 2=B
-						int c;
+//						int c;
 						//pointer counters within the tile
-						int indx, indx1;
+//						int indx, indx1;
 						//direction counter for nbrs[]
-						int dir;
+//						int dir;
 						//dummy indices
-						int i, j;
+//						int i, j;
 						// +1 or -1
-						int sgn;
+//						int sgn;
 
 						//color ratios in up/down/left/right directions
-						float cru, crd, crl, crr;
+//						float cru, crd, crl, crr;
 						//adaptive weights for vertical/horizontal/plus/minus directions
-						float vwt, hwt, pwt, mwt;
+//						float vwt, hwt, pwt, mwt;
 						//vertical and horizontal G interpolations
-						float Gintv, Ginth;
+//						float Gintv, Ginth;
 						//G interpolated in vert/hor directions using adaptive ratios
-						float guar, gdar, glar, grar;
+//						float guar, gdar, glar, grar;
 						//G interpolated in vert/hor directions using Hamilton-Adams method
-						float guha, gdha, glha, grha;
+//						float guha, gdha, glha, grha;
 						//interpolated G from fusing left/right or up/down
-						float Ginthar, Ginthha, Gintvar, Gintvha;
+//						float Ginthar, Ginthha, Gintvar, Gintvha;
 						//color difference (G-R or G-B) variance in up/down/left/right directions
-						float Dgrbvvaru, Dgrbvvard, Dgrbhvarl, Dgrbhvarr;
+//						float Dgrbvvaru, Dgrbvvard, Dgrbhvarl, Dgrbhvarr;
 						//gradients in various directions
-						float gradp, gradm, gradv, gradh, gradpm, gradhv;
+//						float gradp, gradm, gradv, gradh, gradpm, gradhv;
 						//color difference variances in vertical and horizontal directions
-						float vcdvar, hcdvar, vcdvar1, hcdvar1, hcdaltvar, vcdaltvar;
+//						float vcdvar, hcdvar, vcdvar1, hcdvar1, hcdaltvar, vcdaltvar;
 						//adaptive interpolation weight using variance of color differences
-						float varwt;
+//						float varwt;
 						//adaptive interpolation weight using difference of left-right and up-down G interpolations
-						float diffwt;
+//						float diffwt;
 						//alternative adaptive weight for combining horizontal/vertical interpolations
-						float hvwtalt;
+//						float hvwtalt;
 						//temporary variables for combining interpolation weights at R and B sites
-						float vo, ve;
+//						float vo, ve;
 						//interpolation of G in four directions
-						float gu, gd, gl, gr;
+//						float gu, gd, gl, gr;
 						//variance of G in vertical/horizontal directions
-						float gvarh, gvarv;
+//						float gvarh, gvarv;
 
 						//Nyquist texture test
-						float nyqtest;
+//						float nyqtest;
 						//accumulators for Nyquist texture interpolation
-						float sumh, sumv, sumsqh, sumsqv, areawt;
+//						float sumh, sumv, sumsqh, sumsqv, areawt;
 
 						//color ratios in diagonal directions
-						float crse, crnw, crne, crsw;
+//						float crse, crnw, crne, crsw;
 						//color differences in diagonal directions
-						float rbse, rbnw, rbne, rbsw;
+//						float rbse, rbnw, rbne, rbsw;
 						//adaptive weights for combining diagonal interpolations
-						float wtse, wtnw, wtsw, wtne;
+//						float wtse, wtnw, wtsw, wtne;
 						//alternate weight for combining diagonal interpolations
-						float pmwtalt;
+//						float pmwtalt;
 						//variance of R-B in plus/minus directions
-						float rbvarp, rbvarm;
+//						float rbvarp, rbvarm;
 
 						// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -368,11 +368,11 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 							ccmax = cc1;
 						}
 
-						for ( rr = rrmin; rr < rrmax ; rr++ )
-							for ( row = rr + top, cc = ccmin; cc < ccmax ; cc++ ) {
-								col = cc + left;
-								c = Myfc(rr,cc);
-								indx1 = rr * TS + cc;
+						for ( int rr = rrmin; rr < rrmax ; rr++ )
+							for ( int row = rr + top, cc = ccmin; cc < ccmax ; cc++ ) {
+								int col = cc + left;
+								int c = Myfc(rr,cc);
+								int indx1 = rr * TS + cc;
 								rgb[indx1][c] = ((float) rawData[row][col]) * scale_raw_data;
 								//indx=row*width+col;
 								//rgb[indx1][c] = image[indx][c]*scale_raw_data;//for dcraw implementation
@@ -382,17 +382,17 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 						// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 						//fill borders
 						if (rrmin > 0) {
-							for ( rr = 0; rr < 16 ; rr++ )
-								for ( cc = ccmin; cc < ccmax ; cc++ ) {
-									c = Myfc(rr,cc);
+							for ( int rr = 0; rr < 16 ; rr++ )
+								for ( int cc = ccmin; cc < ccmax ; cc++ ) {
+									int c = Myfc(rr,cc);
 									rgb[rr * TS + cc][c] = rgb[(32 - rr) * TS + cc][c];
 									cfa[rr * TS + cc] = rgb[rr * TS + cc][c];
 								}
 						}
 						if (rrmax < rr1) {
-							for ( rr = 0; rr < 16 ; rr++ )
-								for ( cc = ccmin; cc < ccmax ; cc++ ) {
-									c = Myfc(rr,cc);
+							for ( int rr = 0; rr < 16 ; rr++ )
+								for ( int cc = ccmin; cc < ccmax ; cc++ ) {
+									int c = Myfc(rr,cc);
 									rgb[(rrmax + rr) * TS + cc][c] = ((float) rawData[(winy + height - rr - 2)][left
 											+ cc]) * scale_raw_data;
 									//rgb[(rrmax+rr)*TS+cc][c] = (image[(height-rr-2)*width+left+cc][c])*scale_raw_data;//for dcraw implementation
@@ -400,17 +400,17 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 								}
 						}
 						if (ccmin > 0) {
-							for ( rr = rrmin; rr < rrmax ; rr++ )
-								for ( cc = 0; cc < 16 ; cc++ ) {
-									c = Myfc(rr,cc);
+							for ( int rr = rrmin; rr < rrmax ; rr++ )
+								for ( int cc = 0; cc < 16 ; cc++ ) {
+									int c = Myfc(rr,cc);
 									rgb[rr * TS + cc][c] = rgb[rr * TS + 32 - cc][c];
 									cfa[rr * TS + cc] = rgb[rr * TS + cc][c];
 								}
 						}
 						if (ccmax < cc1) {
-							for ( rr = rrmin; rr < rrmax ; rr++ )
-								for ( cc = 0; cc < 16 ; cc++ ) {
-									c = Myfc(rr,cc);
+							for ( int rr = rrmin; rr < rrmax ; rr++ )
+								for ( int cc = 0; cc < 16 ; cc++ ) {
+									int c = Myfc(rr,cc);
 									rgb[rr * TS + ccmax + cc][c] =
 											((float) rawData[(top + rr)][(winx + width - cc - 2)]) * scale_raw_data;
 									//rgb[rr*TS+ccmax+cc][c] = (image[(top+rr)*width+(width-cc-2)][c])*scale_raw_data;//for dcraw implementation
@@ -420,9 +420,9 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 
 						//also, fill the image corners
 						if (rrmin > 0 && ccmin > 0) {
-							for ( rr = 0; rr < 16 ; rr++ )
-								for ( cc = 0; cc < 16 ; cc++ ) {
-									c = Myfc(rr,cc);
+							for ( int rr = 0; rr < 16 ; rr++ )
+								for ( int cc = 0; cc < 16 ; cc++ ) {
+									int c = Myfc(rr,cc);
 									rgb[(rr) * TS + cc][c] = ((float) rawData[winy + 32 - rr][winx + 32 - cc])
 											* scale_raw_data;
 									//rgb[(rr)*TS+cc][c] = (rgb[(32-rr)*TS+(32-cc)][c]);//for dcraw implementation
@@ -430,9 +430,9 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 								}
 						}
 						if (rrmax < rr1 && ccmax < cc1) {
-							for ( rr = 0; rr < 16 ; rr++ )
-								for ( cc = 0; cc < 16 ; cc++ ) {
-									c = Myfc(rr,cc);
+							for ( int rr = 0; rr < 16 ; rr++ )
+								for ( int cc = 0; cc < 16 ; cc++ ) {
+									int c = Myfc(rr,cc);
 									rgb[(rrmax + rr) * TS + ccmax + cc][c] =
 											((float) rawData[(winy + height - rr - 2)][(winx + width - cc - 2)])
 													* scale_raw_data;
@@ -441,9 +441,9 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 								}
 						}
 						if (rrmin > 0 && ccmax < cc1) {
-							for ( rr = 0; rr < 16 ; rr++ )
-								for ( cc = 0; cc < 16 ; cc++ ) {
-									c = Myfc(rr,cc);
+							for ( int rr = 0; rr < 16 ; rr++ )
+								for ( int cc = 0; cc < 16 ; cc++ ) {
+									int c = Myfc(rr,cc);
 									rgb[(rr) * TS + ccmax + cc][c] = ((float) rawData[(winy + 32 - rr)][(winx + width
 											- cc - 2)]) * scale_raw_data;
 									//rgb[(rr)*TS+ccmax+cc][c] = (image[(32-rr)*width+(width-cc-2)][c])*scale_raw_data;//for dcraw implementation
@@ -451,9 +451,9 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 								}
 						}
 						if (rrmax < rr1 && ccmin > 0) {
-							for ( rr = 0; rr < 16 ; rr++ )
-								for ( cc = 0; cc < 16 ; cc++ ) {
-									c = Myfc(rr,cc);
+							for ( int rr = 0; rr < 16 ; rr++ )
+								for ( int cc = 0; cc < 16 ; cc++ ) {
+									int c = Myfc(rr,cc);
 									rgb[(rrmax + rr) * TS + cc][c] = ((float) rawData[(winy + height - rr - 2)][(winx
 											+ 32 - cc)]) * scale_raw_data;
 									//rgb[(rrmax+rr)*TS+cc][c] = (image[(height-rr-2)*width+(32-cc)][c])*scale_raw_data;//for dcraw implementation
@@ -464,8 +464,8 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 						//end of border fill
 						// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-						for ( rr = 1; rr < rr1 - 1 ; rr++ )
-							for ( cc = 1, indx = (rr) * TS + cc; cc < cc1 - 1 ; cc++, indx++ ) {
+						for ( int rr = 1; rr < rr1 - 1 ; rr++ )
+							for ( int cc = 1, indx = (rr) * TS + cc; cc < cc1 - 1 ; cc++, indx++ ) {
 
 								delh[indx] = fabs(cfa[indx+1]-cfa[indx-1]);
 								delv[indx] = fabs(cfa[indx+v1]-cfa[indx-v1]);
@@ -476,8 +476,8 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 
 							}
 
-						for ( rr = 2; rr < rr1 - 2 ; rr++ )
-							for ( cc = 2, indx = (rr) * TS + cc; cc < cc1 - 2 ; cc++, indx++ ) {
+						for (int  rr = 2; rr < rr1 - 2 ; rr++ )
+							for ( int cc = 2, indx = (rr) * TS + cc; cc < cc1 - 2 ; cc++, indx++ ) {
 
 								dirwts[indx][0] = eps + delv[indx + v1] + delv[indx - v1] + delv[indx]; //+fabs(cfa[indx+v2]-cfa[indx-v2]);
 								//vert directional averaging weights
@@ -500,11 +500,11 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 						//interpolate vertical and horizontal color differences
 						//t1_vcdhcd = clock();
 
-						for ( rr = 4; rr < rr1 - 4 ; rr++ )
+						for ( int rr = 4; rr < rr1 - 4 ; rr++ )
 							//for (cc=4+(Myfc(rr,2)&1),indx=rr*TS+cc,c=Myfc(rr,cc); cc<cc1-4; cc+=2,indx+=2) {
-							for ( cc = 4, indx = rr * TS + cc; cc < cc1 - 4 ; cc++, indx++ ) {
+							for ( int cc = 4, indx = rr * TS + cc; cc < cc1 - 4 ; cc++, indx++ ) {
 								float cfaindx = cfa[indx];
-								c = Myfc(rr,cc);
+								int c = Myfc(rr,cc);
 								//if (c&1) {sgn=-1;} else {sgn=1;}
 
 								//initialization of nyquist test
@@ -513,57 +513,39 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 								rbint[indx] = 0;
 
 								//color ratios in each cardinal direction
-								cru = cfa[indx - v1] * (dirwts[indx - v2][0] + dirwts[indx][0])
+								float cru = cfa[indx - v1] * (dirwts[indx - v2][0] + dirwts[indx][0])
 										/ (dirwts[indx - v2][0] * (eps + cfaindx)
 												+ dirwts[indx][0] * (eps + cfa[indx - v2]));
-								crd = cfa[indx + v1] * (dirwts[indx + v2][0] + dirwts[indx][0])
+								float crd = cfa[indx + v1] * (dirwts[indx + v2][0] + dirwts[indx][0])
 										/ (dirwts[indx + v2][0] * (eps + cfaindx)
 												+ dirwts[indx][0] * (eps + cfa[indx + v2]));
-								crl = cfa[indx - 1] * (dirwts[indx - 2][1] + dirwts[indx][1])
+								float crl = cfa[indx - 1] * (dirwts[indx - 2][1] + dirwts[indx][1])
 										/ (dirwts[indx - 2][1] * (eps + cfaindx)
 												+ dirwts[indx][1] * (eps + cfa[indx - 2]));
-								crr = cfa[indx + 1] * (dirwts[indx + 2][1] + dirwts[indx][1])
+								float crr = cfa[indx + 1] * (dirwts[indx + 2][1] + dirwts[indx][1])
 										/ (dirwts[indx + 2][1] * (eps + cfaindx)
 												+ dirwts[indx][1] * (eps + cfa[indx + 2]));
 
-								guha = HCLIP(cfa[indx-v1]) + 0.5f * (cfaindx - cfa[indx - v2]);
-								gdha = HCLIP(cfa[indx+v1]) + 0.5f * (cfaindx - cfa[indx + v2]);
-								glha = HCLIP(cfa[indx-1]) + 0.5f * (cfaindx - cfa[indx - 2]);
-								grha = HCLIP(cfa[indx+1]) + 0.5f * (cfaindx - cfa[indx + 2]);
+								float guha = HCLIP(cfa[indx-v1]) + 0.5f * (cfaindx - cfa[indx - v2]);
+								float gdha = HCLIP(cfa[indx+v1]) + 0.5f * (cfaindx - cfa[indx + v2]);
+								float glha = HCLIP(cfa[indx-1]) + 0.5f * (cfaindx - cfa[indx - 2]);
+								float grha = HCLIP(cfa[indx+1]) + 0.5f * (cfaindx - cfa[indx + 2]);
 
-								if (fabs(1.0f-cru) < arthresh) {
-									guar = cfaindx * cru;
-								}
-								else {
-									guar = guha;
-								}
-								if (fabs(1.0f-crd) < arthresh) {
-									gdar = cfaindx * crd;
-								}
-								else {
-									gdar = gdha;
-								}
-								if (fabs(1.0f-crl) < arthresh) {
-									glar = cfaindx * crl;
-								}
-								else {
-									glar = glha;
-								}
-								if (fabs(1.0f-crr) < arthresh) {
-									grar = cfaindx * crr;
-								}
-								else {
-									grar = grha;
-								}
+								float guar=(fabs(1.0f-cru) < arthresh)?cfaindx * cru:guha;
 
-								hwt = dirwts[indx - 1][1] / (dirwts[indx - 1][1] + dirwts[indx + 1][1]);
-								vwt = dirwts[indx - v1][0] / (dirwts[indx + v1][0] + dirwts[indx - v1][0]);
+								float gdar=(fabs(1.0f-crd) < arthresh)?cfaindx * crd:gdha;
+								float glar=(fabs(1.0f-crl) < arthresh)?cfaindx * crl:glha;
+								float grar=(fabs(1.0f-crr) < arthresh)?cfaindx * crr:grha;
+
+
+								float hwt = dirwts[indx - 1][1] / (dirwts[indx - 1][1] + dirwts[indx + 1][1]);
+								float vwt = dirwts[indx - v1][0] / (dirwts[indx + v1][0] + dirwts[indx - v1][0]);
 
 								//interpolated G via adaptive weights of cardinal evaluations
-								Gintvar = vwt * gdar + (1.0f - vwt) * guar;
-								Ginthar = hwt * grar + (1.0f - hwt) * glar;
-								Gintvha = vwt * gdha + (1.0f - vwt) * guha;
-								Ginthha = hwt * grha + (1.0f - hwt) * glha;
+								float Gintvar = vwt * gdar + (1.0f - vwt) * guar;
+								float Ginthar = hwt * grar + (1.0f - hwt) * glar;
+								float Gintvha = vwt * gdha + (1.0f - vwt) * guha;
+								float Ginthha = hwt * grha + (1.0f - hwt) * glha;
 								if (c & 1) {
 									//interpolated color differences
 									vcd[indx] = cfaindx - Gintvar;
@@ -596,18 +578,18 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 						//t2_vcdhcd += clock() - t1_vcdhcd;
 
 						//t1_cdvar = clock();
-						for ( rr = 4; rr < rr1 - 4 ; rr++ )
+						for ( int rr = 4; rr < rr1 - 4 ; rr++ )
 							//for (cc=4+(Myfc(rr,2)&1),indx=rr*TS+cc,c=Myfc(rr,cc); cc<cc1-4; cc+=2,indx+=2) {
-							for ( cc = 4, indx = rr * TS + cc; cc < cc1 - 4 ; cc++, indx++ ) {
-								c = Myfc(rr,cc);
+							for ( int cc = 4, indx = rr * TS + cc; cc < cc1 - 4 ; cc++, indx++ ) {
+								int c = Myfc(rr,cc);
 
-								hcdvar = 3.0f * (SQR(hcd[indx-2]) + SQR(hcd[indx]) + SQR(hcd[indx+2]))
+								float hcdvar = 3.0f * (SQR(hcd[indx-2]) + SQR(hcd[indx]) + SQR(hcd[indx+2]))
 										- SQR(hcd[indx-2]+hcd[indx]+hcd[indx+2]);
-								hcdaltvar = 3.0f * (SQR(hcdalt[indx-2]) + SQR(hcdalt[indx]) + SQR(hcdalt[indx+2]))
+								float hcdaltvar = 3.0f * (SQR(hcdalt[indx-2]) + SQR(hcdalt[indx]) + SQR(hcdalt[indx+2]))
 										- SQR(hcdalt[indx-2]+hcdalt[indx]+hcdalt[indx+2]);
-								vcdvar = 3.0f * (SQR(vcd[indx-v2]) + SQR(vcd[indx]) + SQR(vcd[indx+v2]))
+								float vcdvar = 3.0f * (SQR(vcd[indx-v2]) + SQR(vcd[indx]) + SQR(vcd[indx+v2]))
 										- SQR(vcd[indx-v2]+vcd[indx]+vcd[indx+v2]);
-								vcdaltvar = 3.0f * (SQR(vcdalt[indx-v2]) + SQR(vcdalt[indx]) + SQR(vcdalt[indx+v2]))
+								float vcdaltvar = 3.0f * (SQR(vcdalt[indx-v2]) + SQR(vcdalt[indx]) + SQR(vcdalt[indx+v2]))
 										- SQR(vcdalt[indx-v2]+vcdalt[indx]+vcdalt[indx+v2]);
 								//choose the smallest variance; this yields a smoother interpolation
 								if (hcdaltvar < hcdvar)
@@ -617,15 +599,15 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 
 								//bound the interpolation in regions of high saturation
 								if (c & 1) { //G site
-									Ginth = cfa[indx] - hcd[indx]; //R or B
-									Gintv = cfa[indx] - vcd[indx]; //B or R
+									float Ginth = cfa[indx] - hcd[indx]; //R or B
+									float Gintv = cfa[indx] - vcd[indx]; //B or R
 
 									if (hcd[indx] > 0) {
 										if (3.0f * hcd[indx] > (Ginth + cfa[indx])) {
 											hcd[indx] = -ULIM(Ginth,cfa[indx-1],cfa[indx+1]) + cfa[indx];
 										}
 										else {
-											hwt = 1.0f - 3.0f * hcd[indx] / (eps + Ginth + cfa[indx]);
+											float hwt = 1.0f - 3.0f * hcd[indx] / (eps + Ginth + cfa[indx]);
 											hcd[indx] = hwt * hcd[indx]
 													+ (1.0f - hwt) * (-ULIM(Ginth,cfa[indx-1],cfa[indx+1]) + cfa[indx]);
 										}
@@ -635,7 +617,7 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 											vcd[indx] = -ULIM(Gintv,cfa[indx-v1],cfa[indx+v1]) + cfa[indx];
 										}
 										else {
-											vwt = 1.0f - 3.0f * vcd[indx] / (eps + Gintv + cfa[indx]);
+											float vwt = 1.0f - 3.0f * vcd[indx] / (eps + Gintv + cfa[indx]);
 											vcd[indx] = vwt * vcd[indx]
 													+ (1.0f - vwt)
 															* (-ULIM(Gintv,cfa[indx-v1],cfa[indx+v1]) + cfa[indx]);
@@ -652,15 +634,15 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 								}
 								else { //R or B site
 
-									Ginth = hcd[indx] + cfa[indx]; //interpolated G
-									Gintv = vcd[indx] + cfa[indx];
+									float Ginth = hcd[indx] + cfa[indx]; //interpolated G
+									float Gintv = vcd[indx] + cfa[indx];
 
 									if (hcd[indx] < 0) {
 										if (3.0f * hcd[indx] < -(Ginth + cfa[indx])) {
 											hcd[indx] = ULIM(Ginth,cfa[indx-1],cfa[indx+1]) - cfa[indx];
 										}
 										else {
-											hwt = 1.0f + 3.0f * hcd[indx] / (eps + Ginth + cfa[indx]);
+											float hwt = 1.0f + 3.0f * hcd[indx] / (eps + Ginth + cfa[indx]);
 											hcd[indx] = hwt * hcd[indx]
 													+ (1.0f - hwt) * (ULIM(Ginth,cfa[indx-1],cfa[indx+1]) - cfa[indx]);
 										}
@@ -670,7 +652,7 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 											vcd[indx] = ULIM(Gintv,cfa[indx-v1],cfa[indx+v1]) - cfa[indx];
 										}
 										else {
-											vwt = 1.0f + 3.0f * vcd[indx] / (eps + Gintv + cfa[indx]);
+											float vwt = 1.0f + 3.0f * vcd[indx] / (eps + Gintv + cfa[indx]);
 											vcd[indx] =
 													vwt * vcd[indx]
 															+ (1.0f - vwt)
@@ -689,8 +671,8 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 								cddiffsq[indx] = SQR(vcd[indx]-hcd[indx]);
 							}
 
-						for ( rr = 6; rr < rr1 - 6 ; rr++ )
-							for ( cc = 6 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 6 ; cc += 2, indx += 2 ) {
+						for ( int rr = 6; rr < rr1 - 6 ; rr++ )
+							for ( int cc = 6 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 6 ; cc += 2, indx += 2 ) {
 
 								//compute color difference variances in cardinal directions
 
@@ -699,20 +681,20 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 								float lave = (hcd[indx] + hcd[indx - 1] + hcd[indx - 2] + hcd[indx - 3]);
 								float rave = (hcd[indx] + hcd[indx + 1] + hcd[indx + 2] + hcd[indx + 3]);
 
-								Dgrbvvaru = SQR(vcd[indx]-uave) + SQR(vcd[indx-v1]-uave) + SQR(vcd[indx-v2]-uave)
+								float Dgrbvvaru = SQR(vcd[indx]-uave) + SQR(vcd[indx-v1]-uave) + SQR(vcd[indx-v2]-uave)
 										+ SQR(vcd[indx-v3]-uave);
-								Dgrbvvard = SQR(vcd[indx]-dave) + SQR(vcd[indx+v1]-dave) + SQR(vcd[indx+v2]-dave)
+								float Dgrbvvard = SQR(vcd[indx]-dave) + SQR(vcd[indx+v1]-dave) + SQR(vcd[indx+v2]-dave)
 										+ SQR(vcd[indx+v3]-dave);
-								Dgrbhvarl = SQR(hcd[indx]-lave) + SQR(hcd[indx-1]-lave) + SQR(hcd[indx-2]-lave)
+								float Dgrbhvarl = SQR(hcd[indx]-lave) + SQR(hcd[indx-1]-lave) + SQR(hcd[indx-2]-lave)
 										+ SQR(hcd[indx-3]-lave);
-								Dgrbhvarr = SQR(hcd[indx]-rave) + SQR(hcd[indx+1]-rave) + SQR(hcd[indx+2]-rave)
+								float Dgrbhvarr = SQR(hcd[indx]-rave) + SQR(hcd[indx+1]-rave) + SQR(hcd[indx+2]-rave)
 										+ SQR(hcd[indx+3]-rave);
 
-								hwt = dirwts[indx - 1][1] / (dirwts[indx - 1][1] + dirwts[indx + 1][1]);
-								vwt = dirwts[indx - v1][0] / (dirwts[indx + v1][0] + dirwts[indx - v1][0]);
+								float hwt = dirwts[indx - 1][1] / (dirwts[indx - 1][1] + dirwts[indx + 1][1]);
+								float vwt = dirwts[indx - v1][0] / (dirwts[indx + v1][0] + dirwts[indx - v1][0]);
 
-								vcdvar = epssq + vwt * Dgrbvvard + (1.0f - vwt) * Dgrbvvaru;
-								hcdvar = epssq + hwt * Dgrbhvarr + (1.0f - hwt) * Dgrbhvarl;
+								float vcdvar = epssq + vwt * Dgrbvvard + (1.0f - vwt) * Dgrbvvaru;
+								float hcdvar = epssq + hwt * Dgrbhvarr + (1.0f - hwt) * Dgrbhvarl;
 
 								//compute fluctuations in up/down and left/right interpolations of colors
 								Dgrbvvaru = (dgintv[indx]) + (dgintv[indx - v1]) + (dgintv[indx - v2]);
@@ -720,12 +702,12 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 								Dgrbhvarl = (dginth[indx]) + (dginth[indx - 1]) + (dginth[indx - 2]);
 								Dgrbhvarr = (dginth[indx]) + (dginth[indx + 1]) + (dginth[indx + 2]);
 
-								vcdvar1 = epssq + vwt * Dgrbvvard + (1.0f - vwt) * Dgrbvvaru;
-								hcdvar1 = epssq + hwt * Dgrbhvarr + (1.0f - hwt) * Dgrbhvarl;
+								float vcdvar1 = epssq + vwt * Dgrbvvard + (1.0f - vwt) * Dgrbvvaru;
+								float hcdvar1 = epssq + hwt * Dgrbhvarr + (1.0f - hwt) * Dgrbhvarl;
 
 								//determine adaptive weights for G interpolation
-								varwt = hcdvar / (vcdvar + hcdvar);
-								diffwt = hcdvar1 / (vcdvar1 + hcdvar1);
+								float varwt = hcdvar / (vcdvar + hcdvar);
+								float diffwt = hcdvar1 / (vcdvar1 + hcdvar1);
 
 								//if both agree on interpolation direction, choose the one with strongest directional discrimination;
 								//otherwise, choose the u/d and l/r difference fluctuation weights
@@ -744,11 +726,11 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 						// Nyquist test
 						//t1_nyqtest = clock();
 
-						for ( rr = 6; rr < rr1 - 6 ; rr++ )
-							for ( cc = 6 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 6 ; cc += 2, indx += 2 ) {
+						for ( int rr = 6; rr < rr1 - 6 ; rr++ )
+							for ( int cc = 6 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 6 ; cc += 2, indx += 2 ) {
 
 								//nyquist texture test: ask if difference of vcd compared to hcd is larger or smaller than RGGB gradients
-								nyqtest = (gaussodd[0] * cddiffsq[indx]
+								float nyqtest = (gaussodd[0] * cddiffsq[indx]
 										+ gaussodd[1]
 												* (cddiffsq[indx - m1] + cddiffsq[indx + p1] + cddiffsq[indx - p1]
 														+ cddiffsq[indx + m1])
@@ -794,8 +776,8 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 								} //nyquist=1 for nyquist region
 							}
 
-						for ( rr = 8; rr < rr1 - 8 ; rr++ )
-							for ( cc = 8 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 8 ; cc += 2, indx += 2 ) {
+						for ( int rr = 8; rr < rr1 - 8 ; rr++ )
+							for ( int cc = 8 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 8 ; cc += 2, indx += 2 ) {
 
 								int areawt = (nyquist[indx - v2] + nyquist[indx - m1] + nyquist[indx + p1]
 										+ nyquist[indx - 2] + nyquist[indx] + nyquist[indx + 2] + nyquist[indx - p1]
@@ -815,17 +797,17 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 						// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 						// in areas of Nyquist texture, do area interpolation
 						//t1_areainterp = clock();
-						for ( rr = 8; rr < rr1 - 8 ; rr++ )
-							for ( cc = 8 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 8 ; cc += 2, indx += 2 ) {
+						for ( int rr = 8; rr < rr1 - 8 ; rr++ )
+							for ( int cc = 8 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 8 ; cc += 2, indx += 2 ) {
 
 								if (nyquist[indx]) {
 									// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 									// area interpolation
-
+									float sumh,sumv,sumsqh,sumsqv,areawt;
 									sumh = sumv = sumsqh = sumsqv = areawt = 0;
-									for ( i = -6; i < 7 ; i += 2 )
-										for ( j = -6; j < 7 ; j += 2 ) {
-											indx1 = (rr + i) * TS + cc + j;
+									for ( int i = -6; i < 7 ; i += 2 )
+										for ( int j = -6; j < 7 ; j += 2 ) {
+											int indx1 = (rr + i) * TS + cc + j;
 											if (nyquist[indx1]) {
 												sumh += cfa[indx1] - 0.5f * (cfa[indx1 - 1] + cfa[indx1 + 1]);
 												sumv += cfa[indx1] - 0.5f * (cfa[indx1 - v1] + cfa[indx1 + v1]);
@@ -841,8 +823,8 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 										}
 
 									//horizontal and vertical color differences, and adaptive weight
-									hcdvar = epssq + fabs(areawt*sumsqh-sumh*sumh);
-									vcdvar = epssq + fabs(areawt*sumsqv-sumv*sumv);
+									float hcdvar = epssq + fabs(areawt*sumsqh-sumh*sumh);
+									float vcdvar = epssq + fabs(areawt*sumsqv-sumv*sumv);
 									hvwt[indx] = hcdvar / (vcdvar + hcdvar);
 
 									// end of area interpolation
@@ -855,14 +837,14 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 
 						// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 						//populate G at R/B sites
-						for ( rr = 8; rr < rr1 - 8 ; rr++ )
-							for ( cc = 8 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 8 ; cc += 2, indx += 2 ) {
+						for ( int rr = 8; rr < rr1 - 8 ; rr++ )
+							for ( int cc = 8 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 8 ; cc += 2, indx += 2 ) {
 
 								//first ask if one gets more directional discrimination from nearby B/R sites
-								hvwtalt = 0.25f
+								float hvwtalt = 0.25f
 										* (hvwt[indx - m1] + hvwt[indx + p1] + hvwt[indx - p1] + hvwt[indx + m1]);
-								vo = fabs(0.5f-hvwt[indx]);
-								ve = fabs(0.5f-hvwtalt);
+								float vo = fabs(0.5f-hvwt[indx]);
+								float ve = fabs(0.5f-hvwtalt);
 								if (vo < ve) {
 									hvwt[indx] = hvwtalt;
 								} //a better result was obtained from the neighbors
@@ -889,12 +871,12 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 						// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 						// refine Nyquist areas using G curvatures
 
-						for ( rr = 8; rr < rr1 - 8 ; rr++ )
-							for ( cc = 8 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 8 ; cc += 2, indx += 2 ) {
+						for ( int rr = 8; rr < rr1 - 8 ; rr++ )
+							for ( int cc = 8 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 8 ; cc += 2, indx += 2 ) {
 
 								if (nyquist[indx]) {
 									//local averages (over Nyquist pixels only) of G curvature squared
-									gvarh = epssq
+									float gvarh = epssq
 											+ (gquinc[0] * Dgrbh2[indx]
 													+ gquinc[1]
 															* (Dgrbh2[indx - m1] + Dgrbh2[indx + p1] + Dgrbh2[indx - p1]
@@ -905,7 +887,7 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 													+ gquinc[3]
 															* (Dgrbh2[indx - m2] + Dgrbh2[indx + p2] + Dgrbh2[indx - p2]
 																	+ Dgrbh2[indx + m2]));
-									gvarv = epssq
+									float gvarv = epssq
 											+ (gquinc[0] * Dgrbv2[indx]
 													+ gquinc[1]
 															* (Dgrbv2[indx - m1] + Dgrbv2[indx + p1] + Dgrbv2[indx - p1]
@@ -929,10 +911,10 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 						// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 						// diagonal interpolation correction
 
-						for ( rr = 8; rr < rr1 - 8 ; rr++ )
-							for ( cc = 8 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 8 ; cc += 2, indx += 2 ) {
+						for ( int rr = 8; rr < rr1 - 8 ; rr++ )
+							for ( int cc = 8 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 8 ; cc += 2, indx += 2 ) {
 
-								rbvarp = epssq
+								float rbvarp = epssq
 										+ (gausseven[0]
 												* (Dgrbpsq1[indx - v1] + Dgrbpsq1[indx - 1] + Dgrbpsq1[indx + 1]
 														+ Dgrbpsq1[indx + v1])
@@ -941,7 +923,7 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 																+ Dgrbpsq1[indx - 2 - v1] + Dgrbpsq1[indx + 2 - v1]
 																+ Dgrbpsq1[indx - 2 + v1] + Dgrbpsq1[indx + 2 + v1]
 																+ Dgrbpsq1[indx + v2 - 1] + Dgrbpsq1[indx + v2 + 1]));
-								rbvarm = epssq
+								float rbvarm = epssq
 										+ (gausseven[0]
 												* (Dgrbmsq1[indx - v1] + Dgrbmsq1[indx - 1] + Dgrbmsq1[indx + 1]
 														+ Dgrbmsq1[indx + v1])
@@ -954,41 +936,22 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 								// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 								//diagonal color ratios
-								crse = 2.0f * (cfa[indx + m1]) / (eps + cfa[indx] + (cfa[indx + m2]));
-								crnw = 2.0f * (cfa[indx - m1]) / (eps + cfa[indx] + (cfa[indx - m2]));
-								crne = 2.0f * (cfa[indx + p1]) / (eps + cfa[indx] + (cfa[indx + p2]));
-								crsw = 2.0f * (cfa[indx - p1]) / (eps + cfa[indx] + (cfa[indx - p2]));
+								float crse = 2.0f * (cfa[indx + m1]) / (eps + cfa[indx] + (cfa[indx + m2]));
+								float crnw = 2.0f * (cfa[indx - m1]) / (eps + cfa[indx] + (cfa[indx - m2]));
+								float crne = 2.0f * (cfa[indx + p1]) / (eps + cfa[indx] + (cfa[indx + p2]));
+								float crsw = 2.0f * (cfa[indx - p1]) / (eps + cfa[indx] + (cfa[indx - p2]));
 
 								//assign B/R at R/B sites
-								if (fabs(1.0f-crse) < arthresh) {
-									rbse = cfa[indx] * crse;
-								} //use this if more precise diag interp is necessary
-								else {
-									rbse = (cfa[indx + m1]) + 0.5f * (cfa[indx] - cfa[indx + m2]);
-								}
-								if (fabs(1.0f-crnw) < arthresh) {
-									rbnw = cfa[indx] * crnw;
-								}
-								else {
-									rbnw = (cfa[indx - m1]) + 0.5f * (cfa[indx] - cfa[indx - m2]);
-								}
-								if (fabs(1.0f-crne) < arthresh) {
-									rbne = cfa[indx] * crne;
-								}
-								else {
-									rbne = (cfa[indx + p1]) + 0.5f * (cfa[indx] - cfa[indx + p2]);
-								}
-								if (fabs(1.0f-crsw) < arthresh) {
-									rbsw = cfa[indx] * crsw;
-								}
-								else {
-									rbsw = (cfa[indx - p1]) + 0.5f * (cfa[indx] - cfa[indx - p2]);
-								}
+								float rbse = (fabs(1.0f-crse) < arthresh)?cfa[indx] * crse : (cfa[indx + m1]) + 0.5f * (cfa[indx] - cfa[indx + m2]);
+								float rbnw = (fabs(1.0f-crnw) < arthresh)?cfa[indx] * crnw : (cfa[indx - m1]) + 0.5f * (cfa[indx] - cfa[indx - m2]);
+								float rbne = (fabs(1.0f-crne) < arthresh)?cfa[indx] * crne : (cfa[indx + p1]) + 0.5f * (cfa[indx] - cfa[indx + p2]);
+								float rbsw = (fabs(1.0f-crsw) < arthresh)?cfa[indx] * crsw : (cfa[indx - p1]) + 0.5f * (cfa[indx] - cfa[indx - p2]);
 
-								wtse = eps + delm[indx] + delm[indx + m1] + delm[indx + m2]; //same as for wtu,wtd,wtl,wtr
-								wtnw = eps + delm[indx] + delm[indx - m1] + delm[indx - m2];
-								wtne = eps + delp[indx] + delp[indx + p1] + delp[indx + p2];
-								wtsw = eps + delp[indx] + delp[indx - p1] + delp[indx - p2];
+
+								float wtse = eps + delm[indx] + delm[indx + m1] + delm[indx + m2]; //same as for wtu,wtd,wtl,wtr
+								float wtnw = eps + delm[indx] + delm[indx - m1] + delm[indx - m2];
+								float wtne = eps + delp[indx] + delp[indx + p1] + delp[indx + p2];
+								float wtsw = eps + delp[indx] + delp[indx - p1] + delp[indx - p2];
 
 								rbm[indx] = (wtse * rbnw + wtnw * rbse) / (wtse + wtnw);
 								rbp[indx] = (wtne * rbsw + wtsw * rbne) / (wtne + wtsw);
@@ -1002,7 +965,7 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 										rbp[indx] = ULIM(rbp[indx] ,cfa[indx-p1],cfa[indx+p1]);
 									}
 									else {
-										pwt = 2.0f * (cfa[indx] - rbp[indx]) / (eps + rbp[indx] + cfa[indx]);
+										float pwt = 2.0f * (cfa[indx] - rbp[indx]) / (eps + rbp[indx] + cfa[indx]);
 										rbp[indx] = pwt * rbp[indx]
 												+ (1.0f - pwt) * ULIM(rbp[indx],cfa[indx-p1],cfa[indx+p1]);
 									}
@@ -1012,7 +975,7 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 										rbm[indx] = ULIM(rbm[indx] ,cfa[indx-m1],cfa[indx+m1]);
 									}
 									else {
-										mwt = 2.0f * (cfa[indx] - rbm[indx]) / (eps + rbm[indx] + cfa[indx]);
+										float mwt = 2.0f * (cfa[indx] - rbm[indx]) / (eps + rbm[indx] + cfa[indx]);
 										rbm[indx] = mwt * rbm[indx]
 												+ (1.0f - mwt) * ULIM(rbm[indx],cfa[indx-m1],cfa[indx+m1]);
 									}
@@ -1030,15 +993,15 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 								//rbint[indx] = 0.5*(cfa[indx] + (rbp*rbvarm+rbm*rbvarp)/(rbvarp+rbvarm));//this is R+B, interpolated
 							}
 
-						for ( rr = 10; rr < rr1 - 10 ; rr++ )
-							for ( cc = 10 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 10 ;
+						for ( int rr = 10; rr < rr1 - 10 ; rr++ )
+							for ( int cc = 10 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 10 ;
 									cc += 2, indx += 2 ) {
 
 								//first ask if one gets more directional discrimination from nearby B/R sites
-								pmwtalt = 0.25f
+								float pmwtalt = 0.25f
 										* (pmwt[indx - m1] + pmwt[indx + p1] + pmwt[indx - p1] + pmwt[indx + m1]);
-								vo = fabs(0.5f-pmwt[indx]);
-								ve = fabs(0.5f-pmwtalt);
+								float vo = fabs(0.5f-pmwt[indx]);
+								float ve = fabs(0.5f-pmwtalt);
 								if (vo < ve) {
 									pmwt[indx] = pmwtalt;
 								} //a better result was obtained from the neighbors
@@ -1046,8 +1009,8 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 										* (cfa[indx] + rbm[indx] * (1.0f - pmwt[indx]) + rbp[indx] * pmwt[indx]); //this is R+B, interpolated
 							}
 
-						for ( rr = 12; rr < rr1 - 12 ; rr++ )
-							for ( cc = 12 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 12 ;
+						for ( int rr = 12; rr < rr1 - 12 ; rr++ )
+							for ( int cc = 12 + (Myfc(rr,2) & 1), indx = rr * TS + cc; cc < cc1 - 12 ;
 									cc += 2, indx += 2 ) {
 
 								if (fabs(0.5f-pmwt[indx]) < fabs(0.5f-hvwt[indx])
@@ -1058,36 +1021,16 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 								//unfortunately, since G interpolation cannot be done diagonally this may lead to color shifts
 								//color ratios for G interpolation
 
-								cru = cfa[indx - v1] * 2.0f / (eps + rbint[indx] + rbint[indx - v2]);
-								crd = cfa[indx + v1] * 2.0f / (eps + rbint[indx] + rbint[indx + v2]);
-								crl = cfa[indx - 1] * 2.0f / (eps + rbint[indx] + rbint[indx - 2]);
-								crr = cfa[indx + 1] * 2.0f / (eps + rbint[indx] + rbint[indx + 2]);
+								float cru = cfa[indx - v1] * 2.0f / (eps + rbint[indx] + rbint[indx - v2]);
+								float crd = cfa[indx + v1] * 2.0f / (eps + rbint[indx] + rbint[indx + v2]);
+								float crl = cfa[indx - 1] * 2.0f / (eps + rbint[indx] + rbint[indx - 2]);
+								float crr = cfa[indx + 1] * 2.0f / (eps + rbint[indx] + rbint[indx + 2]);
 
 								//interpolated G via adaptive ratios or Hamilton-Adams in each cardinal direction
-								if (fabs(1.0f-cru) < arthresh) {
-									gu = rbint[indx] * cru;
-								}
-								else {
-									gu = cfa[indx - v1] + 0.5f * (rbint[indx] - rbint[indx - v2]);
-								}
-								if (fabs(1.0f-crd) < arthresh) {
-									gd = rbint[indx] * crd;
-								}
-								else {
-									gd = cfa[indx + v1] + 0.5f * (rbint[indx] - rbint[indx + v2]);
-								}
-								if (fabs(1.0f-crl) < arthresh) {
-									gl = rbint[indx] * crl;
-								}
-								else {
-									gl = cfa[indx - 1] + 0.5f * (rbint[indx] - rbint[indx - 2]);
-								}
-								if (fabs(1.0f-crr) < arthresh) {
-									gr = rbint[indx] * crr;
-								}
-								else {
-									gr = cfa[indx + 1] + 0.5f * (rbint[indx] - rbint[indx + 2]);
-								}
+								float gu = (fabs(1.0f-cru) < arthresh) ? rbint[indx] * cru : cfa[indx - v1] + 0.5f * (rbint[indx] - rbint[indx - v2]);
+								float gd = (fabs(1.0f-crd) < arthresh) ? rbint[indx] * crd : cfa[indx + v1] + 0.5f * (rbint[indx] - rbint[indx + v2]);
+								float gl = (fabs(1.0f-crl) < arthresh) ? rbint[indx] * crl : cfa[indx - 1] + 0.5f * (rbint[indx] - rbint[indx - 2]);
+								float gr = (fabs(1.0f-crr) < arthresh) ? rbint[indx] * crr : cfa[indx + 1] + 0.5f * (rbint[indx] - rbint[indx + 2]);
 
 								//gu=rbint[indx]*cru;
 								//gd=rbint[indx]*crd;
@@ -1095,9 +1038,9 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 								//gr=rbint[indx]*crr;
 
 								//interpolated G via adaptive weights of cardinal evaluations
-								Gintv = (dirwts[indx - v1][0] * gd + dirwts[indx + v1][0] * gu)
+								float Gintv = (dirwts[indx - v1][0] * gd + dirwts[indx + v1][0] * gu)
 										/ (dirwts[indx + v1][0] + dirwts[indx - v1][0]);
-								Ginth = (dirwts[indx - 1][1] * gr + dirwts[indx + 1][1] * gl)
+								float Ginth = (dirwts[indx - 1][1] * gr + dirwts[indx + 1][1] * gl)
 										/ (dirwts[indx - 1][1] + dirwts[indx + 1][1]);
 
 								// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1107,7 +1050,7 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 										Gintv = ULIM(Gintv ,cfa[indx-v1],cfa[indx+v1]);
 									}
 									else {
-										vwt = 2.0f * (rbint[indx] - Gintv) / (eps + Gintv + rbint[indx]);
+										float vwt = 2.0f * (rbint[indx] - Gintv) / (eps + Gintv + rbint[indx]);
 										Gintv = vwt * Gintv + (1.0f - vwt) * ULIM(Gintv,cfa[indx-v1],cfa[indx+v1]);
 									}
 								}
@@ -1116,7 +1059,7 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 										Ginth = ULIM(Ginth ,cfa[indx-1],cfa[indx+1]);
 									}
 									else {
-										hwt = 2.0f * (rbint[indx] - Ginth) / (eps + Ginth + rbint[indx]);
+										float hwt = 2.0f * (rbint[indx] - Ginth) / (eps + Ginth + rbint[indx]);
 										Ginth = hwt * Ginth + (1.0f - hwt) * ULIM(Ginth,cfa[indx-1],cfa[indx+1]);
 									}
 								}
@@ -1144,27 +1087,27 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 						//t1_chroma = clock();
 						//fancy chrominance interpolation
 						//(ey,ex) is location of R site
-						for ( rr = 13 - ey; rr < rr1 - 12 ; rr += 2 )
-							for ( cc = 13 - ex, indx = rr * TS + cc; cc < cc1 - 12 ; cc += 2, indx += 2 ) { //B coset
+						for ( int rr = 13 - ey; rr < rr1 - 12 ; rr += 2 )
+							for ( int cc = 13 - ex, indx = rr * TS + cc; cc < cc1 - 12 ; cc += 2, indx += 2 ) { //B coset
 								Dgrb[indx][1] = Dgrb[indx][0]; //split out G-B from G-R
 								Dgrb[indx][0] = 0;
 							}
-						for ( rr = 12; rr < rr1 - 12 ; rr++ )
-							for ( cc = 12 + (Myfc(rr,2) & 1), indx = rr * TS + cc, c = 1 - Myfc(rr,cc) / 2;
+						for ( int rr = 12; rr < rr1 - 12 ; rr++ )
+							for ( int cc = 12 + (Myfc(rr,2) & 1), indx = rr * TS + cc, c = 1 - Myfc(rr,cc) / 2;
 									cc < cc1 - 12 ; cc += 2, indx += 2 ) {
-								wtnw = 1.0f
+								float wtnw = 1.0f
 										/ (eps + fabs(Dgrb[indx-m1][c]-Dgrb[indx+m1][c])
 												+ fabs(Dgrb[indx-m1][c]-Dgrb[indx-m3][c])
 												+ fabs(Dgrb[indx+m1][c]-Dgrb[indx-m3][c]));
-								wtne = 1.0f
+								float wtne = 1.0f
 										/ (eps + fabs(Dgrb[indx+p1][c]-Dgrb[indx-p1][c])
 												+ fabs(Dgrb[indx+p1][c]-Dgrb[indx+p3][c])
 												+ fabs(Dgrb[indx-p1][c]-Dgrb[indx+p3][c]));
-								wtsw = 1.0f
+								float wtsw = 1.0f
 										/ (eps + fabs(Dgrb[indx-p1][c]-Dgrb[indx+p1][c])
 												+ fabs(Dgrb[indx-p1][c]-Dgrb[indx+m3][c])
 												+ fabs(Dgrb[indx+p1][c]-Dgrb[indx-p3][c]));
-								wtse = 1.0f
+								float wtse = 1.0f
 										/ (eps + fabs(Dgrb[indx+m1][c]-Dgrb[indx-m1][c])
 												+ fabs(Dgrb[indx+m1][c]-Dgrb[indx-p3][c])
 												+ fabs(Dgrb[indx-m1][c]-Dgrb[indx+m3][c]));
@@ -1188,10 +1131,10 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 														- 0.075f * Dgrb[indx + m1 + v2][c]))
 										/ (wtnw + wtne + wtsw + wtse);
 							}
-						for ( rr = 12; rr < rr1 - 12 ; rr++ )
-							for ( cc = 12 + (Myfc(rr,1) & 1), indx = rr * TS + cc, c = Myfc(rr,cc+1) / 2;
+						for ( int rr = 12; rr < rr1 - 12 ; rr++ )
+							for ( int cc = 12 + (Myfc(rr,1) & 1), indx = rr * TS + cc;//, c = Myfc(rr,cc+1) / 2
 									cc < cc1 - 12 ; cc += 2, indx += 2 )
-								for ( c = 0; c < 2 ; c++ ) {
+								for ( int c = 0; c < 2 ; c++ ) {
 
 									Dgrb[indx][c] = ((hvwt[indx - v1]) * Dgrb[indx - v1][c]
 											+ (1.0f - hvwt[indx + 1]) * Dgrb[indx + 1][c]
@@ -1201,8 +1144,8 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 													+ (hvwt[indx + v1]));
 
 								}
-						for ( rr = 12; rr < rr1 - 12 ; rr++ )
-							for ( cc = 12, indx = rr * TS + cc; cc < cc1 - 12 ; cc++, indx++ ) {
+						for ( int rr = 12; rr < rr1 - 12 ; rr++ )
+							for ( int cc = 12, indx = rr * TS + cc; cc < cc1 - 12 ; cc++, indx++ ) {
 								rgb[indx][0] = (rgb[indx][1] - Dgrb[indx][0]);
 								rgb[indx][2] = (rgb[indx][1] - Dgrb[indx][1]);
 							}
@@ -1214,11 +1157,11 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 						// copy smoothed results back to image matrix
 						int mrow = H - 1;
 						int mcol = W - 1;
-						for ( rr = 16; rr < rr1 - 16 ; rr++ )
-							for ( row = rr + top, cc = 16; cc < cc1 - 16 ; cc++ ) {
-								col = cc + left;
+						for ( int rr = 16; rr < rr1 - 16 ; rr++ )
+							for ( int row = rr + top, cc = 16; cc < cc1 - 16 ; cc++ ) {
+								int col = cc + left;
 
-								indx = rr * TS + cc;
+								int indx = rr * TS + cc;
 								float r = rgb[indx][0];// * post_scale; //- boffset;
 								float g = rgb[indx][1];// * post_scale; // - boffset;
 								float b = rgb[indx][2];// * post_scale; // - boffset;

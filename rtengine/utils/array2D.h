@@ -183,15 +183,16 @@ public:
 	}
 	void clear(void)
 	{
-		if (owner && x && y && data)
+		/*if (owner && x && y && data)
 		{
 			memset(data,0,x*y*sizeof(T));
 		}
 		if ((owner==0) && (flags & ARRAY2D_BYREFERENCE))
-		{
+		{*/
+		if (ptr && x && y)
 			for (int i=0;i<y;i++)
 				memset(ptr[i],0,x*sizeof(T));
-		}
+		//}
 	}
 	// use with indices
 	T * operator[](size_t index) {
@@ -202,19 +203,19 @@ public:
 				return NULL;
 			}
 #endif
-		return data+index*x;//ptr[index];
+		return ptr[index];//data+index*x;
 	}
 
 	// use as pointer to T**
 	operator T**() {
 		return ptr;
 	}
-
+/*
 	// use as pointer to data
 	operator T*() {
 		// only if owner this will return a valid pointer
 		return data;
-	}
+	}*/
 
 	// useful within init of parent object
 	// or use as resize of 2D array

@@ -24,9 +24,17 @@
 
 inline float Contrast(float i) {
     if (i < 0.5f) return i * i * 2.0f;
-    i = 1 - i;
+    i = (1 - i);
     return 1.0f - i * i * 2.0f;
 }
+
+inline float invcontrast(float i)
+{
+	if ( i < 0.5f) return (i>0.0)? sqrt(i)*0.707106781 :0.0;
+	if (i<1.0f) return 1.0f - sqrt(1.0f -i)*0.707106781;
+	return 1.0f;
+}
+
 void color_correct(HDRImage & dest,improps &props)
 {
 	float expcomp = props.pp3["[Exposure]"]["Compensation"];
@@ -34,10 +42,11 @@ void color_correct(HDRImage & dest,improps &props)
 	float contrast = props.pp3["[Exposure]"]["Contrast"];
 	float black = props.pp3["[Exposure]"]["Black"];
 
-	black = black /65536.0f;
+	black = 0.25f * black /65536.0f;
 	bright = bright*0.001f;
-	contrast=contrast*0.01f;
-	const float not_contrast = 1.0f - fabs(contrast);
+	int inv=(contrast<0);
+	contrast=fabs(contrast*0.01f);
+	const float not_contrast = 1.0f - contrast;
 
 	const float post_scale = pow(2.0f, expcomp)/(1.0f-black);
 	float mat[3][3];
@@ -46,7 +55,7 @@ void color_correct(HDRImage & dest,improps &props)
 			mat[i][j]=props.mat[i][j];
 
 	int Hgt=dest.ysize(),Wdt=dest.xsize();
-	cout << "Doing color correction\n";
+	cout << "Doing color correction " << expcomp <<endl;
 #pragma omp parallel for
 	for (  int y = 0 ; y < Hgt ; y++ )
 		for (  int x = 0 ; x < Wdt ; x++ ) {
@@ -63,21 +72,31 @@ void color_correct(HDRImage & dest,improps &props)
 			g = (g > 1.0f) ? 1.0f : ((g < 0.0f) ? 0.0f:g);
 			b = (b > 1.0f) ? 1.0f : ((b < 0.0f) ? 0.0f:b);
 
-			float nr = mat[0][0] * r + mat[0][1] * g + mat[0][2] * b;
-			float ng = mat[1][0] * r + mat[1][1] * g + mat[1][2] * b;
-			float nb = mat[2][0] * r + mat[2][1] * g + mat[2][2] * b;
+			float nr = mat[0][0] * r + mat[0][1] * g + mat[0][2] * b + bright;
+			float ng = mat[1][0] * r + mat[1][1] * g + mat[1][2] * b + bright;
+			float nb = mat[2][0] * r + mat[2][1] * g + mat[2][2] * b + bright;
 
 			// apply contrast
-			r= not_contrast*nr + contrast * Contrast(nr) + bright;
-			g= not_contrast*ng + contrast * Contrast(ng) + bright;
-			b= not_contrast*nb + contrast * Contrast(nb) + bright;
+			if ((contrast >0.0f) && (inv==0))
+			{
+				nr= not_contrast*nr + contrast * Contrast(nr) ;
+				ng= not_contrast*ng + contrast * Contrast(ng) ;
+				nb= not_contrast*nb + contrast * Contrast(nb) ;
+			}
+			if ((contrast >0.0f) && inv)
+			{
+				nr= not_contrast*nr + contrast * invcontrast(nr) ;
+				ng= not_contrast*ng + contrast * invcontrast(ng) ;
+				nb= not_contrast*nb + contrast * invcontrast(nb) ;
+			}
+
 
 			// apply brightness
 
 
-			dest[y][x].r = r;//+bright;
-			dest[y][x].g = g;//+bright;
-			dest[y][x].b = b;//+bright;
+			dest[y][x].r = nr;//+bright;
+			dest[y][x].g = ng;//+bright;
+			dest[y][x].b = nb;//+bright;
 		}
 }
 
