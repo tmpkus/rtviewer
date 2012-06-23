@@ -211,8 +211,8 @@ static void Bilateral_HDR_Luma(HDRImage &ref, HDRImage &working, HDRImage &res,
 		volatile int &early) {
 	int W = working.xsize(), H = working.ysize();
 	int blocksize = 128 - radius * 2;
-
-#pragma omp parallel for schedule(dynamic)
+//schedule(dynamic)
+#pragma omp parallel for
 	for (int X = 0; (X < W * early); X += blocksize) {
 
 		int w = ((X + blocksize) >= W) ? W : X + blocksize;
@@ -304,8 +304,8 @@ static void gauss_HDR(HDRImage &ref, HDRImage &res,float gamma)
 	int W = working.xsize(), H = working.ysize();
 	int blocksize = 128 - radius * 2;
 
-
-#pragma omp parallel for schedule(dynamic)
+//schedule(dynamic)
+#pragma omp parallel for
 	for (int X = 0; (X < W) ; X += blocksize) {
 
 		int w = ((X + blocksize) >= W) ? W : X + blocksize;

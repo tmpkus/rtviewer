@@ -43,8 +43,8 @@ static float torgb[3][3] = { { 3.2404542, -1.5371385, -0.4985314 }, {
 		-0.9692660, 1.8760108, 0.0415560 },
 		{ 0.0556434, -0.2040259, 1.0572252 } };
 
-static const float C_Gamma = 1.0f / 2.0f;
-static const float C_IGamma = 2.0f;
+static const float C_Gamma = 1.0f / 2.4f;
+static const float C_IGamma = 2.4f;
 
 float igamma_fn(float index) {
 	return pow(index, C_IGamma);
@@ -128,7 +128,7 @@ float Lab2xyz_fn(float fx) {
 #define argbINDX( a ) (int)(a>1.0f?4095:((a<0.0f)?0:(a*4095.0f)))
 
 unsigned int uc_gamma_fn(float i) {
-	float temp = 255.0f * exp(log(i)*C_Gamma);
+	float temp = 255.0f * pow(i, C_Gamma);//exp(log(i)*C_Gamma);
 	return (unsigned int) argbCLIP(temp);
 }
 
