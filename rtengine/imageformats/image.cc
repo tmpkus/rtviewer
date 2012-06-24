@@ -21,73 +21,68 @@
 #include "image.h"
 #include "../colormanagement/colorconversions.h"
 
-template<typename color> void Image<color>::set_pixel(int w, int h,
-		unsigned int c)
+template<typename color> void Image<color>::set_pixel(int w, int h, unsigned int c)
 {
-	if (((unsigned int) w < data.width()) && ((unsigned int) h < data.height()))
-		data[h][w] = c;
+  if (((unsigned int) w < data.width()) && ((unsigned int) h < data.height()))
+    data[h][w] = c;
 }
 template<typename color> void Image<color>::set_pixel(int w, int h, color c)
 {
-	if (((unsigned int) w < data.width()) && ((unsigned int) h < data.height()))
-		data[h][w] = c;
+  if (((unsigned int) w < data.width()) && ((unsigned int) h < data.height()))
+    data[h][w] = c;
 }
 template<typename color> Image<color>::Image(int w, int h)
 {
-	data(w, h);
+  data(w, h);
 }
-template<typename color> Image<color>::Image(int w, int h, unsigned int * orig,
-		unsigned int flgs) // create new by reference or copying
+template<typename color> Image<color>::Image(int w, int h, unsigned int * orig, unsigned int flgs) // create new by reference or copying
 {
-	if (flgs)
-		data(w, h, orig, ARRAY2D_BYREFERENCE);
-	else
-		data(w, h, orig);
+  if (flgs)
+    data(w, h, orig, ARRAY2D_BYREFERENCE);
+  else
+    data(w, h, orig);
 }
 
-template<typename color> void Image<color>::operator()(int w, int h,
-		color * orig, unsigned int flgs) // change by copy or reference
+template<typename color> void Image<color>::operator()(int w, int h, color * orig, unsigned int flgs) // change by copy or reference
 {
-	if (flgs)
-		data(w, h, orig, ARRAY2D_BYREFERENCE);
-	else
-		data(w, h, orig);
+  if (flgs)
+    data(w, h, orig, ARRAY2D_BYREFERENCE);
+  else
+    data(w, h, orig);
 }
-template<typename color> void Image<color>::set_ref(int w, int h, color * orig,
-		unsigned int flgs) // change by copy or reference
+template<typename color> void Image<color>::set_ref(int w, int h, color * orig, unsigned int flgs) // change by copy or reference
 {
-	if (flgs)
-		data(w, h, orig, ARRAY2D_BYREFERENCE);
-	else
-		data(w, h, orig);
+  if (flgs)
+    data(w, h, orig, ARRAY2D_BYREFERENCE);
+  else
+    data(w, h, orig);
 }
-template<typename color> void Image<color>::operator()(int w, int h,
-		unsigned int * orig, unsigned int flgs) // change by copy or reference
+template<typename color> void Image<color>::operator()(int w, int h, unsigned int * orig, unsigned int flgs) // change by copy or reference
 {
-	if (flgs)
-		data(w, h, orig, ARRAY2D_BYREFERENCE);
-	else
-		data(w, h, orig);
+  if (flgs)
+    data(w, h, orig, ARRAY2D_BYREFERENCE);
+  else
+    data(w, h, orig);
 }
 template<typename color> void Image<color>::operator()(int w, int h) // change by copy or reference
 {
-	data(w, h);
+  data(w, h);
 }
-template<typename color> void Image<color>::set_ref(int w, int h,
-		unsigned int * orig, unsigned int flgs) // change by copy or reference
+template<typename color> void Image<color>::set_ref(int w, int h, unsigned int * orig, unsigned int flgs) // change by copy or reference
 {
-	if (flgs)
-		data(w, h, orig, ARRAY2D_BYREFERENCE);
-	else
-		data(w, h, orig);
+  if (flgs)
+    data(w, h, orig, ARRAY2D_BYREFERENCE);
+  else
+    data(w, h, orig);
 }
 
-template<typename color> Image<color> & Image<color>::operator=(
-		Image<color> & rhs) {
-	if (this != &rhs) {
-		data = rhs.data;
-	}
-	return *this;
+template<typename color> Image<color> & Image<color>::operator=( Image<color> & rhs)
+{
+  if (this != &rhs)
+    {
+      data = rhs.data;
+    }
+  return *this;
 }
 /*
  template <typename color,typename othercolor>
@@ -104,14 +99,16 @@ template<typename color> Image<color> & Image<color>::operator=(
 */
 
 template<typename color>
-int Image<color>::load(std::string name) {
-	logerr("image::load(std::string name) not implemented yet");
-	return 0;
+int Image<color>::load(std::string name)
+{
+  logerr("image::load(std::string name) not implemented yet");
+  return 0;
 }
 template<typename color>
-int Image<color>::save(std::string name) {
-	logerr("image::save(std::string name) not implemented yet");
-	return 0;
+int Image<color>::save(std::string name)
+{
+  logerr("image::save(std::string name) not implemented yet");
+  return 0;
 }
 
 // Instantiate the classes for the supported template type parameters

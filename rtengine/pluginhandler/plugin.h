@@ -22,39 +22,33 @@
 #include "../processing/improps.h"
 #include "../imageformats/image.h"
 
-/*
-#define ARGBImage Image<argb8>
-#define LabImage Image<Lab>
-#define HSVImage Image<hsv>
-#define HIImage Image<rgbHI>
-#define HDRImage Image<rgbHDR>
-#define LBrBbImage Image<LBrBb>
-*/
 typedef enum image_type_t
 {
-	Labim,
-	HSVim,
-	HDRim,
-	LBrBbim,
-	ARGBim,
-}image_type;
- typedef struct module_t {
-	 char * name;
-	 image_type type;
-	 int rank;
-	 void(* fLabim) (LabImage &a,improps &b);
-	 void(* fHSVim) (HSVImage &a,improps &b);
-	 void(* fHDRim) (HDRImage &a,improps &b);
-	 void(* fLBrBbim) (LBrBbImage &a,improps &b);
-	 void(* fARGBim) (ARGBImage &a,improps &b);
+  Labim,
+  HSVim,
+  HDRim,
+  LBrBbim,
+  ARGBim,
+} image_type;
 
-	 struct module_t * next;
- } module;
+typedef struct module_t
+{
+  char * name;
+  image_type type;
+  int rank;
+  void(* fLabim) (LabImage &a,improps &b);
+  void(* fHSVim) (HSVImage &a,improps &b);
+  void(* fHDRim) (HDRImage &a,improps &b);
+  void(* fLBrBbim) (LBrBbImage &a,improps &b);
+  void(* fARGBim) (ARGBImage &a,improps &b);
+
+  struct module_t * next;
+} module;
 
 
- void list_filters(void);
- void addmodule(module & moduleinfo);
- module * get_filters();
+void list_filters(void);
+void addmodule(module & moduleinfo);
+module * get_filters();
 
 #define ADD_FILTER( fn, inputtype , myrank) \
 static module moduleinfo; \

@@ -70,84 +70,90 @@
 #define LUTu LUT<unsigned int>
 
 template<typename T>
-class LUT {
+class LUT
+{
 private:
-	// list of variables ordered to improve cache speed
+  // list of variables ordered to improve cache speed
 
-	T * data;
-	unsigned int clip, size,max, owner;
-	T (*fn)(float);
-	T (*fp)(float,float*);
-	float * params;
-	float fscale;
+  T * data;
+  unsigned int clip, size,max, owner;
+  T (*fn)(float);
+  T (*fp)(float,float*);
+  float * params;
+  float fscale;
 public:
 
-	// reset all LUT data to 0
-	void clear(void);
-	// creator for LUT with size and optional flags
-	LUT(int s, int flags = LUT_DEFAULT_FL);
+  // reset all LUT data to 0
+  void clear(void);
+  // creator for LUT with size and optional flags
+  LUT(int s, int flags = LUT_DEFAULT_FL);
 //	LUT(int s, T (*fn)(float),int flags = LUT_DEFAULT_FL);
-	LUT(unsigned int s, T (*fn)(float,float*),float * parms,float scale=1.0f,int flags = LUT_DEFAULT_FL);
-	LUT(unsigned int s, T (*fn)(float),float scale=1.0f,int flags = LUT_DEFAULT_FL);
-	// copy operator
-	explicit LUT(const LUT<T>& copy);
-	// call to setup lut size and flags
-	void operator ()(int s, int flags = LUT_DEFAULT_FL);
-	void operator ()(unsigned int s, T (*fn)(float,float*),float * parms,float scale=1.0f,int flags = LUT_DEFAULT_FL);
-	void operator ()(unsigned int s, T (*fn)(float),float scale=1.0f,int flags = LUT_DEFAULT_FL);
-	// initialize LUT with data from an array
-	LUT(int s, T * source);
-	// default creator with no size
-	LUT(void);
-	// default destructor
-	~LUT();
-	// assignment operator
-	LUT<T> & operator=(const LUT<T> &rhs);
-	// index operator for use with integer indices
-	T& operator[](int index)
-	{
-		if (((unsigned int)index)<size) return data[index];
-		else
-		{
-			if (index < 0)
-				return data[0];
-			else
-				return data[size - 1];
-		}
-	};
-	// index operator for use with float indices
-	T operator[](float index) {
-		if (data==NULL) return (T) 0;
-		//float index = indx;
-		if (clip & LUT_SCALE_FLOAT)
-			index = index * fscale;
-		int idx = floor(index);
-		if ((unsigned int) idx >= max) {
-			if (idx < 0) {
-				if (clip & LUT_CLIP_BELOW)
-					return data[0];
-				if (fn)
-					return fn(index);
-				if (fp)
-					return fp(index,params);
-				idx = 0;
-			} else {
-				if (clip & LUT_CLIP_ABOVE)
-					return data[max];
-				// use 2nd order derivative too.
-				if (fn)
-					return fn(index);
-				if (fp)
-					return fp(index,params);
-				idx = max;
-			}
-		}
-		float diff = index-(float) idx;
-		T p1 = data[idx];
-		T p2 = data[idx + 1] - p1;
-		return (p1 + p2 * diff);
-	};	// to check if LUT has been setup
-	operator bool (void);
+  LUT(unsigned int s, T (*fn)(float,float*),float * parms,float scale=1.0f,int flags = LUT_DEFAULT_FL);
+  LUT(unsigned int s, T (*fn)(float),float scale=1.0f,int flags = LUT_DEFAULT_FL);
+  // copy operator
+  explicit LUT(const LUT<T>& copy);
+  // call to setup lut size and flags
+  void operator ()(int s, int flags = LUT_DEFAULT_FL);
+  void operator ()(unsigned int s, T (*fn)(float,float*),float * parms,float scale=1.0f,int flags = LUT_DEFAULT_FL);
+  void operator ()(unsigned int s, T (*fn)(float),float scale=1.0f,int flags = LUT_DEFAULT_FL);
+  // initialize LUT with data from an array
+  LUT(int s, T * source);
+  // default creator with no size
+  LUT(void);
+  // default destructor
+  ~LUT();
+  // assignment operator
+  LUT<T> & operator=(const LUT<T> &rhs);
+  // index operator for use with integer indices
+  T& operator[](int index)
+  {
+    if (((unsigned int)index)<size) return data[index];
+    else
+      {
+        if (index < 0)
+          return data[0];
+        else
+          return data[size - 1];
+      }
+  };
+  // index operator for use with float indices
+  T operator[](float index)
+  {
+    if (data==NULL) return (T) 0;
+    //float index = indx;
+    if (clip & LUT_SCALE_FLOAT)
+      index = index * fscale;
+    int idx = floor(index);
+    if ((unsigned int) idx >= max)
+      {
+        if (idx < 0)
+          {
+            if (clip & LUT_CLIP_BELOW)
+              return data[0];
+            if (fn)
+              return fn(index);
+            if (fp)
+              return fp(index,params);
+            idx = 0;
+          }
+        else
+          {
+            if (clip & LUT_CLIP_ABOVE)
+              return data[max];
+            // use 2nd order derivative too.
+            if (fn)
+              return fn(index);
+            if (fp)
+              return fp(index,params);
+            idx = max;
+          }
+      }
+    float diff = index-(float) idx;
+    T p1 = data[idx];
+    T p2 = data[idx + 1] - p1;
+    return (p1 + p2 * diff);
+  };	// to check if LUT has been setup
+  operator bool (void);
 };
 
 #endif /* LUT_H_ */

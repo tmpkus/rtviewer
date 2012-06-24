@@ -22,53 +22,53 @@
 
 Image_Raw ::Image_Raw(char * new_name)
 {
-	pp3_found = props.read(new_name);
-	if (pp3_found)
-	{
-		ref = new fast_demosaic (new_name);
-		ref->cook_data(props);
-	}
+  pp3_found = props.read(new_name);
+  if (pp3_found)
+    {
+      ref = new fast_demosaic (new_name);
+      ref->cook_data(props);
+    }
 }
 
 Image_Raw ::~Image_Raw()
 {
-	delete ref;
+  delete ref;
 }
 
 void Image_Raw ::demosaic(HDRImage &dest,int scale)
 {
-	if (scale!=ref->resize)
-		ref->cook_data(props,scale);
-	if (scale==1)
-	switch (ref->demosaic_method())
-	{
-	case AMAZE_DEMOSAIC:
-		ref->amaze_demosaic_RT(dest,props);
-		break;
-	case FAST_DEMOSAIC:
-		ref->fast_demo(dest,props);
-		break;
-	case JRP_DEMOSAIC:
-		ref->jrp_demo(dest,props);
-		break;
-	case HALFSIZE_DEMOSAIC:
-		ref->half_size_demo(dest,props);
-		break;
-	case VARSIZE_DEMOSAIC:
-		ref->nth_size_demo(dest,3,props);
-		break;
-	}
-	else
-		ref->nth_size_demo(dest,scale,props);
+  if (scale!=ref->resize)
+    ref->cook_data(props,scale);
+  if (scale==1)
+    switch (ref->demosaic_method())
+      {
+      case AMAZE_DEMOSAIC:
+        ref->amaze_demosaic_RT(dest,props);
+        break;
+      case FAST_DEMOSAIC:
+        ref->fast_demo(dest,props);
+        break;
+//      case JRP_DEMOSAIC:
+//        ref->jrp_demo(dest,props);
+//        break;
+//      case HALFSIZE_DEMOSAIC:
+//        ref->half_size_demo(dest,props);
+//        break;
+      case VARSIZE_DEMOSAIC:
+        ref->nth_size_demo(dest,3,props);
+        break;
+      }
+  else
+    ref->nth_size_demo(dest,scale,props);
 
 }
 int Image_Raw ::width()
 {
-	fast_demosaic *thisraw =(fast_demosaic *)ref;
-	return thisraw->get_width();
+  fast_demosaic *thisraw =(fast_demosaic *)ref;
+  return thisraw->get_width();
 }
 int Image_Raw ::height()
 {
-	fast_demosaic *thisraw =(fast_demosaic *)ref;
-	return thisraw->get_height();
+  fast_demosaic *thisraw =(fast_demosaic *)ref;
+  return thisraw->get_height();
 }

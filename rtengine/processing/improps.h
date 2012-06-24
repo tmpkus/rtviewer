@@ -39,92 +39,92 @@ struct ltstr
 };
 class configdata
 {
-	enum datatype
-	{
-		BOOL,
-		FLOAT,
-		INT,
-		FLOAT_ARRAY,
-		INT_ARRAY,
-		TEXT,
-	};
+  enum datatype
+  {
+    BOOL,
+    FLOAT,
+    INT,
+    FLOAT_ARRAY,
+    INT_ARRAY,
+    TEXT,
+  };
 
-	enum datatype type;
+  enum datatype type;
 
 public:
-	char * text;
-	template <typename T> void get(T & dst);
-	template <typename T> void set(T & src);
+  char * text;
+  template <typename T> void get(T & dst);
+  template <typename T> void set(T & src);
 
-	template <class U> configdata & operator= (U rhs);
-	template <typename T> configdata & operator= (vector<T> & rhs);
+  template <class U> configdata & operator= (U rhs);
+  template <typename T> configdata & operator= (vector<T> & rhs);
 
-	operator float()
-	{
-		char *t;
-		type=FLOAT;
-		if (text)
-			return (float)strtod(text,&t);
-		else return 0.0f;
-	};
-	operator int()
-	{
-		char *t;
-		type=INT;
-		if (text) return strtol(text,&t,0);
-		return 0;
-	};
-	operator bool()
-	{
-		char *t="true";
-		type=BOOL;
-		if (text)
-			return ((strncmp(t,text,4))==0);
-		return false;
-	};
-	operator char *()
-	{
-		type=TEXT;
-		return text;
-	};
-	operator class vector<float> ()
-		{
-			vector<float> t;
-			if (text)
-			{
-			char * r=text;
-			while(*r)
-			{
-				char *res;
-				t.push_back(strtod(r,&res));
-				if (*res==';') res++;
-				r=res;
-			}
-			}
-			return t;
-		}
-	operator class vector<int> ()
-		{
-			vector<int> t;
-			if (text)
-			{
-			char * r=text;
-			while(*r)
-			{
-				char *res;
-				t.push_back(strtol(r,&res,0));
-				if (*res==';') res++;
-				r=res;
-			}
-			}
-			return t;
-		}
+  operator float()
+  {
+    char *t;
+    type=FLOAT;
+    if (text)
+      return (float)strtod(text,&t);
+    else return 0.0f;
+  };
+  operator int()
+  {
+    char *t;
+    type=INT;
+    if (text) return strtol(text,&t,0);
+    return 0;
+  };
+  operator bool()
+  {
+    char *t="true";
+    type=BOOL;
+    if (text)
+      return ((strncmp(t,text,4))==0);
+    return false;
+  };
+  operator char *()
+  {
+    type=TEXT;
+    return text;
+  };
+  operator class vector<float> ()
+  {
+    vector<float> t;
+    if (text)
+      {
+        char * r=text;
+        while(*r)
+          {
+            char *res;
+            t.push_back(strtod(r,&res));
+            if (*res==';') res++;
+            r=res;
+          }
+      }
+    return t;
+  }
+  operator class vector<int> ()
+  {
+    vector<int> t;
+    if (text)
+      {
+        char * r=text;
+        while(*r)
+          {
+            char *res;
+            t.push_back(strtol(r,&res,0));
+            if (*res==';') res++;
+            r=res;
+          }
+      }
+    return t;
+  }
 };
 
 typedef struct
 {
-	char * colspace_name;
-	//colmatrix col_matrix;
+  char * colspace_name;
+  //colmatrix col_matrix;
 } colorspace;
 
 
@@ -137,20 +137,20 @@ typedef map<char*,configitems,ltstr> pp3_datamap;
 class improps
 {
 private:
-	char * raw_name;
-	char * pp3_name;
-	struct timespec mtime;
-	int ino_fd;
+  char * raw_name;
+  char * pp3_name;
+  struct timespec mtime;
+  int ino_fd;
 public:
-	pp3_datamap pp3;
-	volatile int early;
-	colorspace cols;
-	float mat[3][3]; // color matrix used
+  pp3_datamap pp3;
+  volatile int early;
+  colorspace cols;
+  float mat[3][3]; // color matrix used
 
 
-	int read(char * name);
-	void dump(void);
-	int update();
+  int read(char * name);
+  void dump(void);
+  int update();
 };
 
 #endif /* IMPROPS_H_ */

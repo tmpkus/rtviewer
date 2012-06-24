@@ -25,18 +25,21 @@
 class Image_Raw : public Image<rgbHDR>
 {
 private:
-	float ISO;
-	class fast_demosaic * ref;
+  float ISO;
+  class fast_demosaic * ref;
 public:
-	int pp3_found;
-	improps props;
-	Image_Raw(char * new_name);
-	Image_Raw(char * new_name,improps properties);
-	float get_ISO(void) {return ISO;};
-	~Image_Raw();
-	void demosaic(HDRImage &dest,int scale=1);
-	int width();
-	int height();
+  int pp3_found;
+  improps props;
+  Image_Raw(char * new_name);
+  Image_Raw(char * new_name,improps properties);
+  float get_ISO(void)
+  {
+    return ISO;
+  };
+  ~Image_Raw();
+  void demosaic(HDRImage &dest,int scale=1);
+  int width();
+  int height();
 };
 
 #endif /* RAWIMAGE_H_ */

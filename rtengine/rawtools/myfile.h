@@ -7,7 +7,7 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
- * 
+ *
  *  RawTherapee is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -26,12 +26,13 @@
 #include <string.h>
 #include <fcntl.h>
 
-struct IMFILE {
-	int fd;
-	int pos;
-	int size;
-	char* data;
-	bool eof;
+struct IMFILE
+{
+  int fd;
+  int pos;
+  int size;
+  char* data;
+  bool eof;
 };
 
 IMFILE* fopen (const char* fname);
@@ -40,61 +41,70 @@ IMFILE* fcreate_temp (unsigned* buf, int size);
 //void fwrite(unsigned* buf, int bsize,int blocks,IMFILE* dest);
 void fclose (IMFILE* f);
 
-inline int ftell (IMFILE* f) {
+inline int ftell (IMFILE* f)
+{
 
-	return f->pos;
+  return f->pos;
 }
 
-inline int feof (IMFILE* f) {
+inline int feof (IMFILE* f)
+{
 
-	return f->eof;
+  return f->eof;
 }
 
-inline void fseek (IMFILE* f, int p, int how) {
+inline void fseek (IMFILE* f, int p, int how)
+{
 
-	if (how==SEEK_SET)
-		f->pos = p;
-	else if (how==SEEK_CUR)
-		f->pos += p;
-	else if (how==SEEK_END)
-		f->pos = f->size-p;
+  if (how==SEEK_SET)
+    f->pos = p;
+  else if (how==SEEK_CUR)
+    f->pos += p;
+  else if (how==SEEK_END)
+    f->pos = f->size-p;
 }
 
-inline int fgetc (IMFILE* f) {
+inline int fgetc (IMFILE* f)
+{
 
-	if (f->pos<f->size)
-		return (unsigned char)f->data[f->pos++];
-	f->eof = true;
-	return EOF;
+  if (f->pos<f->size)
+    return (unsigned char)f->data[f->pos++];
+  f->eof = true;
+  return EOF;
 }
 
-inline int getc (IMFILE* f) {
+inline int getc (IMFILE* f)
+{
 
-	if (f->pos<f->size)
-		return (unsigned char)f->data[f->pos++];
-	f->eof = true;
-	return EOF;
+  if (f->pos<f->size)
+    return (unsigned char)f->data[f->pos++];
+  f->eof = true;
+  return EOF;
 }
 
-inline int fread (void* dst, int es, int count, IMFILE* f) {
+inline int fread (void* dst, int es, int count, IMFILE* f)
+{
 
-	int s = es*count;
-	int avail = f->size - f->pos;
-	if (s<=avail) {
-		memcpy (dst, f->data+f->pos, s);
-		f->pos += s;
-		return count;
-	}
-	else {
-		memcpy (dst, f->data+f->pos, avail);
-		f->pos += avail;
-		f->eof = true;
-		return avail/es;
-	}
+  int s = es*count;
+  int avail = f->size - f->pos;
+  if (s<=avail)
+    {
+      memcpy (dst, f->data+f->pos, s);
+      f->pos += s;
+      return count;
+    }
+  else
+    {
+      memcpy (dst, f->data+f->pos, avail);
+      f->pos += avail;
+      f->eof = true;
+      return avail/es;
+    }
 }
 
-inline unsigned char* fdata(int offset, IMFILE* f) {
-	return (unsigned char*)f->data + offset;
+inline unsigned char* fdata(int offset, IMFILE* f)
+{
+  return (unsigned char*)f->data + offset;
 }
 
 int fscanf (IMFILE* f, const char* s ...);
