@@ -32,37 +32,15 @@ static LUTf dirwt;
 #define abs(a) ((a)<0?-(a):(a))
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
-//static void __attribute__((constructor)) setup_dirwt()
-//{
-//	dirwt(0x10000);
-//	//set up directional weight function
-//	for (int i=0; i<0x10000; i++)
-//		dirwt[i] = 1.0f/SQR(1.0f+(float)i);
-//}
-
-/*
- static void __attribute__((destructor)) cleanup_dirwt()
- {
- delete [] dirwt;
- }
- */
 void fast_demosaic::fast_demo(HDRImage & dest,improps & props)
 {
   dirwt(0x30000);
   //set up directional weight function
   for (int i = 0; i < 0x10000; i++)
     dirwt[i] = 1.0f / SQR(1.0f+(float)i/3.0f);
-  //int winx=0, winy=0;
-  //int winw=W, winh=H;
-  /*
-   if (plistener) {
-   plistener->setProgressStr ("Fast demosaicing...");
-   plistener->setProgress (0.0);
-   }*/
-  //float progress = 0.0;
+
   dest(W, H);
 
-  //float my_gamma = 1.0f / 2.2f;
   cout << W << "x" << H << "starting conversion\n";
   cout << "step 1\n";
 #define bord 4
@@ -98,11 +76,6 @@ void fast_demosaic::fast_demo(HDRImage & dest,improps & props)
   //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #pragma omp parallel
   {
-    // copy-in original 16bit raw data
-    /*#pragma omp for
-     for (int row = 0; row < H; row++)
-     for (int col = 0; col < W; col++)
-     rawData[row][col] = data[row][col];*/
 
 #pragma omp for
     //first, interpolate borders using bilinear
@@ -187,7 +160,7 @@ void fast_demosaic::fast_demo(HDRImage & dest,improps & props)
 
           }//j
       }//i
-    cout << "step 2\n";
+    //cout << "step 2\n";
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #pragma omp for
     for (int j = bord; j < W - bord; j++)
@@ -277,7 +250,7 @@ void fast_demosaic::fast_demo(HDRImage & dest,improps & props)
 
     //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    cout << "step 3\n";
+    //cout << "step 3\n";
 
 #pragma omp for
     // interpolate G using gradient weights
@@ -290,9 +263,6 @@ void fast_demosaic::fast_demo(HDRImage & dest,improps & props)
             if (FC(i, j) == 1)
               {
                 dest[i][j].g = (float)rawData[i][j];
-                //dest[i][j].r = dest[i][j].g;
-                //dest[i][j].b = dest[i][j].g;
-
               }
             else
               {
@@ -317,15 +287,9 @@ void fast_demosaic::fast_demo(HDRImage & dest,improps & props)
                                  * (float) rawData[i + 1][j] + wtl
                                  * (float) rawData[i][j - 1] + wtr
                                  * (float) rawData[i][j + 1]) / sum);
-                //dest[i][j].r = dest[i][j].g;
-                //dest[i][j].b = dest[i][j].g;
-
               }
           }
-        //progress+=(double)0.33/(H);
-        //if(plistener) plistener->setProgress(progress);
       }
-    //if(plistener) plistener->setProgress(0.4);
 
     cout << "step 4\n";
 #pragma omp for
@@ -364,10 +328,7 @@ void fast_demosaic::fast_demo(HDRImage & dest,improps & props)
                 dest[i][j].b = rawData[i][j];
               }
           }
-        //progress+=(double)0.33/(H);
-        //if(plistener) plistener->setProgress(progress);
       }
-    //if(plistener) plistener->setProgress(0.7);
 
 #pragma omp barrier
     cout << "step 5\n";
@@ -391,10 +352,7 @@ void fast_demosaic::fast_demo(HDRImage & dest,improps & props)
                                                         - dest[i][j - 1].b) + (dest[i][j + 1].g
                                                             - dest[i][j + 1].b))));
           }
-        //progress+=(double)0.33/(H);
-        //if(plistener) plistener->setProgress(progress);
       }
-    //if(plistener) plistener->setProgress(0.99);
 
 #pragma omp for
 
@@ -434,8 +392,8 @@ void fast_demosaic::fast_demo(HDRImage & dest,improps & props)
       if (min[i] < mg)
         mg = min[i];
     }
-  cout << " min/max" << mg << " / " << Mg << endl;
+  //cout << " min/max" << mg << " / " << Mg << endl;
 
-  cout << "ready conversion\n";
+  //cout << "ready conversion\n";
 #undef bord
 }

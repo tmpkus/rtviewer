@@ -5,18 +5,12 @@
  */
 
 #include "rawimage.h"
-//#include <colortemp.h>
-//#include <utils.h>
+
 #ifdef WIN32
 #include <winsock2.h>
 #else
 #include <netinet/in.h>
 #endif
-//#include <safegtk.h>
-
-
-
-//extern Settings settings;
 
 RawImage::RawImage(  char * new_name )
   :allocation(NULL)
@@ -155,7 +149,6 @@ skip_block:
 int RawImage::loadRaw (bool loadData, bool closeFile)
 {
   ifname = filename.c_str(); //safe_locale_from_utf8(filename).c_str();
-  //image = NULL;
   verbose =0;// settings.verbose;
   oprof = NULL;
   cout << " RawImage::loadRaw " << filename << endl;
@@ -199,7 +192,6 @@ int RawImage::loadRaw (bool loadData, bool closeFile)
       iheight = height;
       iwidth  = width;
       // dcraw needs this global variable to hold pixel data
-      //if (image) delete [] image;
       image =  newimage(height,width,meta_length);
       cout << " RawImage::loadRaw found simensions " << width << " x " << height<< "@" << image << endl;
 

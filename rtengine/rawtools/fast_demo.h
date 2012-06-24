@@ -60,26 +60,16 @@ public:
     success=(load(mfilename, 0)==0);
     std::cout << "fast_demosaic: DONE load file " << mfilename << endl;
   };
-  /*
-  fast_demosaic(char * mfilename,improps nprop):
-  	//props(nprop),
-  	RawImageSource(mfilename)
-  {
-  	std::cout << "fast_demosaic: load file " << mfilename << endl;
-  	success=(load(mfilename, 0)==0);
-  	std::cout << "fast_demosaic: DONE load file " << mfilename << endl;
-  };*/
-
   void fast_demo(HDRImage & dest, improps &props);
   void amaze_demosaic_RT(HDRImage & dest, improps &props);
-  void jrp_demo(HDRImage & dest, improps &props);
-  void half_size_demo(HDRImage & dest, improps &props);
+//  void jrp_demo(HDRImage & dest, improps &props);
+//  void half_size_demo(HDRImage & dest, improps &props);
   void nth_size_demo(HDRImage & dest,int num, improps &props);
 
-  void naive(HDRImage & dst,array2D<float> &hint,float adjust ,float ladjust );
-  void corner(HDRImage & dst,array2D<float> &I);
-  void improve_correlation(HDRImage & pass1,HDRImage& pass2,float adjust,float ladjust,int green);
-  void color_correct(HDRImage & pass1, HDRImage& pass2, improps &props);
+//  void naive(HDRImage & dst,array2D<float> &hint,float adjust ,float ladjust );
+//  void corner(HDRImage & dst,array2D<float> &I);
+//  void improve_correlation(HDRImage & pass1,HDRImage& pass2,float adjust,float ladjust,int green);
+//  void color_correct(HDRImage & pass1, HDRImage& pass2, improps &props);
   int touch_tiles(HDRImage &dest,int &tile_xs,int &tile_xe,int &tile_ys,int &tile_ye);
   float get_ISO(void)
   {
@@ -89,7 +79,7 @@ public:
   {
     return method;
   }
-  void linear_interpolate(void);
+//  void linear_interpolate(void);
   void cook_data(improps &props,int scale=4);
 };
 #endif /* FAST_DEMO_H_ */

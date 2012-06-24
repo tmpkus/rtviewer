@@ -48,12 +48,6 @@ void Image_Raw ::demosaic(HDRImage &dest,int scale)
       case FAST_DEMOSAIC:
         ref->fast_demo(dest,props);
         break;
-//      case JRP_DEMOSAIC:
-//        ref->jrp_demo(dest,props);
-//        break;
-//      case HALFSIZE_DEMOSAIC:
-//        ref->half_size_demo(dest,props);
-//        break;
       case VARSIZE_DEMOSAIC:
         ref->nth_size_demo(dest,3,props);
         break;

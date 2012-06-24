@@ -62,9 +62,11 @@ plugins:
 clean:
 	-$(RM) $(OBJS) rtviewer
 	-@echo ' '
+	cd rtengine/plugins/ && make clean
 
 post-build:
 	-@echo 'install library'
+	cd rtengine/plugins/ && make 
 	-@echo ' '
 
 .PHONY: all clean dependents
