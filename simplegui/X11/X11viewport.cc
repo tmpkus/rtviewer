@@ -43,6 +43,7 @@ viewport::viewport(char * newtitle, int newwidth, int newheight)
 {
   ref = (void *) new viewport_t;
   viewport_t &vp = *((viewport_t *) ref);
+  stop=0;
   int Screen;
   int Screen_Width;
   int Screen_Height;
@@ -264,13 +265,14 @@ int viewport::process_events(void)
           /* Get the keysym */
           keysym = XLookupKeysym(&xevent.xkey, 0);
           /* report that the key was pressed */
-          key((xevent.xkey.keycode & 0xff) << 16, 1);
+          key(keysym/*(xevent.xkey.keycode & 0xff) << 16*/, 1);
           break;
         case KeyRelease:
           /* Get the keysym */
           keysym = XLookupKeysym(&xevent.xkey, 0);
           /* report that the key was released */
-          key((xevent.xkey.keycode & 0xff) << 16, 0);
+          key(keysym/*(xevent.xkey.keycode & 0xff) << 16*/, 0);
+          break;
         case MotionNotify:
           /* get the current mouse coordinates */
           mx = xevent.xmotion.x;
@@ -298,7 +300,7 @@ int viewport::process_events(void)
         break;
         case ClientMessage:
           //printf(" received a close message\n");
-          return 0;
+          stop = 1;
           break;
         case UnmapNotify:
         case MapNotify:
@@ -322,7 +324,7 @@ int viewport::process_events(void)
           break;
         }
     }
-  return 1;
+  return stop?0:1;
 }
 
 void viewport::run(void)

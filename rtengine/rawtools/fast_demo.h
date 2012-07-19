@@ -70,7 +70,7 @@ public:
 //  void corner(HDRImage & dst,array2D<float> &I);
 //  void improve_correlation(HDRImage & pass1,HDRImage& pass2,float adjust,float ladjust,int green);
 //  void color_correct(HDRImage & pass1, HDRImage& pass2, improps &props);
-  int touch_tiles(HDRImage &dest,int &tile_xs,int &tile_xe,int &tile_ys,int &tile_ye);
+  int touch_tiles(HDRImage &dest);
   float get_ISO(void)
   {
     return iso_speed;

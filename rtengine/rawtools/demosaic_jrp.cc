@@ -40,6 +40,7 @@ void fast_demosaic::cook_data(improps & props,int scale)
   cout << "jrp demosaic step 1\n";
   int sum[8];
   int c;
+  props.scale=scale;
   resize=scale;
   recalc =1;
   memset(sum, 0, sizeof sum);
@@ -146,10 +147,10 @@ void fast_demosaic::cook_data(improps & props,int scale)
 
 }
 
-int fast_demosaic::touch_tiles(HDRImage &dest, int &tile_xs, int &tile_xe, int &tile_ys, int &tile_ye)
+int fast_demosaic::touch_tiles(HDRImage &dest)
 {
   int rot = (get_rotateDegree() / 90) & 3;
-
+  int tile_xs, tile_xe, tile_ys, tile_ye;
   cout << " check tiles with rotation " << rot << endl;
 
 // clip properly the translation.
@@ -234,11 +235,11 @@ int fast_demosaic::touch_tiles(HDRImage &dest, int &tile_xs, int &tile_xe, int &
   //cout << "tiles from " << tile_xs << "x" << tile_ys << " to " << tile_xe << "x" << tile_ye <<endl;
 
 
-  for ( ; tile_ys <= tile_ye ; tile_ys++ )
-    for ( int tx = tile_xs ; tx <= tile_xe ; tx++ )
-      if (Tile_flags[tile_ys][tx] !=2)
+  for (unsigned ty=tile_ys ; ty <= tile_ye ; ty++ )
+    for ( unsigned int tx = tile_xs ; tx <= tile_xe ; tx++ )
+      if (Tile_flags[ty][tx] !=2)
         {
-          Tile_flags[tile_ys][tx] = 1;
+          Tile_flags[ty][tx] = 1;
           runtiles++;
         }
   //cout << " done runtiles" << endl;
@@ -265,10 +266,10 @@ void fast_demosaic::nth_size_demo(HDRImage & dest,int num,improps & props)
           for ( int X = 0 ; X < (W-num) ; X += num )
             {
               float r=0,b=0,g=0,nr=0,ng=0,nb=0;
-              for (int ty=Y; ty<Y+num; ty++)
-                for(int tx=X; tx<X+num; tx++)
+              for (unsigned int ty=Y; ty<Y+num; ty++)
+                for(unsigned int tx=X; tx<X+num; tx++)
                   {
-                    int color=FC(tx, ty);
+                    int color=FC( ty,tx);
                     if (color == 1) // green here
                       {
                         g += rawData[ty][tx];

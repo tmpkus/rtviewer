@@ -226,7 +226,7 @@ private:
   array2D<color> data;
   color bgcolor;
 public:
-  color* operator[](int index)
+  color* operator[](unsigned int index)
   {
     return data[index];
   }

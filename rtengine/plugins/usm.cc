@@ -336,10 +336,11 @@ void sharpen (LabImage & dst,improps &props)
   float radius = props.pp3["[Sharpening]"]["Radius"];
   float amount = props.pp3["[Sharpening]"]["Amount"];
   float thresh = props.pp3["[Sharpening]"]["Threshold"];
+  radius = radius /float(props.scale);
   cout << "sharpen filter: radius" << radius << " amount "<< amount << " threshold "<< thresh << endl;
   if ((bool) props.pp3["[Sharpening]"]["Enabled"] != true)
     {
-      cout<<" not enabled " << endl;
+      //cout<<" not enabled " << endl;
       return;
     }
   if (amount==0.0) return;
@@ -374,4 +375,15 @@ void sharpen (HDRImage & dst,improps &props) {
 	dst <<= temp;
 }
 */
-ADD_FILTER( sharpen, Labim , 100)
+
+static int enabled(improps & props)
+{
+  float amount = props.pp3["[Sharpening]"]["Amount"];
+  if ((bool) props.pp3["[Sharpening]"]["Enabled"] != true)
+      return 0;
+  if (amount==0.0)
+      return 0;
+  return 1; // yes we will have work to do.
+}
+
+ADD_FILTER( sharpen, Labim , 105)

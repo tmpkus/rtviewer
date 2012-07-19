@@ -208,8 +208,9 @@ public:
         memset(ptr[i],0,x*sizeof(T));
     //}
   }
+
   // use with indices
-  T * operator[](size_t index)
+  T * operator[](unsigned int index)
   {
 #ifdef _DEBUG
     if (index<0 || index>=y)
@@ -220,7 +221,19 @@ public:
 #endif
     return ptr[index];//data+index*x;
   }
+  // use with indices
 
+  T * operator[](int index)
+  {
+#ifdef _DEBUG
+    if (index<0 || index>=y)
+      {
+        cout << "Array2d: out of bounds: " << index << " max is " << y << endl;
+        return NULL;
+      }
+#endif
+    return ptr[index];//data+index*x;
+  }
   // use as pointer to T**
   operator T**()
   {
@@ -386,7 +399,7 @@ public:
             N * src=rhs[i];
             T * dst=data+i*x;
 
-            for (int j = 0; j < x; j++)
+            for (unsigned int j = 0; j < x; j++)
               dst[j] = src[j];//,x*sizeof(T));
           }
       }
@@ -442,7 +455,7 @@ public:
 #pragma omp parallel for
               for (int i = yds; i < yde; i++)
                 {
-                  int k = i + yss;
+                  unsigned int k = i + yss;
                   N * src=rhs[k];
                   T * dst=data+i*x;
                   for (int j = xds, l = xss; j < xde; j++, l++)

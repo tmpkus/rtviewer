@@ -94,5 +94,8 @@ void color_correct(HDRImage & dest,improps &props)
         dest[y][x].b = nb;
       }
 }
-
-ADD_FILTER( color_correct, HDRim , 1)
+static int enabled(improps & props)
+{
+  return 1; // always enabled due to color matrix conversion
+}
+ADD_FILTER( color_correct, HDRim , 2)

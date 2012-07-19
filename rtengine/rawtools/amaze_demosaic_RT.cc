@@ -70,9 +70,9 @@ template <typename T> static inline void Swap(T &x,T &y)
 
 void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
 {
-  int tile_xs,tile_ys,tile_xe,tile_ye;
+  //int tile_xs,tile_ys,tile_xe,tile_ye;
   int rot = (get_rotateDegree() / 90) & 3;
-  if (touch_tiles(dest,tile_xs,tile_xe,tile_ys,tile_ye) > 0)
+  if (touch_tiles(dest) > 0)
     {
       int winx = 0, winy = 0, winw = W, winh = H;
       //cout << " amaze: running " << runtiles << " tiles\n";
@@ -404,12 +404,12 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
                     ccmax = cc1;
                   }
 
-                for ( int rr = rrmin; rr < rrmax ; rr++ )
-                  for ( int row = rr + top, cc = ccmin; cc < ccmax ; cc++ )
+                for (unsigned int rr = rrmin; rr < rrmax ; rr++ )
+                  for ( unsigned int row = rr + top, cc = ccmin; cc < ccmax ; cc++ )
                     {
                       int col = cc + left;
-                      int c = Myfc(rr,cc);
-                      int indx1 = rr * TS + cc;
+                      unsigned int c = Myfc(rr,cc);
+                      unsigned int indx1 = rr * TS + cc;
                       rgb[indx1][c] = ((float) rawData[row][col]) * scale_raw_data;
                       //indx=row*width+col;
                       //rgb[indx1][c] = image[indx][c]*scale_raw_data;//for dcraw implementation
@@ -1206,11 +1206,11 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
                 int mrow = H - 1;
                 int mcol = W - 1;
                 for ( int rr = 16; rr < rr1 - 16 ; rr++ )
-                  for ( int row = rr + top, cc = 16; cc < cc1 - 16 ; cc++ )
+                  for ( unsigned int row = rr + top, cc = 16; cc < cc1 - 16 ; cc++ )
                     {
-                      int col = cc + left;
+                      unsigned int col = cc + left;
 
-                      int indx = rr * TS + cc;
+                      unsigned int indx = rr * TS + cc;
                       float r = rgb[indx][0];// * post_scale; //- boffset;
                       float g = rgb[indx][1];// * post_scale; // - boffset;
                       float b = rgb[indx][2];// * post_scale; // - boffset;

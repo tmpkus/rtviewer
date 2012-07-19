@@ -41,7 +41,7 @@ public:
   int process_events (void);
   void run(void);
   unsigned int usec_delay;
-  volatile int refresh,width,height;
+  volatile int refresh,width,height,stop;
 
 private:
   int bpp;

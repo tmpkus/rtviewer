@@ -146,6 +146,7 @@ public:
   volatile int early;
   colorspace cols;
   float mat[3][3]; // color matrix used
+  int scale;
 
 
   int read(char * name);

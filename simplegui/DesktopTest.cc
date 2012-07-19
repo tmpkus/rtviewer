@@ -25,20 +25,22 @@
 #define X_SIZE 1280
 #define Y_SIZE 720
 #define START_MOVE 50
-void Lab_Denoise(LabImage &a,improps & b);
+//void Lab_Denoise(LabImage &a,improps & b);
 class desktop: public viewport
 {
 
   LabImage baseim;
-
+  vector<char*> filelist;
+  int maxindex,index;
   Image<rgbHDR> tempim;
   volatile int moved, scale, do_filter;
   volatile int dx, dy, px, py;
   char * raw_to_load;
   Image_Raw * MyRAW;
-  int pp3_found;
+  //int pp3_found;
 public:
   //improps props;
+
 
   int setup()
   {
@@ -56,6 +58,7 @@ public:
     RawTile.moveto(0, 0);
     // demosaic raw photo
     MyRAW->demosaic(RawTile,scale);
+
     // output to window
     *this <<= RawTile;
 
@@ -66,11 +69,77 @@ public:
     usec_delay = 20000;
     return 1;
   }
+#if 0
+  void change_file(char* name)
+  {
+    if (MyRAW) delete MyRAW;
+    raw_to_load = strdup(name);
+    setup();
+  }
+  void read_dir(char * filename)
+  {
+    char * offset;
+    dirname = strdup(filename);
+    if (offset=rindex(dirname,'/'))
+      {
+        *offset = 0;
+      }
+    else
+      dirname = "/";
+
+
+  }
+  void next_file(void)
+  {
+     index=(index<max_index)?index+1:0;
+     change_file(filename[index]);
+  }
+
+  void prev_file(void)
+  {
+    index=(index<max_index)?index+1:0;
+    change_file(filename[index]);
+  }
+#endif
   ~desktop(void)
   {
     if (MyRAW) delete MyRAW;
   }
 
+  void key(int value,int pressed)
+  {
+    int old_scale = scale;
+    int scale_change=0;
+    if (pressed)
+      {
+        switch (value)
+        {
+        case ',' :
+            moved = START_MOVE;
+            if (scale>1) scale--;
+            scale_change=1;
+          break;
+        case '.':
+            moved = START_MOVE;
+            if (scale<10) scale ++;
+            scale_change=1;
+          break;
+      //  case 'n': if (file_list) next_file();
+      //        break;
+      //  case 'p': if (file_list) prev_file();
+      //        break;
+        case 'q': stop=1;
+              break;
+        }
+        if (scale_change)
+                  {
+                    // recalculate upper left corner after scaling
+                    // adjusting the view to keep the center constant.
+                    dx=(((dx+width/2)*old_scale)/scale)-(width/2);
+                    dy=(((dy+height/2)*old_scale)/scale)-(height/2);
+                  }
+      }
+  }
   // deal with mouse interaction
   void mouse(int x, int y, int butt)
   {
@@ -172,6 +241,7 @@ public:
             RawTile.moveto(dx, dy);
             // convert raw
             MyRAW->demosaic(RawTile,scale);
+
             // grab current position
             RawTile.pos(dx, dy); // demosaic has clipped the offsets so we grab them again
             apply_filters(RawTile,  MyRAW->props, 10);
@@ -197,6 +267,7 @@ public:
     // read pp3 file
 
     // set name of raw file
+    //read_dir(argv[1]);
     raw_to_load = argv[1];
   }
 };

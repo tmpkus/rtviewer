@@ -45,84 +45,87 @@ void apply_filters(HDRImage & im, improps & props, int max)
 
       // HSV support is broken so we comment it
 
-      cout << "adapt imagetype" << endl;
-      if (cur != list->type)
+      // cout << "adapt imagetype" << endl;
+      if (list->enabled(props))
         {
-          switch (cur)
+          if (cur != list->type)
             {
-            case HDRim:
-              cout << "adapt imagetype from HDR" << endl;
-              switch (list->type)
+              switch (cur)
                 {
+                case HDRim:
+                  cout << "adapt imagetype from HDR" << endl;
+                  switch (list->type)
+                    {
+                    case Labim:
+                      L = im;
+                      cur = Labim;
+                      break;
+                      /* -- HSV is broken , needs fixing --
+                      case HSVim:
+                      	//H <<= im;
+                      	cur = HSVim;
+                      	break;*/
+                    case HDRim:
+                    default: // nothing to do
+                      break;
+                    }
                 case Labim:
-                  L = im;
-                  cur = Labim;
-                  break;
+                  switch (list->type)
+                    {
+                    case Labim:
+                      break;
+                      /* -- HSV is broken , needs fixing --
+                      case HSVim:
+                      	H = L;
+                      	cur = HSVim;
+                      	break; */
+                    case HDRim:
+                      im = L;
+                      cur = HDRim;
+                      break;
+                    default: // nothing to do
+                      break;
+                    }
                   /* -- HSV is broken , needs fixing --
                   case HSVim:
-                  	//H <<= im;
-                  	cur = HSVim;
-                  	break;*/
-                case HDRim:
-                default: // nothing to do
-                  break;
+                  	switch (list->type) {
+                  	case Labim:
+                  		//L <<= H;
+                  		cur = Labim;
+                  		break;
+                  	case HSVim:
+                  		break;
+                  	case HDRim:
+                  		cur = HDRim;
+                  		//im <<= H;
+                  		break;
+                  	default: // nothing to do
+                  		break;
+                  	}
+                  	*/
                 }
+            }
+
+          // call function with current type.
+          // cout << "applying filter: " << list->name << endl;
+          switch (list->type)
+            {
             case Labim:
-              switch (list->type)
-                {
-                case Labim:
-                  break;
-                  /* -- HSV is broken , needs fixing --
-                  case HSVim:
-                  	H = L;
-                  	cur = HSVim;
-                  	break; */
-                case HDRim:
-                  im = L;
-                  cur = HDRim;
-                  break;
-                default: // nothing to do
-                  break;
-                }
+              list->fLabim(L, props);
+              break;
               /* -- HSV is broken , needs fixing --
               case HSVim:
-              	switch (list->type) {
-              	case Labim:
-              		//L <<= H;
-              		cur = Labim;
-              		break;
-              	case HSVim:
-              		break;
-              	case HDRim:
-              		cur = HDRim;
-              		//im <<= H;
-              		break;
-              	default: // nothing to do
-              		break;
-              	}
-              	*/
+              	break;*/
+            case HDRim:
+              list->fHDRim(im, props);
+              break;
+            default: // nothing to do
+              break;
             }
-        }
-
-      // call function with current type.
-      cout << "applying filter: " << list->name << endl;
-      switch (list->type)
-        {
-        case Labim:
-          list->fLabim(L, props);
-          break;
-          /* -- HSV is broken , needs fixing --
-          case HSVim:
-          	break;*/
-        case HDRim:
-          list->fHDRim(im, props);
-          break;
-        default: // nothing to do
-          break;
         }
       list = list->next;
     }
-  cout << "convert back imagetype" << endl;
+  // cout << "convert back imagetype" << endl;
 
   // convert back to HDRImage.
   // since that is where we started.

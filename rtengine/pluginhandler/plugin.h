@@ -41,7 +41,7 @@ typedef struct module_t
   void(* fHDRim) (HDRImage &a,improps &b);
   void(* fLBrBbim) (LBrBbImage &a,improps &b);
   void(* fARGBim) (ARGBImage &a,improps &b);
-
+  int (* enabled) (improps &b);
   struct module_t * next;
 } module;
 
@@ -58,6 +58,7 @@ static int setmoduleinfo(void) \
 	moduleinfo.type = inputtype ; \
 	moduleinfo.rank= myrank; \
 	moduleinfo.f##inputtype = fn; \
+	moduleinfo.enabled = enabled; \
 	addmodule(moduleinfo); \
    return 1; \
 }; \
