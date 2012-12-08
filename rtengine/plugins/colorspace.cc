@@ -43,7 +43,7 @@ void color_correct(HDRImage & dest,improps &props)
   float contrast = props.pp3["[Exposure]"]["Contrast"];
   float black = props.pp3["[Exposure]"]["Black"];
 
-  black = 0.25f * black /65536.0f;
+  black =  black /65536.0f;
   bright = bright*0.001f;
   int inv=(contrast<0);
   contrast=fabs(contrast*0.01f);
