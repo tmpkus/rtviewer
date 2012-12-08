@@ -81,7 +81,7 @@ IMFILE* fopen (const char* fname)
     }
 
   void* data = mmap(0,stat_buffer.st_size,PROT_READ,MAP_PRIVATE,fd,0);
-  if ( data == 0 )
+  if ( data == MAP_FAILED )
     {
       perror("no mmap\n");
       int ret =close(fd);
