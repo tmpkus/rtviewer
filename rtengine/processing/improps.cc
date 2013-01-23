@@ -64,14 +64,20 @@ template<typename TY> configdata & configdata::operator=(vector<TY> & rhs)
 #define EVENT_BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
 int improps::update()
 {
-  //cout << "testing filechange" << pp3_name << endl;
+
   char buf[EVENT_BUF_LEN];
   if (ino_fd)
     {
-      if (::read(ino_fd,buf,EVENT_BUF_LEN)<1) return 0;
+      //cout << "testing filechange" << pp3_name << " " << ino_fd ;
+
+      int first = ::read(ino_fd,buf,EVENT_BUF_LEN);
+      cout << " " << first <<endl;
+      if (first<1) return 0;
       while (::read(ino_fd,buf,EVENT_BUF_LEN)>0);
+      //cout << "detected filechange on " << pp3_name << endl;
       return 1;
     }
+  return 0;
   struct stat64 fileinfo;
   if (-1 != stat64(pp3_name, &fileinfo))
     {
@@ -116,25 +122,32 @@ int improps::read(char * toread)
       if (tst == NULL)
         {
           cout << "file " << config_file << " and " << default_config
-               << " not found\n";
+               << " not found" << endl;
           return 0;
         }
       pp3_name = strdup(config_file.c_str());
       ino_fd=inotify_init1(IN_NONBLOCK);
-      inotify_add_watch( ino_fd, pp3_name, IN_CLOSE_WRITE );
+      wd = inotify_add_watch( ino_fd, pp3_name, IN_CLOSE_WRITE|IN_MODIFY );
+      if (wd<0)
+        {
+          cout << "watch descriptor failed" << endl;
+          return 0;
+        }
 
 
     }
   else
     {
+      //cout << " trying an update" << endl;
       if (pp3_name == NULL
          ) return 0;
       tst = config_file_p.open(pp3_name, ios::in);
       if (tst == NULL
          ) return 0;
+      //cout << " doing an update" << endl;
     }
   char line[256];
-  update();
+  //update();
   istream is(&config_file_p);
   char * chapter = "<default>";
   int len;

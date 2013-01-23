@@ -140,14 +140,14 @@ private:
   char * raw_name;
   char * pp3_name;
   struct timespec mtime;
-  int ino_fd;
+  int ino_fd,wd;
 public:
   pp3_datamap pp3;
   volatile int early;
   colorspace cols;
   float mat[3][3]; // color matrix used
   int scale;
-
+  float black;
 
   int read(char * name);
   void dump(void);

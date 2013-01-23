@@ -105,7 +105,7 @@ void fast_demosaic::cook_data(improps & props,int scale)
   for (int i=0; i<3; i++)
     for (int j=0; j<3; j++)
       props.mat[i][j]=mat[i][j];
-
+  props.black = black;
   cout << "setup tile management\n";
   int rot = get_rotateDegree() / 90;
 
