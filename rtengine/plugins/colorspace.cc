@@ -148,12 +148,12 @@ inline void Contrast(float & r,float &g , float & b,float contrast,int inv,float
 }
 void color_correct(HDRImage & dest,improps &props)
 {
-  float expcomp = props.pp3["[Exposure]"]["Compensation"];
-  float bright = props.pp3["[Exposure]"]["Brightness"];
-  float contrast = props.pp3["[Exposure]"]["Contrast"];
-  float black = props.pp3["[Exposure]"]["Black"];
-  float comp = props.pp3["[Exposure]"]["HighlightCompr"];
-  float sat = props.pp3["[Exposure]"]["Saturation"];
+  float expcomp = props.pp3["Exposure"]["Compensation"];
+  float bright = props.pp3["Exposure"]["Brightness"];
+  float contrast = props.pp3["Exposure"]["Contrast"];
+  float black = props.pp3["Exposure"]["Black"];
+  float comp = props.pp3["Exposure"]["HighlightCompr"];
+  float sat = props.pp3["Exposure"]["Saturation"];
   sat =1.0f + sat*0.01f;
 
   comp = comp*0.01f;

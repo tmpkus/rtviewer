@@ -156,10 +156,10 @@ int improps::read(char * toread)
       cout << line << endl;
       if (line[0] == '[')
         {
-          chapter = strdup(line);
+          chapter = strdup(line+1); // skip '['
           char *t=chapter;
           while(*t && *t!=']') t++;
-          if (*t==']') t[1]=0; // avoid CR LF stuff
+          if (*t==']') t[0]=0; // remove trailing ']' and avoid CR LF stuff
           configitems temp;
           cout << "added chapter " << chapter <<endl;
           pp3[chapter] = temp;

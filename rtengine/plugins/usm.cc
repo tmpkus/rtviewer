@@ -305,10 +305,10 @@ template <class T> void gaussVertical (T & src, T & dst, float sigma)
 /*
 void sharpen (LBrBbImage & dst,improps &props)
 {
-	if ((bool) props.pp3["[Sharpening]"]["Enabled"] != true) return;
-	float radius = props.pp3["[Sharpening]"]["Radius"];
-	float amount = props.pp3["[Sharpening]"]["Amount"];
-	float thresh = props.pp3["[Sharpening]"]["Threshold"];
+	if ((bool) props.pp3["Sharpening"]["Enabled"] != true) return;
+	float radius = props.pp3["Sharpening"]["Radius"];
+	float amount = props.pp3["Sharpening"]["Amount"];
+	float thresh = props.pp3["Sharpening"]["Threshold"];
 	if (amount==0.0) return;
 	amount=amount* 0.01f;
 	LBrBbImage temp;
@@ -333,12 +333,12 @@ void sharpen (LBrBbImage & dst,improps &props)
 }*/
 void sharpen (LabImage & dst,improps &props)
 {
-  float radius = props.pp3["[Sharpening]"]["Radius"];
-  float amount = props.pp3["[Sharpening]"]["Amount"];
-  float thresh = props.pp3["[Sharpening]"]["Threshold"];
+  float radius = props.pp3["Sharpening"]["Radius"];
+  float amount = props.pp3["Sharpening"]["Amount"];
+  float thresh = props.pp3["Sharpening"]["Threshold"];
   radius = radius /float(props.scale);
   cout << "sharpen filter: radius" << radius << " amount "<< amount << " threshold "<< thresh << endl;
-  if ((bool) props.pp3["[Sharpening]"]["Enabled"] != true)
+  if ((bool) props.pp3["Sharpening"]["Enabled"] != true)
     {
       //cout<<" not enabled " << endl;
       return;
@@ -378,8 +378,8 @@ void sharpen (HDRImage & dst,improps &props) {
 
 static int enabled(improps & props)
 {
-  float amount = props.pp3["[Sharpening]"]["Amount"];
-  if ((bool) props.pp3["[Sharpening]"]["Enabled"] != true)
+  float amount = props.pp3["Sharpening"]["Amount"];
+  if ((bool) props.pp3["Sharpening"]["Enabled"] != true)
       return 0;
   if (amount==0.0)
       return 0;

@@ -394,16 +394,16 @@ static void inline RGB_gauss(HDRImage &ref, HDRImage &working, HDRImage &res, fl
 
 static void RGB_denoise(HDRImage & src, improps & props)
 {
-  if ((bool) props.pp3["[Directional Pyramid Denoising]"]["Enabled"] != true)
+  if ((bool) props.pp3["Directional Pyramid Denoising"]["Enabled"] != true)
     return;
-  float luma = props.pp3["[Directional Pyramid Denoising]"]["Luma"];
-  float chroma = props.pp3["[Directional Pyramid Denoising]"]["Chroma"];
-  const float gam_in = props.pp3["[Directional Pyramid Denoising]"]["Gamma"];
-  int radius = props.pp3["[Directional Pyramid Denoising]"]["Radius"];
+  float luma = props.pp3["Directional Pyramid Denoising"]["Luma"];
+  float chroma = props.pp3["Directional Pyramid Denoising"]["Chroma"];
+  const float gam_in = props.pp3["Directional Pyramid Denoising"]["Gamma"];
+  int radius = props.pp3["Directional Pyramid Denoising"]["Radius"];
   radius = (radius<=0)?6:radius;
   radius=radius/props.scale;
-  wdt = 0.01f;//props.pp3["[Directional Pyramid Denoising]"]["Wdt"];
-  offset= gam_in*0.02f;//luma;//props.pp3["[Directional Pyramid Denoising]"]["Offset"];
+  wdt = 0.01f;
+  offset= gam_in*0.02f;
   if (((luma == 0.0) && (chroma == 0.0))||(radius==0))
     return;
 
@@ -454,7 +454,7 @@ static void RGB_denoise(HDRImage & src, improps & props)
 	{
 		rgbHDR L = src[y][x];
 		float sI = getI(L);
-		float I = intens1[y][x];//getI(L);
+		float I = intens1[y][x];
 		
 		if ((I>0.0f)&&(sI>0.0f))
 		{
@@ -462,7 +462,6 @@ static void RGB_denoise(HDRImage & src, improps & props)
 			L.r = L.r*I;
 			L.g = L.g*I;
 			L.b = L.b*I;
-			//src[y][x]=L;
 		} else L.b=L.g=L.r=0.0f;
 		
 		src[y][x]=L;	
@@ -474,10 +473,10 @@ static void RGB_denoise(HDRImage & src, improps & props)
 static int enabled(improps & props)
 {
   cout << "check denoise\n";
-  if ((bool) props.pp3["[Directional Pyramid Denoising]"]["Enabled"] != true)
+  if ((bool) props.pp3["Directional Pyramid Denoising"]["Enabled"] != true)
    { cout << "Denoise is OFF\n"; return 0;}
-  float luma = props.pp3["[Directional Pyramid Denoising]"]["Luma"];
-  float chroma = props.pp3["[Directional Pyramid Denoising]"]["Chroma"];
+  float luma = props.pp3["Directional Pyramid Denoising"]["Luma"];
+  float chroma = props.pp3["Directional Pyramid Denoising"]["Chroma"];
   if ((luma == 0.0) && (chroma == 0.0))
   {
 	cout << " both zero.\n";
