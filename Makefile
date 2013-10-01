@@ -4,7 +4,7 @@
 
 #-include ../makefile.init
 
-CC_OPTIMIZE := -O3 -fopenmp -march=native -msse4 -mfpmath=sse -ffast-math -Wall -c -fmessage-length=0 
+CC_OPTIMIZE := -O3 -fomit-frame-pointer -fopenmp -march=native -mtune=native -ffast-math -msse -mrecip -mfpmath=sse -mssse3 -Wall -c -fmessage-length=0
 #CC_OPTIMIZE := -g -O1 -fopenmp -ffast-math -c -fmessage-length=0 
 RM := rm -rf
 
@@ -42,21 +42,23 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: rtviewer
+all: rtviewer plugins
 
 # Tool invocations
 rtviewer: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
 	g++ -g -rdynamic -o "rtviewer" $(OBJS) $(USER_OBJS) $(LIBS)
+	mkdir -p ~/bin
+	cp rtviewer ~/bin/view_raw
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
 
 plugins:
 	@echo 'Building plugins'
-	$(MAKE) -f rtengine/filters/Makefile 
-	
+	cd rtengine/plugins/ && make 
+	@echo 'ok'
 
 # Other Targets
 clean:
@@ -66,7 +68,7 @@ clean:
 
 post-build:
 	-@echo 'install library'
-	cd rtengine/plugins/ && make 
+	#cd rtengine/plugins/ && make 
 	-@echo ' '
 
 .PHONY: all clean dependents

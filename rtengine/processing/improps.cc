@@ -71,10 +71,10 @@ int improps::update()
       //cout << "testing filechange" << pp3_name << " " << ino_fd ;
 
       int first = ::read(ino_fd,buf,EVENT_BUF_LEN);
-      cout << " " << first <<endl;
+      //cout << " " << first <<endl;
       if (first<1) return 0;
       while (::read(ino_fd,buf,EVENT_BUF_LEN)>0);
-      //cout << "detected filechange on " << pp3_name << endl;
+      cout << "detected filechange on " << pp3_name << endl;
       return 1;
     }
   return 0;
@@ -146,12 +146,12 @@ int improps::read(char * toread)
          ) return 0;
       //cout << " doing an update" << endl;
     }
-  char line[256];
+  char line[4096];
   //update();
   istream is(&config_file_p);
   char * chapter = "<default>";
   int len;
-  while (is.getline(line, 256))
+  while (is.getline(line, 4096))
     {
       cout << line << endl;
       if (line[0] == '[')

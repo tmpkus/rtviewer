@@ -61,7 +61,14 @@ static inline float RGBdiff(const rgbHDR &tst, const rgbHDR &ref, const float am
   //const float Rtst =  sqrt(0.0784f *tr * tr + 0.0196f * tb * tb + 0.3364f *tg * tg);
   const float Rref =  sqrt(rr * rr + rb * rb + rg * rg);
   const float Rtst =  sqrt(tr * tr + tb * tb + tg * tg);
-
+  const float Iref = .28f * ref.r + .14f * ref.b + .58f * ref.g ;
+  const float Itst = .28f * tst.r + .14f * tst.b + .58f * tst.g ;
+  const float Rdiff = ref.r*Itst-tst.r*Iref;
+  const float Gdiff = ref.g*Itst-tst.g*Iref;
+  const float Bdiff = ref.b*Itst-tst.b*Iref;
+  const float Cdiff = Rdiff*Rdiff+Gdiff*Gdiff+Bdiff*Bdiff;
+  const float Idiff = 1.0f - (Iref-Itst)*(Iref-Itst)*(1.0f-amount);
+  return Idiff*(1.0f-Cdiff*(1.0f-chroma));
   //const float Rref =  rr+rb+rg;//(rr * rr + rb * rb + rg * rg);
   //const float Rtst =  (tr * tr + tb * tb + tg * tg);
 #endif
@@ -80,7 +87,7 @@ static inline float RGBdiff(const rgbHDR &tst, const rgbHDR &ref, const float am
   const float gv = (rg - tg);
   const float bv = (rb - tb);
   //const float Dv = .28f * ((rv>0)?rv:-rv)+.14f *((bv>0)?bv:-bv)+.58f *((gv>0)?gv:-gv);//.28f * rv + .14f * bv + .58f * gv ;
-  const float Dv = ((rv>0)?rv:-rv)+((bv>0)?bv:-bv)+((gv>0)?gv:-gv);//.28f * rv + .14f * bv + .58f * gv ;
+  //const float Dv = ((rv>0)?rv:-rv)+((bv>0)?bv:-bv)+((gv>0)?gv:-gv);//.28f * rv + .14f * bv + .58f * gv ;
 #endif
 //  const float tf = 1.0f- 1.0f*((rv*rv+gv*gv+bv*bv)*(1.0f-chroma)+chroma*Dv*Dv)/(width);//sqrt
   float tf = 1.0f- ((10.1f)-amount*10.0f)*((rv*rv+gv*gv+bv*bv)*(1.0f-chroma)+chroma*RDiff*RDiff)/(width);//sqrt
@@ -108,191 +115,249 @@ static inline float RGBdiff(const rgbHDR &tst, const rgbHDR &ref, const float am
   p = 1.0f / (1.0f + p);
   return p; // fast approximation of exp(-t*t);
 }
+static inline float getI(const rgbHDR & sL)
+{
+  return .28f * sL.r + .14f * sL.b + .58f * sL.g;
+  //return sqrt( .28f *sL.r*sL.r+.58f *sL.g*sL.g+.14f *sL.b*sL.b );
+}
+static inline float colorI(float t)
+{
+	return 0.75f+0.25f*t;
+}
 
-static void inline RGB_reduce(HDRImage &ref, HDRImage &working, HDRImage &res, float amount, float gamma, float chroma, int x, int y, int si, int ei, int sj, int ej,int radius)
+static void inline RGB_reduce(array2D<float> &Isrc,HDRImage &src, HDRImage &dst, float chroma, int x, int y, int si, int ei, int sj, int ej,int radius)
 {
 
-  const rgbHDR sL = ref[y][x];
-  const rgbHDR refL = working[y][x];
-  rgbHDR L, Ln;
+  const rgbHDR sL = src[y][x];
+  const float sI = Isrc[y][x]; // adjusted reference intensity.
+  //const float Vlen = 0.659090282f;
+  rgbHDR L;//, Ln;
   L.r = 0.0f;
   L.g = 0.0f;
   L.b = 0.0f;
-  Ln.r = 0.0f;
-  Ln.g = 0.0f;
-  Ln.b = 0.0f;
-  float lum=/*1.05f-*/amount;
-  float chrom=chroma;//(11.0f-sqrt(chroma))*2.0f;// 2 .. 20 non linear
-  float thresh = gamma;//(chrom*chrom);
-  amount = amount *50.0f;
-  float wgt = 0.0f, wgtn = 0.0f;
-  int n = 0,rad=radius*radius;
+  float wgt = 0.0f;
+  int rad=radius*radius;
   for (int j = sj; j < ej; j++)
     for (int i = si; i < ei; i++)
       {
         int r=i*i+j*j;
-        if (((i != 0) || (j != 0))&&(r<=rad))
+        if ((i|j)&&(r<=rad))
           {
-            rgbHDR cL;
-            float w, g;
-            //cL = ref[y + j][x + i];
-            cL = working[y + j][x + i];
-            g = RGBdiff(cL, sL, lum,chrom) * amount
-                / (amount + (float) (i * i + j * j));
+            rgbHDR cL= src[y + j][x + i];
+            //float w, l;
+            float cI = Isrc[y+j][x+i]; // intensity of cL ..
+		    float tI = (sI-cI); // difference i.r.t. refpixel
+		    float dI= tI*tI;//abs(tI);
+		    //tI=dI*dI;
+		    if ((cI>0.0f)&&(sI>0.0f))
+		    {
+			float dist = 1.0f;//colorI(cI);
+			//float I = dI;// /(sI*cI);
+			float rdiff = (cL.r-sL.r);
+			float gdiff = (cL.g-sL.g);
+			float bdiff = (cL.b-sL.b);
+			float l = dist *(1.0f - (rdiff*rdiff+gdiff*gdiff+bdiff*bdiff)*dI);//
+			if (l>0.0f)
+			{
+				wgt +=l;
+				L.r += cL.r * l;
+				L.g += cL.g * l;
+				L.b += cL.b * l;
+			}
+	    }
+	  }
+  }
 
-            //float g = w * RGBdiff(cL,refL,amount);
-            if (g > thresh) // strong correlation found
-              {
-                n++;
-              }
-            wgt += g;
-            L.r += cL.r * g;
-            L.g += cL.g * g;
-            L.b += cL.b * g;
-#ifdef twice
-            cL = ref[y + j][x + i];
-            g = RGBdiff(cL, sL, amount) * chroma
-                / (50.0f + (float) (i * i + j * j));
+  //if(sI>0.0f)
+  {
+	//float tI = colorI(sI);
+	L.r += sL.r*(1.0f-chroma);//*tI;
+	L.g += sL.g*(1.0f-chroma);//*tI;
+	L.b += sL.b*(1.0f-chroma);//*tI;
+	wgt +=(1.0f-chroma);//*tI;
+  }
+  if (wgt>0.0f)
+  {
+	L.r = ((L.r / wgt));
+	L.g = ((L.g / wgt));
+	L.b = ((L.b / wgt));
+  }
+  dst[y][x]=L;
+  /*
+  float Ires = getI(L);
+  if ((Ires>0.0)&&(sI>0.0))
+  {
+    L.r = L.r * sI / (Ires);
+    L.g = L.g * sI / (Ires);
+    L.b = L.b * sI / (Ires);
+  
+    dst[y][x] = L;
+  } else dst[y][x] = sL;*/
+}
 
-            //float g = w * RGBdiff(cL,refL,amount);
-            if (g > 0.2) // strong correlation found
-              {
-                n++;
-              }
-            wgt += g;
-            L.r += cL.r * g;
-            L.g += cL.g * g;
-            L.b += cL.b * g;
-#endif
+static void I_reduce(array2D<float> &src, array2D<float>& dst, HDRImage & ref,float amount, int x, int y, int si, int ei, int sj, int ej,int radius)
+{
+  const float sI = src[y][x]; // reference intensity.
+  float luma=amount;
+  float Iwgt = 0.0f;
+  float Isum=0.0f;
+  int rad=radius*radius;
+  for (int j = sj; j < ej; j++)
+    for (int i = si; i < ei; i++)
+      {
+        int r=i*i+j*j;
+        if ((i|j)&&(r<=rad))
+          {
+            float cI= src[y + j][x + i];
+            //float w, l;
+            float dist =luma/(luma + (float) (r));
+            float tI = (sI-cI);
+	    float dI=tI*tI;
+	    tI=dI*dI;//abs(tI);
+            // vector length of normalization is 0.659090282
+            float g = dist *(1.0f- tI*tI); // intensity difference for filter
+	    Iwgt += g;
+	    Isum +=cI*g;
           }
       }
-
-  /*	 if (n>15)
-  	 {
-  	 wgtn+=1.0f;
-  	 Ln.r+=refL.r;
-  	 Ln.g+=refL.g;
-  	 Ln.b+=refL.b;
-  	 L.r=(Ln.r/wgtn);//*(1.0-antidot)+antidot*sL.r;//-sL.r)*amount+sL.r;
-  	 L.g=(Ln.g/wgtn);//*(1.0-antidot)+antidot*sL.g;//-sL.g)*amount+sL.g;
-  	 L.b=(Ln.b/wgtn);//*(1.0-antidot)+antidot*sL.b;//-sL.b)*amount+sL.b;
-  	 res[y][x]=L;
-  	 return;
-  	 }*/
-#ifdef account_count
-  if (n > 1) //(wgt>0.65f) // no salt/pepper
-    {
-      const float add = 1.0f;
-      wgt += add ;
-      L.r += sL.r * add ;
-      L.g += sL.g * add;
-      L.b += sL.b * add ;
-
-    }
-  else
-    {
-      const float add = 0.00000001f ;
-      wgt += add ;
-      L.r += sL.r * add;
-      L.g += sL.g * add;
-      L.b += sL.b * add;
-    }
-#endif
-
-  /**/
-  // salt and pepper filter
-  /*	if (sL>0.0f)
-   {
-   float offset = sL*wgt;
-   float rdiff = offset-L;
-   //float rdiff = diff;
-   if (rdiff<0.0) rdiff=-rdiff;
-   // small enough difference means no salt/pepper
-   if (rdiff<(anti_dot*offset)) { wgt+=0.5f;L+=sL*0.5f;}
-   }*/
-  if(n>1)
-    {
-      L.r += refL.r;
-      L.g += refL.g;
-      L.b += refL.b;
-      wgt +=1.0f;
-    }
-  else
-    {
-      L.r += refL.r*0.1f;
-      L.g += refL.g*0.1f;
-      L.b += refL.b*0.1f;
-      wgt +=0.1f;
-    }
-  L.r = ((L.r / wgt));//-sL.r)*amount+sL.r; //*(1.0-antidot)+chroma*sL.r;//;
-  L.g = ((L.g / wgt));//-sL.g)*amount+sL.g; //*(1.0-antidot)+chroma*sL.g;//;
-  L.b = ((L.b / wgt));//-sL.b)*amount+sL.b; //*(1.0-antidot)+chroma*sL.b;//;
-
-  res[y][x] = L; //(L / wgt - sL) * amount + sL;
-
+    Iwgt +=1.0f-luma;
+    Isum +=(1.0f-luma)*sI;
+    Isum = dst[y][x] =(Iwgt>0.0f)?( Isum/Iwgt):sI;
+    /*
+    if (sI>0.0f) {
+	rgbHDR T = ref[y][x];
+	T.r = Isum*T.r/sI;
+	T.g = Isum*T.g/sI;
+	T.b = Isum*T.b/sI;
+	ref[y][x]=T;
+	// adjust pixel with proper intensity.
+	
+    }*/
 }
-static void Bilateral_HDR_Luma(HDRImage &ref, HDRImage &working, HDRImage &res, int radius, float gamma, float amount, float chroma, volatile int &early)
+
+static void Bilateral_float_Luma( array2D<float> & src,array2D<float>& dest,HDRImage& ref, int radius, float amount)
 {
-  int W = working.xsize(), H = working.ysize();
+  int W = ref.xsize(), H = ref.ysize();
   int blocksize = 128 - radius * 2;
-//
-#pragma omp parallel for schedule(dynamic)
-  for (int X = 0; (X < W * early); X += blocksize)
+#pragma omp parallel for 
+  for (int X = 0; (X < W); X += blocksize)
     {
 
       int w = ((X + blocksize) >= W) ? W : X + blocksize;
       int y, h = H;
-      for (y = 0; y < radius * early; y++)
+      for (y = 0; y < radius; y++)
         {
           int s1 = -y;
           int e1 = radius + 1;
-          for (int x = X; x < w * early; x++)
+          for (int x = X; x < w; x++)
             {
               int s2 = (x > radius) ? -radius : -x;
               int e2 = ((W - x) > (radius + 1)) ? radius + 1 : (W - x);
-              RGB_reduce(ref, working, res, amount, gamma, chroma, x, y, s2,
-                         e2, s1, e1,radius);
+              I_reduce(src, dest,ref, amount,x, y, s2,e2, s1, e1,radius);
             }
         }
 
-      for (; y < (h - radius - 1) * early; y++)
+      for (; y < (h - radius - 1); y++)
         {
 
           // left edge
           int x = X;
           //
           if (X == 0)
-            for (; x < radius * early; x++)
+            for (; x < radius ; x++)
               {
-                RGB_reduce(ref, working, res, amount, gamma, chroma, x, y,
-                           -x, radius + 1, -radius, radius + 1,radius);
+                I_reduce(src, dest,ref, amount,x, y,-x, radius + 1, -radius, radius + 1,radius);
               }
           // mid part
           int end = (w == W) ? w - radius - 1 : w;
-          for (; x < end * early; x++)
+          for (; x < end; x++)
             {
-              RGB_reduce(ref, working, res, amount, gamma, chroma, x, y,
-                         -radius, radius + 1, -radius, radius + 1,radius);
+              I_reduce(src, dest,ref, amount,x, y,-radius, radius + 1, -radius, radius + 1,radius);
             }
-          // right part
+          // right edge
           if (w == W)
-            for (; x < w * early; x++)
+            for (; x < w ; x++)
               {
-                RGB_reduce(ref, working, res, amount, gamma, chroma, x, y,
-                           -radius, w - x, -radius, radius + 1,radius);
+                I_reduce(src, dest,ref, amount,x, y,-radius, w - x, -radius, radius + 1,radius);
               }
         }
-      for (; y < h * early; y++)
+      for (; y < h; y++)
         {
 
           //cout << "3:line " << y << endl;
           int s1 = (y > radius) ? -radius : -y;
           int e1 = ((h - y) > (radius + 1)) ? radius + 1 : (h - y);
-          for (int x = X; x < w * early; x++)
+          for (int x = X; x < w ; x++)
             {
               int s2 = (x > radius) ? -radius : -x;
               int e2 = ((W - x) > (radius + 1)) ? radius + 1 : (W - x);
-              RGB_reduce(ref, working, res, amount, gamma, chroma, x, y, s2,
+              I_reduce(src, dest,ref, amount,x, y, s2, e2, s1, e1,radius);
+            }
+        }
+    }
+} 
+
+static void Bilateral_HDR_chroma(array2D<float> &Isrc,HDRImage &src, HDRImage &dst, int radius, float chroma)
+{
+  int W = src.xsize(), H = src.ysize();
+  int blocksize = 128 - radius * 2;
+#pragma omp parallel for 
+  for (int X = 0; (X < W); X += blocksize)
+    {
+
+      int w = ((X + blocksize) >= W) ? W : X + blocksize;
+      int y, h = H;
+      for (y = 0; y < radius; y++)
+        {
+          int s1 = -y;
+          int e1 = radius + 1;
+          for (int x = X; x < w ; x++)
+            {
+              int s2 = (x > radius) ? -radius : -x;
+              int e2 = ((W - x) > (radius + 1)) ? radius + 1 : (W - x);
+              RGB_reduce(Isrc,src,dst, chroma, x, y, s2,
+                         e2, s1, e1,radius);
+            }
+        }
+
+      for (; y < (h - radius - 1); y++)
+        {
+
+          // left edge
+          int x = X;
+          //
+          if (X == 0)
+            for (; x < radius; x++)
+              {
+                RGB_reduce(Isrc,src,dst, chroma, x, y,
+                           -x, radius + 1, -radius, radius + 1,radius);
+              }
+          // mid part
+          int end = (w == W) ? w - radius - 1 : w;
+          for (; x < end ; x++)
+            {
+              RGB_reduce(Isrc,src,dst, chroma, x, y,
+                         -radius, radius + 1, -radius, radius + 1,radius);
+            }
+          // right edge
+          if (w == W)
+            for (; x < w ; x++)
+              {
+                RGB_reduce(Isrc,src,dst, chroma, x, y,
+                           -radius, w - x, -radius, radius + 1,radius);
+              }
+        }
+      for (; y < h ; y++)
+        {
+
+          //cout << "3:line " << y << endl;
+          int s1 = (y > radius) ? -radius : -y;
+          int e1 = ((h - y) > (radius + 1)) ? radius + 1 : (h - y);
+          for (int x = X; x < w ; x++)
+            {
+              int s2 = (x > radius) ? -radius : -x;
+              int e2 = ((W - x) > (radius + 1)) ? radius + 1 : (W - x);
+              RGB_reduce(Isrc,src,dst, chroma, x, y, s2,
                          e2, s1, e1,radius);
             }
         }
@@ -325,93 +390,7 @@ static void inline RGB_gauss(HDRImage &ref, HDRImage &working, HDRImage &res, fl
   res[y][x] = L;
 
 }
-static void gauss_HDR(HDRImage &ref, HDRImage &res,float gamma)
-{
-  HDRImage &working = ref;
-  int radius=3;
-  bool early = true;
-  float amount=1.0f;
-  float anti_dot=0.0f;
 
-  int W = working.xsize(), H = working.ysize();
-  int blocksize = 128 - radius * 2;
-
-//schedule(dynamic)
-#pragma omp parallel for
-  for (int X = 0; (X < W) ; X += blocksize)
-    {
-
-      int w = ((X + blocksize) >= W) ? W : X + blocksize;
-      int y, h = H;
-      for (y = 0; (y < radius) && early; y++)
-        {
-          int s1 = -y;
-          int e1 = radius + 1;
-          for (int x = X; ((x < w) && early); x++)
-            {
-              int s2 = (x > radius) ? -radius : -x;
-              int e2 = ((W - x) > (radius + 1)) ? radius + 1 : (W - x);
-              RGB_gauss(ref, working, res, amount, gamma, anti_dot, x, y, s2,
-                        e2, s1, e1);
-            }
-        }
-
-      for (; (y < (h - radius - 1)) && early; y++)
-        {
-
-          // left edge
-          int x = X;
-          //
-          if (X == 0)
-            for (; (x < radius) && early; x++)
-              {
-                RGB_gauss(ref, working, res, amount, gamma, anti_dot, x, y,
-                          -x, radius + 1, -radius, radius + 1);
-              }
-          // mid part
-          int end = (w == W) ? w - radius - 1 : w;
-          for (; (x < end) && early; x++)
-            {
-              RGB_gauss(ref, working, res, amount, gamma, anti_dot, x, y,
-                        -radius, radius + 1, -radius, radius + 1);
-            }
-          // right part
-          if (w == W)
-            for (; (x < w) && early; x++)
-              {
-                RGB_gauss(ref, working, res, amount, gamma, anti_dot, x, y,
-                          -radius, w - x, -radius, radius + 1);
-              }
-        }
-      for (; (y < h) && early; y++)
-        {
-
-          //cout << "3:line " << y << endl;
-          int s1 = (y > radius) ? -radius : -y;
-          int e1 = ((h - y) > (radius + 1)) ? radius + 1 : (h - y);
-          for (int x = X; (x < w) && early; x++)
-            {
-              int s2 = (x > radius) ? -radius : -x;
-              int e2 = ((W - x) > (radius + 1)) ? radius + 1 : (W - x);
-              RGB_gauss(ref, working, res, amount, gamma, anti_dot, x, y, s2,
-                        e2, s1, e1);
-            }
-        }
-    }
-}
-
-void avg(HDRImage & working,HDRImage & tmp,HDRImage & dst)
-{
-  int W = working.xsize(), H = working.ysize();
-  for (int y=0;y<H;y++)
-  for (int x=0;x<W;x++)
-    {
-      dst[y][x].r = 0.5f *(working[y][x].r+tmp[y][x].r);
-      dst[y][x].g = 0.5f *(working[y][x].g+tmp[y][x].g);
-      dst[y][x].b = 0.5f *(working[y][x].b+tmp[y][x].b);
-
-    }
-}
 
 static void RGB_denoise(HDRImage & src, improps & props)
 {
@@ -421,17 +400,17 @@ static void RGB_denoise(HDRImage & src, improps & props)
   float chroma = props.pp3["[Directional Pyramid Denoising]"]["Chroma"];
   const float gam_in = props.pp3["[Directional Pyramid Denoising]"]["Gamma"];
   int radius = props.pp3["[Directional Pyramid Denoising]"]["Radius"];
-  radius = (radius<=0)?8:radius;
+  radius = (radius<=0)?6:radius;
   radius=radius/props.scale;
   wdt = 0.01f;//props.pp3["[Directional Pyramid Denoising]"]["Wdt"];
   offset= gam_in*0.02f;//luma;//props.pp3["[Directional Pyramid Denoising]"]["Offset"];
   if (((luma == 0.0) && (chroma == 0.0))||(radius==0))
     return;
 
-  luma = luma * 0.01f;
-  //chroma = chroma * 0.01f;
+  // luma = luma * 0.01f;
+  // chroma = chroma * 0.01f;
   cout << "doing noise reduction: luma " << luma << " chroma " << chroma << "gamma " << gam_in << endl;
-  float lumaw = luma;// * luma;
+  float lumaw = luma*0.01f;// * luma;
   float chromaw = chroma* 0.01f;
   float gammaw = gam_in;
   //cout << " denoise using gamma " << gammaw << endl;
@@ -440,47 +419,71 @@ static void RGB_denoise(HDRImage & src, improps & props)
   int W = src.xsize(), H = src.ysize();
   cout << " got size " << W << " x " << H << endl;
 
-  HDRImage temp1(W, H); //,temp2;
-  HDRImage temp2(W, H);
+  array2D<float> intens1(W,H),intens2(W,H);
+#pragma omp parallel for
+  for (int y=0;y<H;y++)
+  	for (int x=0;x<W;x++)
+	{
+		rgbHDR L = src[y][x];
+		float I = getI(L);
+		intens1[y][x]=I;
+		if (I>0.0f)
+		{
+			L.r = L.r/I;
+			L.g = L.g/I;
+			L.b = L.b/I;
+			src[y][x]=L;
+		}
+	}
 
-  //gauss_HDR(src,temp2,0.01f);
-#if 1
-  if (props.early)
-    Bilateral_HDR_Luma( src, src,temp1, radius, gammaw / 10.0f, lumaw, chromaw, props.early);
-  //if (props.early) gauss_HDR(temp1,temp2,0.02f);
-  //chromaw=chromaw*2.0f;
-  //avg(src,temp1,temp2);
-  //if (props.early)
-  //		Bilateral_HDR_Luma( temp2,temp1,src, 12, gammaw / 10.0f, lumaw, chromaw,props.early);
-  if (props.early) src=temp1;
-#else
-  if (props.early) src=temp2;
-#endif
-
-  /*		if (props.early)
-  		Bilateral_HDR_Luma(src,temp1, temp2, 5, gammaw / 10.0f, lumaw, 1.0f,
-  				props.early);
-  	if (props.early) src=temp2;*/
-  //Bilateral_HDR_Luma(temp1,src,temp1 ,1, gammaw / 10.0f, lumaw, 0.0f);
-  //src=temp1;
-
-#if 0
-  Bilateral_HDR_Luma(temp1,src,temp1 ,10, gammaw / 10.0f, lumaw, 1.0f); //lumaw * 0.15f, 0.1f);
-  src=temp1;
-#else
-
-#endif
+	HDRImage temp(W, H);
+    if (lumaw>0.0f)
+    { 
+		Bilateral_float_Luma(  intens1, intens2 ,temp ,radius/3, lumaw);
+		Bilateral_float_Luma(  intens2, intens1 ,temp ,radius/3, lumaw);
+	}
+    //temp <<= src;
+    if (chromaw>0.0f)
+    {
+		Bilateral_HDR_chroma( intens1,src,temp,radius,chromaw);
+		Bilateral_HDR_chroma( intens1,temp,src,radius,chromaw);
+	}
+#pragma omp parallel for
+  for (int y=0;y<H;y++)
+  	for (int x=0;x<W;x++)
+	{
+		rgbHDR L = src[y][x];
+		float sI = getI(L);
+		float I = intens1[y][x];//getI(L);
+		
+		if ((I>0.0f)&&(sI>0.0f))
+		{
+			I=I/sI;
+			L.r = L.r*I;
+			L.g = L.g*I;
+			L.b = L.b*I;
+			//src[y][x]=L;
+		} else L.b=L.g=L.r=0.0f;
+		
+		src[y][x]=L;	
+	}
+	
 
 }
 
 static int enabled(improps & props)
 {
+  cout << "check denoise\n";
   if ((bool) props.pp3["[Directional Pyramid Denoising]"]["Enabled"] != true)
-    return 0;
+   { cout << "Denoise is OFF\n"; return 0;}
   float luma = props.pp3["[Directional Pyramid Denoising]"]["Luma"];
   float chroma = props.pp3["[Directional Pyramid Denoising]"]["Chroma"];
   if ((luma == 0.0) && (chroma == 0.0))
-    return 0;
+  {
+	cout << " both zero.\n";
+    		return 0;
+	}
+  cout << "denoise enabled\n";
   return 1; // yes we have work todo.
 }
 
