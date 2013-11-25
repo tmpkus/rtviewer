@@ -68,13 +68,27 @@ int improps::update()
   char buf[EVENT_BUF_LEN];
   if (ino_fd)
     {
-      //cout << "testing filechange" << pp3_name << " " << ino_fd ;
+	  int first = ::read(ino_fd,buf,EVENT_BUF_LEN);
+      // cout << "testing filechange" << pp3_name << " " << ino_fd << "  " << first << endl;
 
-      int first = ::read(ino_fd,buf,EVENT_BUF_LEN);
+      
       //cout << " " << first <<endl;
       if (first<1) return 0;
       while (::read(ino_fd,buf,EVENT_BUF_LEN)>0);
       cout << "detected filechange on " << pp3_name << endl;
+      /*
+      // re-issue our watcher because editors like gedit will do strange stuff when saving.
+	  // that causes inotofy to lose the watch on that file.
+	  // To avoid that we simply remove the current watch and add a new watch on our pp3 file.
+	   
+	  inotify_rm_watch(ino_fd,wd);
+	  wd = inotify_add_watch( ino_fd, pp3_name, IN_MODIFY );
+      if (wd<0)
+        {
+          cout << "watch descriptor failed" << endl;
+	  }
+	  * apparently doing it here will make our app loop..
+      */
       return 1;
     }
   return 0;
@@ -126,31 +140,53 @@ int improps::read(char * toread)
           return 0;
         }
       pp3_name = strdup(config_file.c_str());
+      cout << "using config " << pp3_name << endl;
       ino_fd=inotify_init1(IN_NONBLOCK);
-      wd = inotify_add_watch( ino_fd, pp3_name, IN_CLOSE_WRITE|IN_MODIFY );
+      if (ino_fd == -1) { 
+		  cout << " can't create inotify instance.\n";
+	  } else {
+      wd = inotify_add_watch( ino_fd, pp3_name, IN_MODIFY);
       if (wd<0)
         {
           cout << "watch descriptor failed" << endl;
           return 0;
         }
-
+	}
 
     }
   else
     {
-      //cout << " trying an update" << endl;
+      cout << " trying an update" << endl;
       if (pp3_name == NULL
          ) return 0;
       tst = config_file_p.open(pp3_name, ios::in);
-      if (tst == NULL
-         ) return 0;
-      //cout << " doing an update" << endl;
+      if (tst == NULL) 
+      {
+		  cout << " failed to open " << pp3_name << " for update\n";
+		  return 0;
+	  }
+	  
+	  // re-issue our watcher because editors like gedit will do strange stuff when saving.
+	  // that causes inotofy to lose the watch on that file.
+	  // To avoid that we simply remove the current watch and add a new watch on our pp3 file.
+	  // gedit usually uses a backup file .. this will make inotify even more difficult to use.
+	  // when editing pp3 files in gedit try to save it several times.
+	  // if you want reliable updates after saving in gedit then disable backup in the editor settings.
+	   
+	  inotify_rm_watch(ino_fd,wd);
+	  wd = inotify_add_watch( ino_fd, pp3_name, IN_MODIFY );
+      if (wd<0)
+        {
+          cout << "watch descriptor failed" << endl;
+	  }
+      cout << " doing an update" << endl;
     }
   char line[4096];
   //update();
   istream is(&config_file_p);
   char * chapter = "<default>";
   int len;
+  pp3.clear(); // make sure we will be using the new values. without clear it seems the map does not get updated correctly?
   while (is.getline(line, 4096))
     {
       cout << line << endl;
@@ -185,7 +221,7 @@ int improps::read(char * toread)
   config_file_p.close();
 
   // now we walk through the config_ data
-
+/*
   pp3_datamap::iterator chapt = pp3.begin();
   while (chapt != pp3.end())
     {
@@ -201,7 +237,7 @@ int improps::read(char * toread)
       chapt++;
     }
 
-  dump();
+  dump();*/
   return 1;
 }
 

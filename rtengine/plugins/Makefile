@@ -1,7 +1,7 @@
 SRCS = $(wildcard *.cc)
 OBJS = $(patsubst %.cc,%.so,$(SRCS))
 
-CC_OPTIMIZE := -O3 -fomit-frame-pointer -fopenmp -march=native -mtune=native -msse -mfpmath=sse -mssse3 -ffast-math -Wall -fmessage-length=0 
+CC_OPTIMIZE := -O3 -fomit-frame-pointer -fopenmp -march=native -mtune=native -msse -mfpmath=sse -mssse3 -ffast-math -Wall -fmessage-length=0 -flto
 
 all: $(OBJS) install
 

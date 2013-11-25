@@ -191,125 +191,32 @@ void color_correct(HDRImage & dest,improps &props)
         float g = (dest[y][x].g-tblack);//-black+bright)/(1.0f-black);//*post_scale ;
         float b = (dest[y][x].b-tblack);//-black+bright)/(1.0f-black);//*post_scale ;
 
+        // here the range of the samples is still undefined and we can use the 'extra' information
+        // to do highlight compression or other clever stuff.
+        
+        // highlight correction, treating all colors the same
         highlightcomp(post_scale, comp,r,g,b);
 
-#if 0
-
-        // clip bottom
-        r=(r<0.0f)?0.0f:r;
-        g=(g<0.0f)?0.0f:g;
-        b=(b<0.0f)?0.0f:b;
-
-        // highlight correction, treating all colors the same
+        // clipping to range [0,1]
         // providing color correct conversion.
-        float factor = sqrt(r*r+g*g+b*b);
-        factor = hlcurve(post_scale, comp, factor);
-        r=r*factor;
-        g=g*factor;
-        b=b*factor;
-#endif
-      // clipping to range [0,1]
+        // values outside [0,1] usually mess up other filters anyway.
         ClipFull(r,g,b);
 
-#if 0
-        // apply contrast
-        // range will remain [0,1]
-        if ((contrast >0.0f) && (inv==0))
-          {
-            float l = r*Pr+g*Pg+b*Pb;//sqrt(r*r*Pr+g*g*Pg+b*b*Pb);
-            l=(l>0.0)? Contrast(l)/l:1.0f;
-            r= not_contrast*r + contrast * l*r ;
-            g= not_contrast*g + contrast * l*g ;
-            b= not_contrast*b + contrast * l*b ;
-          }
-        if ((contrast >0.0f) && inv)
-          {
-            float l = r*Pr+g*Pg+b*Pb;//sqrt(r*r*Pr+g*g*Pg+b*b*Pb);
-            l=(l>0.0)? invcontrast(l)/l:1.0f;
-            r= not_contrast*r + contrast * l*r ;
-            g= not_contrast*g + contrast * l*g ;
-            b= not_contrast*b + contrast * l*b ;
-
-            //r= not_contrast*r + contrast * invcontrast(r) ;
-            //g= not_contrast*g + contrast * invcontrast(g) ;
-            //b= not_contrast*b + contrast * invcontrast(b) ;
-          }
-#endif
-#if 0
-        // apply contrast
-        // range will remain [0,1]
-        if ((contrast >0.0f) && (inv==0))
-          {
-            float l = r*Pr+g*Pg+b*Pb;//sqrt(r*r*Pr+g*g*Pg+b*b*Pb);
-            l=(l>0.0)? Contrast(l)/l:1.0f;
-            r= not_contrast*r + contrast * l*r ;
-            g= not_contrast*g + contrast * l*g ;
-            b= not_contrast*b + contrast * l*b ;
-          }
-        if ((contrast >0.0f) && inv)
-          {
-            float l = r*Pr+g*Pg+b*Pb;//sqrt(r*r*Pr+g*g*Pg+b*b*Pb);
-            l=(l>0.0)? invcontrast(l)/l:1.0f;
-            r= not_contrast*r + contrast * l*r ;
-            g= not_contrast*g + contrast * l*g ;
-            b= not_contrast*b + contrast * l*b ;
-
-            //r= not_contrast*r + contrast * invcontrast(r) ;
-            //g= not_contrast*g + contrast * invcontrast(g) ;
-            //b= not_contrast*b + contrast * invcontrast(b) ;
-          }
-#endif
-#if 0
-        // apply contrast
-        if ((contrast >0.0f) && (inv==0))
-          {
-            r= not_contrast*r + contrast * Contrast(r) ;
-            g= not_contrast*g + contrast * Contrast(g) ;
-            b= not_contrast*b + contrast * Contrast(b) ;
-          }
-        if ((contrast >0.0f) && inv)
-          {
-            r= not_contrast*r + contrast * invcontrast(r) ;
-            g= not_contrast*g + contrast * invcontrast(g) ;
-            b= not_contrast*b + contrast * invcontrast(b) ;
-          }
-#endif
-#if 0
-        // apply contrast
-        if ((contrast >0.0f) && (inv==0))
-          {
-            r= not_contrast*r + contrast * Contrast(r) ;
-            g= not_contrast*g + contrast * Contrast(g) ;
-            b= not_contrast*b + contrast * Contrast(b) ;
-          }
-        if ((contrast >0.0f) && inv)
-          {
-            r= not_contrast*r + contrast * invcontrast(r) ;
-            g= not_contrast*g + contrast * invcontrast(g) ;
-            b= not_contrast*b + contrast * invcontrast(b) ;
-          }
-#endif
+		// apply matrix. This will properly implemet camera and color temperature adaptation.
         float nr = mat[0][0] * r + mat[0][1] * g + mat[0][2] * b -black;
         float ng = mat[1][0] * r + mat[1][1] * g + mat[1][2] * b -black;
         float nb = mat[2][0] * r + mat[2][1] * g + mat[2][2] * b -black;
-        // highlight correction, treating all colors the same
-        // providing color correct conversion.
 
+        ClipFull(nr,ng,nb);
+
+#if 0
         // clip bottom
+        // 
         nr=(nr<0.0f)?0.0f:nr;
         ng=(ng<0.0f)?0.0f:ng;
         nb=(nb<0.0f)?0.0f:nb;
-
-
-#if 0
-        // highlight
-        //float factor = sqrt(nr*nr+ng*ng+nb*nb)*post_scale;
-        float factor = sqrt(nr*nr*Pr+ng*ng*Pg+nb*nb*Pb)*post_scale;
-        factor = hlcurve(post_scale, comp, factor)*post_scale;
-        nr=nr*factor;//+bright;
-        ng=ng*factor;//+bright;
-        nb=nb*factor;//+bright;
 #endif
+
         //
         if (end_scale!=0.0)
           {
@@ -321,136 +228,8 @@ void color_correct(HDRImage & dest,improps &props)
 
         ClipFull(nr,ng,nb);
         Contrast(nr,ng,nb,contrast,inv,not_contrast);
-#if 0
-        // apply contrast
-        // range will remain [0,1]
-        if ((contrast >0.0f) && (inv==0))
-          {
-            float l = nr*Pr+ng*Pg+nb*Pb;//sqrt(r*r*Pr+g*g*Pg+b*b*Pb);
-            l=(l>0.0)? Contrast(l)/l:1.0f;
-            r= not_contrast*r + contrast * l*r ;
-            g= not_contrast*g + contrast * l*g ;
-            b= not_contrast*b + contrast * l*b ;
-          }
-        if ((contrast >0.0f) && inv)
-          {
-            float l = r*Pr+g*Pg+b*Pb;//sqrt(r*r*Pr+g*g*Pg+b*b*Pb);
-            l=(l>0.0)? invcontrast(l)/l:1.0f;
-            r= not_contrast*r + contrast * l*r ;
-            g= not_contrast*g + contrast * l*g ;
-            b= not_contrast*b + contrast * l*b ;
-
-            //r= not_contrast*r + contrast * invcontrast(r) ;
-            //g= not_contrast*g + contrast * invcontrast(g) ;
-            //b= not_contrast*b + contrast * invcontrast(b) ;
-          }
-#endif
-#if 0
-        // apply contrast
-        // range will remain [0,1]
-        if ((contrast >0.0f) && (inv==0))
-          {
-            float l = r*Pr+g*Pg+b*Pb;//sqrt(r*r*Pr+g*g*Pg+b*b*Pb);
-            l=(l>0.0)? Contrast(l)/l:1.0f;
-            r= not_contrast*r + contrast * l*r ;
-            g= not_contrast*g + contrast * l*g ;
-            b= not_contrast*b + contrast * l*b ;
-          }
-        if ((contrast >0.0f) && inv)
-          {
-            float l = r*Pr+g*Pg+b*Pb;//sqrt(r*r*Pr+g*g*Pg+b*b*Pb);
-            l=(l>0.0)? invcontrast(l)/l:1.0f;
-            r= not_contrast*r + contrast * l*r ;
-            g= not_contrast*g + contrast * l*g ;
-            b= not_contrast*b + contrast * l*b ;
-
-            //r= not_contrast*r + contrast * invcontrast(r) ;
-            //g= not_contrast*g + contrast * invcontrast(g) ;
-            //b= not_contrast*b + contrast * invcontrast(b) ;
-          }
-#endif
-#if 0
-        // apply contrast
-        if ((contrast >0.0f) && (inv==0))
-          {
-            nr= not_contrast*nr + contrast * Contrast(nr) ;
-            ng= not_contrast*ng + contrast * Contrast(ng) ;
-            nb= not_contrast*nb + contrast * Contrast(nb) ;
-          }
-        if ((contrast >0.0f) && inv)
-          {
-            nr= not_contrast*nr + contrast * invcontrast(nr) ;
-            ng= not_contrast*ng + contrast * invcontrast(ng) ;
-            nb= not_contrast*nb + contrast * invcontrast(nb) ;
-          }
-#endif
-
-#if 0
-        // apply contrast
-        if ((contrast >0.0f) && (inv==0))
-          {
-            nr= not_contrast*nr + contrast * Contrast(nr) ;
-            ng= not_contrast*ng + contrast * Contrast(ng) ;
-            nb= not_contrast*nb + contrast * Contrast(nb) ;
-          }
-        if ((contrast >0.0f) && inv)
-          {
-            nr= not_contrast*nr + contrast * invcontrast(nr) ;
-            ng= not_contrast*ng + contrast * invcontrast(ng) ;
-            nb= not_contrast*nb + contrast * invcontrast(nb) ;
-          }
-#endif
-#if 0
-        // clipping to range [0,1]
-                nr = (nr > 1.0f) ? 1.0f : ((nr < 0.0f) ? 0.0f:nr);
-                ng = (ng > 1.0f) ? 1.0f : ((ng < 0.0f) ? 0.0f:ng);
-                nb = (nb > 1.0f) ? 1.0f : ((nb < 0.0f) ? 0.0f:nb);
-#endif
-#if 0
-        // apply contrast
-        // range will remain [0,1]
-        if ((contrast >0.0f) && (inv==0))
-          {
-            float l = sqrt(nr*nr*Pr+ng*ng*Pg+nb*nb*Pb);//sqrt(nr*nr+ng*ng+nb*nb);
-            l=(l>0.0)? Contrast(l)/l:1.0f;
-            nr= not_contrast*nr + contrast * l*nr ;
-            ng= not_contrast*ng + contrast * l*ng ;
-            nb= not_contrast*nb + contrast * l*nb ;
-          }
-        if ((contrast >0.0f) && inv)
-          {
-            float l = sqrt(nr*nr*Pr+ng*ng*Pg+nb*nb*Pb);//sqrt(nr*nr+ng*ng+nb*nb);
-            l=(l>0.0)? invcontrast(l)/l:1.0f;
-            nr= not_contrast*nr + contrast * l*nr ;
-            ng= not_contrast*ng + contrast * l*ng ;
-            nb= not_contrast*nb + contrast * l*nb ;
-
-            //r= not_contrast*r + contrast * invcontrast(r) ;
-            //g= not_contrast*g + contrast * invcontrast(g) ;
-            //b= not_contrast*b + contrast * invcontrast(b) ;
-          }
-#endif
-#if 0
-        // apply contrast
-        if ((contrast >0.0f) && (inv==0))
-          {
-            nr= not_contrast*nr + contrast * Contrast(nr) ;
-            ng= not_contrast*ng + contrast * Contrast(ng) ;
-            nb= not_contrast*nb + contrast * Contrast(nb) ;
-          }
-        if ((contrast >0.0f) && inv)
-          {
-            nr= not_contrast*nr + contrast * invcontrast(nr) ;
-            ng= not_contrast*ng + contrast * invcontrast(ng) ;
-            nb= not_contrast*nb + contrast * invcontrast(nb) ;
-          }
-#endif
-#if 0
-        nr=nr*hlcurve(post_scale, comp, nr);
-        ng=ng*hlcurve(post_scale, comp, ng);
-        nb=nb*hlcurve(post_scale, comp, nb);
-#endif
-
+        
+        // write out resulting color.
         dest[y][x].r = nr;
         dest[y][x].g = ng;
         dest[y][x].b = nb;
@@ -460,4 +239,4 @@ static int enabled(improps & props)
 {
   return 1; // always enabled due to color matrix conversion
 }
-ADD_FILTER( color_correct, HDRim , 2)
+ADD_FILTER( color_correct, HDRim , 0)

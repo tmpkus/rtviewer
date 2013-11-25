@@ -4,7 +4,7 @@
 
 #-include ../makefile.init
 
-CC_OPTIMIZE := -O3 -fomit-frame-pointer -fopenmp -march=native -mtune=native -ffast-math -msse -mrecip -mfpmath=sse -mssse3 -Wall -c -fmessage-length=0
+CC_OPTIMIZE := -O3 -fomit-frame-pointer -fopenmp -march=native -mtune=native -ffast-math -msse -mrecip -mfpmath=sse -mssse3 -Wall -c -fmessage-length=0 -flto
 #CC_OPTIMIZE := -g -O1 -fopenmp -ffast-math -c -fmessage-length=0 
 RM := rm -rf
 
@@ -48,7 +48,7 @@ all: rtviewer plugins
 rtviewer: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -g -rdynamic -o "rtviewer" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -O3 -flto -rdynamic -o "rtviewer" $(OBJS) $(USER_OBJS) $(LIBS)
 	mkdir -p ~/bin
 	cp rtviewer ~/bin/view_raw
 	@echo 'Finished building target: $@'

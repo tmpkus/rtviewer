@@ -20,32 +20,9 @@
 #include <iostream>
 using namespace std;
 
-void apply_filters(HDRImage & im, improps & props, int max)
+
+void apply_one(LabImage &L,HDRImage&im,improps & props, module * list,image_type & cur)
 {
-  image_type cur = HDRim;
-  LabImage L(im.xsize(),im.ysize());
-  L.moveto(0,0);
-
-  /* -- HSV is broken , needs fixing --
-  HSVImage H;//(im.xsize(),im.ysize());
-  H.moveto(0,0);
-  */
-
-  //list_filters();
-  module * list = get_filters();
-
-  while (list && list->rank<=max && props.early)
-    {
-
-      // convert current type to desired type
-      // if necessary
-
-      // while converting we don't use '<<=' but '='
-      // which ensures we can resize or rotate the original too.
-
-      // HSV support is broken so we comment it
-
-      // cout << "adapt imagetype" << endl;
       if (list->enabled(props))
         {
           if (cur != list->type)
@@ -123,6 +100,41 @@ void apply_filters(HDRImage & im, improps & props, int max)
               break;
             }
         }
+	}
+void apply_filters(HDRImage & im, improps & props, int max)
+{
+  image_type cur = HDRim;
+  LabImage L(im.xsize(),im.ysize());
+  L.moveto(0,0);
+
+  /* -- HSV is broken , needs fixing --
+  HSVImage H;//(im.xsize(),im.ysize());
+  H.moveto(0,0);
+  */
+
+  //list_filters();
+  module * list = get_filters();
+  module * pre = list;
+  while (list && list->rank <1) list=list->next;
+      while(pre && pre->rank <1 )
+  {
+	  apply_one(L,im,props,pre,cur);
+      pre = pre->next;
+  }
+
+  while (list && list->rank<=max && props.early)
+    {
+
+      // convert current type to desired type
+      // if necessary
+
+      // while converting we don't use '<<=' but '='
+      // which ensures we can resize or rotate the original too.
+
+      // HSV support is broken so we comment it
+
+      // cout << "adapt imagetype" << endl;
+      apply_one(L,im,props,list,cur);
       list = list->next;
     }
   // cout << "convert back imagetype" << endl;

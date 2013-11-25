@@ -258,6 +258,19 @@ public:
     return 0;
   }
 
+  int mainloop(int dt)
+  {
+	  if (MyRAW->pp3_found && MyRAW->props.update())
+      {
+        //refresh=1;
+        //cout << "pp3 file has changed" << endl;
+        MyRAW->props.read(NULL);
+
+        moved=START_MOVE;
+        //refresh=0;
+      }
+      return 0;
+  }
   desktop(int argc, char**argv, int nwidth, int nheight) :
     viewport(argv[1], nwidth, nheight)
   {

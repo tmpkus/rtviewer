@@ -187,7 +187,7 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
         float (*rbm);
 
         // nyquist texture flag 1=nyquist, 0=not nyquist
-        int (*nyquist);
+        char (*nyquist);
 
         // assign working space
         buffer = new float[33 * TS * TS];
@@ -223,7 +223,7 @@ void fast_demosaic::amaze_demosaic_RT(HDRImage & dest,improps &props)
         rbp = (float(*)) (buffer + 30 * TS * TS);
         rbm = (float(*)) (buffer + 31 * TS * TS);
 
-        nyquist = (int(*)) (buffer + 32 * TS * TS);
+        nyquist = (char(*)) (buffer + 32 * TS * TS);
 
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

@@ -41,7 +41,8 @@ static float torgb[3][3] = { { 3.2404542, -1.5371385, -0.4985314 }, {-0.9692660,
 
 static const float C_Gamma = 1.0f / 2.2f;
 static const float C_IGamma = 2.2f;
-
+//static const float C_Gamma = 1.0f / 1.8f;
+//static const float C_IGamma = 1.8f;
 float igamma_fn(float index)
 {
   return pow(index, C_IGamma);

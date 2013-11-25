@@ -342,7 +342,6 @@ void viewport::run(void)
               mytime = clock();
               dt = 0 - dt;
             }
-          mainloop(dt);
           if (render(dt))
             update();// render should return 1 if update needed
         }
