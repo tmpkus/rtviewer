@@ -215,11 +215,11 @@ static void inline RGB_reduce(array2D<float> &logIref,HDRImage & lref,HDRImage &
   L.r = 0.0f;
   L.g = 0.0f;
   L.b = 0.0f;
-  double wgt = 0.0f;
+  double wgtR = 0.0f,wgtG = 0.0f,wgtB = 0.0f;
   float rad=radius*radius;
   float rd=radius;
-  double rscale = 6.0*(double)chroma*(double)chroma;
-  double coldiff = 0.5/(0.1+(double)chroma*(double)chroma);
+  double rscale = 0.6*(double)chroma*(double)chroma;
+  double coldiff = 2.5/(0.1+(double)chroma*(double)chroma);
   for (int j = sj; j < ej; j++)
     for (int i = si; i < ei; i++)
       {
@@ -237,19 +237,29 @@ static void inline RGB_reduce(array2D<float> &logIref,HDRImage & lref,HDRImage &
 	    double rdiff = lL.r-sL.r;			// log(cR/sR) == log(cR)-log(sR)
 	    double gdiff = lL.g-sL.g;			// log(cG/sG) == log(cG)-log(sG)
 	    double bdiff = lL.b-sL.b;			// log(cB/sB) == log(cB)-log(sB)
-	    double diff = tI + coldiff*(rdiff*rdiff+gdiff*gdiff+bdiff*bdiff);
-	    double l = fact*fact/(fact + diff);
+	    double diff = tI + coldiff*(rdiff*rdiff);//+gdiff*gdiff+bdiff*bdiff);
+	    double l = fact/(fact + diff);
 
-	    wgt +=l;
+	    wgtR +=l;
 	    R += (double)cL.r * l;
+	    
+	    diff = tI + coldiff*(gdiff*gdiff);//+bdiff*bdiff);
+	    l = fact/(fact + diff);
+	    wgtG +=l;
+	    
 	    G += (double)cL.g * l;
+	    
+	    diff = tI + coldiff*(bdiff*bdiff);
+	    l = fact/(fact + diff);
+	    wgtB +=l;
+	    
 	    B += (double)cL.b * l;
 	    }
       }
 
-	R = R / wgt ;
-	G = G / wgt ;
-	B = B / wgt ;
+	R = R / wgtR ;
+	G = G / wgtG ;
+	B = B / wgtB ;
 	L.r=R;
 	L.g=G;
 	L.b=B;
@@ -427,8 +437,9 @@ static void RGB_denoise(HDRImage & src, improps & props)
   const float gam_in = props.pp3["Directional Pyramid Denoising"]["Gamma"];
   int radius = props.pp3["Directional Pyramid Denoising"]["Radius"];
   mygamma = gam_in;
-  radius = (radius<=0)?6:radius;
+  radius = (radius<=0)?10:radius;
   radius=radius/props.scale;
+  if (radius<2) return;
   wdt = 0.01f;
   offset= gam_in*0.02f;
   if (((luma == 0.0) && (chroma == 0.0))||(radius==0))
@@ -476,8 +487,8 @@ static void RGB_denoise(HDRImage & src, improps & props)
     {
 	array2D<float> tlogI(W,H),t2logI(W,H);
 	array2D<float> intens2(W,H);// define within if to ensure memory gets released after operation
-	Bilateral_float_Luma( logI,logI,tlogI, intens1, intens1, intens2 ,radius, lumaw);
-	Bilateral_float_Luma( logI,tlogI,logI, intens1, intens2, intens1 ,radius, lumaw);
+	Bilateral_float_Luma( logI,logI,tlogI, intens1, intens1, intens2 ,radius/2, lumaw);
+	Bilateral_float_Luma( logI,tlogI,logI, intens1, intens2, intens1 ,radius/2, lumaw);
     }
 
     if (chromaw>0.0f)
