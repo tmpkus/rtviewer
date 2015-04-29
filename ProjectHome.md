@@ -1,0 +1,1 @@
+Viewer of raw photo files that uses RawTherapee pp3 files during the conversion process. The viewer is done as a technology preview for a rewrite of RawTherapee.
